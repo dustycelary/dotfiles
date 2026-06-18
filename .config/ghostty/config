@@ -1,0 +1,138 @@
+# font-family = Iosevka Custom
+font-family = Hack Nerd Font Mono
+font-size = 13
+font-thicken = true
+selection-background = #13c2c2
+selection-foreground = #000000
+
+# window-decoration = false
+
+# theme = GitHub Dark Colorblind
+# theme = Github Light High Contrast 
+
+# theme = Catppuccin Latte
+# theme = Gruvbox Dark
+theme = Carbonfox
+# theme = Kanagawa Wave
+# background = #1d2021
+# foreground = #d4be98
+# selection-background = ffffff
+# cursor-color = ffcc00
+# selection-background = 4C566A
+# cursor-color = f1e962
+# cursor-color = ffffff
+
+# Gruvbox Material Hard Dark palette
+# palette = 0=#1d2021
+# palette = 1=#ea6962
+# palette = 2=#a9b665
+# palette = 3=#d8a657
+# palette = 4=#7daea3
+# palette = 5=#d3869b
+# palette = 6=#89b482
+# palette = 7=#d4be98
+# palette = 8=#32302f
+# palette = 9=#ea6962
+# palette = 10=#a9b665
+# palette = 11=#d8a657
+# palette = 12=#7daea3
+# palette = 13=#d3869b
+# palette = 14=#89b482
+# palette = 15=#d4be98
+
+# background-opacity = 0.95
+background-blur-radius = 20
+window-colorspace = srgb
+
+
+#
+# # Scrollback
+scrollback-limit = 50000
+
+shell-integration = zsh
+shell-integration-features = no-cursor,sudo,no-title
+cursor-style = block
+adjust-cell-height = 15%
+# adjust-cell-height = 35% # ORIGINAL ONE 
+adjust-font-baseline = -1
+#
+
+mouse-hide-while-typing = true
+# mouse-scroll-multiplier = 2
+
+# STYLE 
+
+window-width = 80
+window-height = 24
+window-padding-x = 10
+window-padding-y = 10
+window-padding-balance = true
+window-save-state = always
+macos-titlebar-style=transparent
+macos-titlebar-proxy-icon=visible
+
+
+macos-icon=holographic 
+# cursor-opacity=0.9
+tab-inherit-working-directory=true
+# window-theme = ghostty
+
+
+# keybindings
+
+keybind = cmd+s>r=reload_config
+keybind = cmd+s>x=close_surface
+
+keybind = cmd+s>n=new_window
+
+# tabs
+keybind = cmd+s>c=new_tab
+keybind = cmd+s>shift+l=next_tab
+keybind = cmd+s>shift+h=previous_tab
+keybind = cmd+s>comma=move_tab:-1
+keybind = cmd+s>period=move_tab:1
+
+# quick tab switch
+keybind = cmd+s>1=goto_tab:1
+keybind = cmd+s>2=goto_tab:2
+keybind = cmd+s>3=goto_tab:3
+keybind = cmd+s>4=goto_tab:4
+keybind = cmd+s>5=goto_tab:5
+keybind = cmd+s>6=goto_tab:6
+keybind = cmd+s>7=goto_tab:7
+keybind = cmd+s>8=goto_tab:8
+keybind = cmd+s>9=goto_tab:9
+
+# split
+keybind = cmd+s>\=new_split:right
+keybind = cmd+s>-=new_split:down
+
+keybind = cmd+s>j=goto_split:bottom
+keybind = cmd+s>k=goto_split:top
+keybind = cmd+s>h=goto_split:left
+keybind = cmd+s>l=goto_split:right
+
+keybind = cmd+s>z=toggle_split_zoom
+keybind = cmd+s>f=toggle_window_float_on_top
+
+keybind = cmd+s>e=equalize_splits
+
+# other
+copy-on-select = clipboard
+clipboard-read = allow 
+clipboard-write = allow 
+
+
+
+# personal
+keybind = cmd+up=unbind
+keybind = cmd+down=unbind
+keybind = cmd+left=unbind
+keybind = cmd+right=unbind
+keybind = cmd+up=jump_to_prompt:-1
+keybind = cmd+down=jump_to_prompt:1
+
+
+keybind = global:cmd+shift+`=toggle_quick_terminal
+quick-terminal-position=bottom
+keybind = cmd+s>w=write_scrollback_file:open

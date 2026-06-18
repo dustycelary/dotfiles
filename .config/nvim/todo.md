@@ -1,0 +1,2 @@
+- [x] add the bst commadns to a harpoon storage so i can quickly access them.
+- [ ] add oil to nvim config

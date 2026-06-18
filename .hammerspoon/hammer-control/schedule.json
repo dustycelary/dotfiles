@@ -1,0 +1,53 @@
+{
+  "sunday": [
+    {
+      "start": "00:01",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    },
+
+  ],
+  "monday": [
+    {
+      "start": "00:01",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    },
+  ],
+  "tuesday": [
+    {
+      "start": "00:01",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    },
+  ],
+  "wednesday": [
+    {
+      "start": "00:01",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    }
+  ],
+  "thursday": [
+    {
+      "start": "00:01",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    },
+  ],
+  "friday": [
+    {
+      "start": "00:00",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    },
+  ],
+  "saturday": [
+    {
+      "start": "00:01",
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Desktop/myblock.selfcontrol"
+    },
+
+  ]
+}
