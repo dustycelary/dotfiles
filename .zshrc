@@ -115,7 +115,10 @@ export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git --exclude venv'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
-export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --color=always {} 2>/dev/null || ls {}'"
+# Alt-J cd widget: zoxide frecency list first, then fd for undiscovered dirs,
+# deduped so frecency-ranked entries win when both sources emit the same path.
+export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}' --header 'Alt-J › cd (zoxide frecency + fd discovery)'"
 
 # Ghostty shell integration — only load when directly inside Ghostty (not tmux).
 # GHOSTTY_RESOURCES_DIR is inherited by tmux child processes, so we must also
@@ -265,6 +268,7 @@ rga-fzf() {
 # 9. Keybindings & ZLE widgets
 # -----------------------------------------------------------------------------
 bindkey -r '\el'   # free up Alt-l
+bindkey -r '\ec'   # free Alt-C (was fzf cd-widget; remapped to Alt-J below)
 
 # Ctrl-V Ctrl-E : open the current command line in $EDITOR for heavy editing
 autoload -Uz edit-command-line
@@ -282,6 +286,9 @@ bindkey '^y^p' copy-pwd
 # Ctrl-G : Interactive in-file search using rga and fzf (works on PDF/DOCX/OCR/text)
 zle -N rga-fzf
 bindkey '^g' rga-fzf
+
+# Alt-J : fzf cd-widget (frecency-ranked directory jump), remapped from Alt-C
+bindkey '\ej' fzf-cd-widget
 
 # Prefix history search: type `git` then up-arrow to cycle only commands
 # starting with `git`. Uncomment to enable (can fight autosuggestions).

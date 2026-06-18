@@ -1,7 +1,7 @@
 -- nvim-cmp — completion engine.
 -- Sources: LSP, LuaSnip snippets, path, buffer words. lazydev takes priority for lua files.
 -- Ghost text shows the top suggestion inline as you type.
--- Non-obvious: <C-y> or <CR> confirms; <C-e> aborts; <Tab>/<S-Tab> cycle or jump snippet stops.
+-- Non-obvious: <C-y> or <Tab> confirms; <C-e> aborts; <C-n>/<C-p> cycle items; <Tab>/<S-Tab> jump snippet stops.
 -- Custom sort order: exact match → score → recently used → locality → kind.
 -- Formatting shows kind icon + kind name instead of source label.
 return {
@@ -62,10 +62,10 @@ return {
 				["<C-Space>"] = cmp.mapping.complete(),
 				["<C-e>"]    = cmp.mapping.abort(),
 				["<C-y>"]    = cmp.mapping.confirm({ select = true }),
-				["<CR>"]     = cmp.mapping.confirm({ select = true }),
+				["<CR>"]     = cmp.mapping(function(fallback) fallback() end, { "i", "s" }),
 				["<Tab>"] = cmp.mapping(function(fallback)
 					if cmp.visible() then
-						cmp.select_next_item()
+						cmp.confirm({ select = true })
 					elseif luasnip.expand_or_jumpable() then
 						luasnip.expand_or_jump()
 					else

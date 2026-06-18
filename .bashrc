@@ -18,6 +18,21 @@
 # fi
 
 # -----------------------------------------------------------------------------
+# ble.sh — Bash syntax highlighting + autosuggestions
+#           (like zsh-syntax-highlighting + zsh-autosuggestions)
+#           Install: brew install blesh
+# -----------------------------------------------------------------------------
+if [[ $- == *i* ]]; then
+  _blesh_path="$(brew --prefix 2>/dev/null)/share/blesh/ble.sh"
+  if [[ -f "$_blesh_path" ]]; then
+    source "$_blesh_path" --noattach
+  elif [[ -f ~/.local/share/blesh/ble.sh ]]; then
+    source ~/.local/share/blesh/ble.sh --noattach
+  fi
+  unset _blesh_path
+fi
+
+# -----------------------------------------------------------------------------
 
 # pipx / user-local binaries
 export PATH="$HOME/.local/bin:$PATH"
@@ -29,6 +44,9 @@ export VISUAL='nvim'
 # export LANG=en_US.UTF-8                   # uncomment if your locale is unset
 
 export PYTHONDONTWRITEBYTECODE=1
+
+# bat as man pager — colorized manual pages (like zsh colored-man-pages plugin)
+command -v bat >/dev/null && export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # -----------------------------------------------------------------------------
 # 3. Version managers  (all sit after Homebrew so PATH is already set up)
@@ -118,7 +136,10 @@ export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git --exclude venv'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
-export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --color=always {} 2>/dev/null || ls {}'"
+# Alt-J cd widget: zoxide frecency list first, then fd for undiscovered dirs,
+# deduped so frecency-ranked entries win when both sources emit the same path.
+export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}' --header 'Alt-J › cd (zoxide frecency + fd discovery)'"
 
 # Ghostty shell integration — only load when directly inside Ghostty (not tmux).
 # GHOSTTY_RESOURCES_DIR is inherited by tmux child processes, so we must also
@@ -153,6 +174,10 @@ command -v eza  >/dev/null && alias ls='eza --group-directories-first --icons' \
                            && alias ll='eza -la --group-directories-first --icons --git' \
                            && alias lt='eza --tree --level=2 --icons'
 command -v bat  >/dev/null && alias cat='bat --paging=never'
+
+# Colorize common output
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
 
 # -----------------------------------------------------------------------------
 # 8. Functions
@@ -274,6 +299,7 @@ rga-fzf() {
 # 9. Keybindings & Readline bindings
 # -----------------------------------------------------------------------------
 bind -r '\el' 2>/dev/null || true   # free up Alt-l in Readline
+bind -r '\ec' 2>/dev/null || true   # free Alt-C (was fzf cd-widget; remapped to Alt-J below)
 
 # Ctrl-V Ctrl-E : open the current command line in $EDITOR for heavy editing
 bind '"\C-v\C-e": edit-and-execute-command' 2>/dev/null || true
@@ -288,10 +314,21 @@ bind -x '"\C-y\C-p": copy-pwd' 2>/dev/null || true
 # Ctrl-G : Interactive in-file search using rga and fzf (works on PDF/DOCX/OCR/text)
 bind -x '"\C-g": rga-fzf' 2>/dev/null || true
 
+# Alt-J : fzf cd-widget (frecency-ranked directory jump), remapped from Alt-C
+bind -x '"\ej": __fzf_cd__' 2>/dev/null || true
+
 # -----------------------------------------------------------------------------
-# 10. Powerlevel10k user config — DISABLED (Zsh-specific)
+# 10. Prompt (PS1) — colored, git-aware  (replaces disabled Powerlevel10k)
 # -----------------------------------------------------------------------------
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+__bash_git_branch() {
+  git rev-parse --is-inside-work-tree &>/dev/null || return
+  local branch
+  branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+  [[ -n "$branch" ]] && printf ' (%s)' "$branch"
+}
+
+# user@host  ~/path  (branch)  $
+PS1='\[\e[38;5;39m\]\u\[\e[0m\]@\[\e[38;5;208m\]\h\[\e[0m\] \[\e[38;5;82m\]\w\[\e[0m\]\[\e[38;5;220m\]$(__bash_git_branch)\[\e[0m\] \$ '
 
 
 # =============================================================================
@@ -367,3 +404,6 @@ bind -x '"\C-g": rga-fzf' 2>/dev/null || true
 # }
 # # In Bash, we hook these into PROMPT_COMMAND instead of using add-zsh-hook precmd:
 # # PROMPT_COMMAND="_ghostty_precmd_keep_bottom_rows; _tmux_precmd_keep_bottom_rows; $PROMPT_COMMAND"
+
+# ble.sh attach — must be the last line
+[[ ${BLE_VERSION-} ]] && ble-attach

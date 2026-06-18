@@ -98,7 +98,8 @@ return {
 						actions = {
 							["default"] = function(selected)
 								if selected and selected[1] then
-									vim.cmd("edit " .. vim.fn.fnameescape(selected[1]))
+									vim.cmd("tcd " .. vim.fn.fnameescape(selected[1]))
+									vim.notify("cwd: " .. selected[1], vim.log.levels.INFO)
 								end
 							end,
 						},
