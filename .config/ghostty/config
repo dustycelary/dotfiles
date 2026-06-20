@@ -124,6 +124,8 @@ clipboard-write = allow
 
 
 
+macos-option-as-alt = true
+
 # personal
 keybind = cmd+up=unbind
 keybind = cmd+down=unbind

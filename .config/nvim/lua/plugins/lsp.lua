@@ -183,12 +183,6 @@ return {
 					)
 					vim.keymap.set(
 						"n",
-						"<leader>qq",
-						vim.diagnostic.setqflist,
-						{ buffer = args.buf, desc = "Diagnostics → quickfix" }
-					)
-					vim.keymap.set(
-						"n",
 						"<leader>cl",
 						vim.diagnostic.setloclist,
 						{ buffer = args.buf, desc = "Diagnostics → loclist" }

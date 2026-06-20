@@ -4,11 +4,12 @@ hs.window.animationDuration = 0
 
 require("hammer-control.init")
 
--- agy monitoring
--- Create a new space in the macOS menu bar
+-- agy & antigravity monitoring
+-- Create new spaces in the macOS menu bar
 agyMenu = hs.menubar.new()
+appMenu = hs.menubar.new()
 
-local function updateAgyStatus()
+local function updateStatus()
 	-- 1. Ask the system directly for all processes (CPU and Command line)
 	-- Using the absolute path /bin/ps guarantees Hammerspoon can find it
 	local output = hs.execute("/bin/ps x -o %cpu,command")
@@ -16,40 +17,58 @@ local function updateAgyStatus()
 	-- Safety check: if ps fails entirely
 	if not output then
 		agyMenu:setTitle("🤖 ERR")
+		appMenu:setTitle("🛸 ERR")
 		return
 	end
 
-	local totalCpu = 0
-	local isRunning = false
+	local agyCpu = 0
+	local agyRunning = false
+	
+	local appCpu = 0
+	local appRunning = false
 
 	-- 2. Loop through every single line of the output
 	for line in string.gmatch(output, "[^\r\n]+") do
-		-- 3. Look for the word "agy" in the command, but ignore our own ps command
-		if string.find(line, "agy") and not string.find(line, "ps x") then
-			-- Extract the number at the very start of the line (the CPU percentage)
+		if not string.find(line, "ps x") then
 			local cpuStr = string.match(line, "^%s*([%d%.]+)")
-
 			if cpuStr then
-				totalCpu = totalCpu + tonumber(cpuStr)
-				isRunning = true
+				local cpu = tonumber(cpuStr)
+				-- Check for CLI
+				if string.find(line, "agy") then
+					agyCpu = agyCpu + cpu
+					agyRunning = true
+				end
+				-- Check for App
+				if string.find(string.lower(line), "antigravity") then
+					appCpu = appCpu + cpu
+					appRunning = true
+				end
 			end
 		end
 	end
 
-	-- 4. Update the menu bar
-	if not isRunning then
+	-- 3. Update the menu bars
+	-- CLI
+	if not agyRunning then
 		agyMenu:setTitle("🤖 OFF")
-	elseif totalCpu > 10.0 then
-		-- High CPU: Show warning
-		agyMenu:setTitle("🤖 ⚠ " .. string.format("%.1f", totalCpu) .. "%")
+	elseif agyCpu > 10.0 then
+		agyMenu:setTitle("🤖 ⚠ " .. string.format("%.1f", agyCpu) .. "%")
 	else
-		-- Running but idle
 		agyMenu:setTitle("🤖 IDLE")
+	end
+
+	-- App
+	if not appRunning then
+		appMenu:setTitle("🛸 OFF")
+	elseif appCpu > 10.0 then
+		appMenu:setTitle("🛸 ⚠ " .. string.format("%.1f", appCpu) .. "%")
+	else
+		appMenu:setTitle("🛸 IDLE")
 	end
 end
 
 -- Run immediately on startup
-updateAgyStatus()
+updateStatus()
 
 -- Check every 3 seconds
-agyTimer = hs.timer.doEvery(3, updateAgyStatus)
+statusTimer = hs.timer.doEvery(3, updateStatus)
