@@ -251,6 +251,14 @@ fi
 # =============================================================================
 # 7. Zsh Keybindings & Widget Registration
 # =============================================================================
+# Ctrl+Y Ctrl+P for copy-pwd
+copy-pwd-widget() {
+  copy-pwd
+  zle reset-prompt
+}
+zle -N copy-pwd-widget
+bindkey '^y^p' copy-pwd-widget
+
 # Ctrl+G for interactive rga content search
 rga-fzf-widget() {
   rga-fzf
