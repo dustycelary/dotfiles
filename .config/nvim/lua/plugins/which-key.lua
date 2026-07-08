@@ -114,6 +114,7 @@ return {
 			{ "<leader>s", group = "Search/Find" },
 			{ "<leader>u", group = "UI Toggles" },
 			{ "<leader>w", group = "Windows" },
+			{ "<leader>x", group = "Trouble/Diagnostics" },
 			-- Clean up 'g' command descriptions
 			{ "gb", desc = "Bookmarks (netrw)" },
 			{ "gd", desc = "Go to definition" },

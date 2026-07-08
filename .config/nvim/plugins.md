@@ -146,6 +146,22 @@ Shows vim marks (`a-z`, `A-Z`) as indicators in the sign column. No configuratio
 
 ---
 
+## hardtime.nvim
+Prevents bad habits by blocking the spamming of movement keys (like `h`, `j`, `k`, `l`), mouse wheel, etc.
+
+| Key | Action |
+|-----|--------|
+| `<leader>uh` | Toggle hardtime |
+
+| Command | Action |
+|---------|--------|
+| `:Hardtime toggle` | Toggle hardtime |
+| `:Hardtime enable` | Enable |
+| `:Hardtime disable` | Disable |
+| `:Hardtime report` | View habit warnings report |
+
+---
+
 ## harpoon2
 Quick-access bookmarks for up to 4 files per project. List is saved automatically on toggle (`save_on_toggle = true`).
 
@@ -225,6 +241,15 @@ Smooth animated scrolling for `<C-u>`, `<C-d>`, `<C-b>`, `<C-f>`, `<C-y>`, `<C-e
 
 ---
 
+## precognition.nvim
+Guides Neovim motions by showing inline hints for available movement options (like `w`, `b`, `e`, `$`, `0`, etc.).
+
+| Key | Action |
+|-----|--------|
+| `<leader>up` | Toggle precognition |
+
+---
+
 ## quick-scope
 Highlights the best `f`/`F`/`t`/`T` jump target on each line when you press those keys — underlines the first unique character per word so you can pick your target immediately. No configuration needed.
 
@@ -259,6 +284,20 @@ Highlights `TODO`, `FIXME`, `HACK`, `NOTE`, `WARN`, `PERF`, `TEST` comments with
 | `]t` | Next TODO comment (repeatable) |
 | `[t` | Previous TODO comment (repeatable) |
 | `<leader>st` | Search all TODOs (fzf) |
+
+---
+
+## trouble.nvim
+Pretty split panel list for showing diagnostics, LSP references, definitions, quickfix, and location lists.
+
+| Key | Action |
+|-----|--------|
+| `<leader>xx` | Toggle workspace diagnostics panel |
+| `<leader>xX` | Toggle buffer diagnostics panel |
+| `<leader>xs` | Toggle symbols outline panel |
+| `<leader>xl` | Toggle LSP definitions/references split |
+| `<leader>xq` | Toggle quickfix panel |
+| `<leader>xL` | Toggle location list panel |
 
 ---
 
@@ -339,5 +378,26 @@ Key group prefixes:
 | `<leader>s` | Search / Find |
 | `<leader>u` | UI Toggles |
 | `<leader>w` | Surrounds (sandwich) |
+| `<leader>x` | Trouble / Diagnostics |
 | `gr` | LSP / References |
 | `]` / `[` | Next / Prev |
+
+---
+
+## yanky.nvim
+Enhanced yank and paste experience. Maintains a history of yanks, highlights put/yank actions, preserves cursor position on yank, and allows cycling through history after pasting. Integrates with fzf-lua for a searchable yank history.
+
+| Key | Action |
+|-----|--------|
+| `<leader>sy` | Open yank history (fzf) |
+| `y` | Yank text (preserves cursor position) |
+| `p` / `P` | Put text after/before cursor |
+| `gp` / `gP` | Put text after/before selection |
+| `[y` / `]y` | Cycle backward/forward through yank history |
+| `<C-p>` / `<C-n>` | Cycle backward/forward through history (only after put) |
+| `[p` / `]p` | Put and indent left/right |
+| `[P` / `]P` | Put before and indent left/right |
+| `>p` / `<p` | Put and indent right/left |
+| `>P` / `<P` | Put before and indent right/left |
+| `=p` / `=P` | Put after/before applying filter |
+

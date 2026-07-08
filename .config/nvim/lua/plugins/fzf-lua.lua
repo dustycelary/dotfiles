@@ -30,6 +30,7 @@ return {
 				fzf_opts = { ["--scheme"] = "path" },
 			},
 		})
+		require("fzf-lua").register_ui_select()
 	end,
 	keys = {
 		{ "<leader>sf", "<cmd>FzfLua files<cr>", desc = "Fzf Files" },

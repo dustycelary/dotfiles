@@ -12,7 +12,7 @@ return {
 		floating_window = true,
 		floating_window_above_cur_line = true,
 		close_timeout = 4000,
-		toggle_key = "<C-s>",
+		toggle_key = "<M-t>",
 		toggle_key_flip_floatwin_setting = true,
 	},
 }

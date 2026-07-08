@@ -69,17 +69,17 @@ return {
 			local move = require("nvim-treesitter-textobjects.move")
 
 			local textobjects = {
-				{ "f", "@function.outer",    "@function.inner",    "function"            },
-				{ "c", "@class.outer",       "@class.inner",       "class"               },
-				{ "a", "@parameter.outer",   "@parameter.inner",   "argument"            },
-				{ "b", "@block.outer",       "@block.inner",       "block"               },
-				{ "I", "@conditional.outer", "@conditional.inner", "conditional"         },
-				{ "l", "@loop.outer",        "@loop.inner",        "loop"                },
-				{ "m", "@call.outer",        "@call.inner",        "call"                },
-				{ "K", "@comment.outer",     "@comment.inner",     "comment"             },
-				{ "=", "@assignment.outer",  "@assignment.inner",  "assignment", "assignment (rhs)" },
-				{ "R", "@return.outer",      "@return.inner",      "return"              },
-				{ "A", "@attribute.outer",   "@attribute.inner",   "attribute/decorator" },
+				{ "f", "@function.outer", "@function.inner", "function" },
+				{ "c", "@class.outer", "@class.inner", "class" },
+				{ "a", "@parameter.outer", "@parameter.inner", "argument" },
+				{ "b", "@block.outer", "@block.inner", "block" },
+				{ "I", "@conditional.outer", "@conditional.inner", "conditional" },
+				{ "l", "@loop.outer", "@loop.inner", "loop" },
+				{ "m", "@call.outer", "@call.inner", "call" },
+				{ "K", "@comment.outer", "@comment.inner", "comment" },
+				{ "=", "@assignment.outer", "@assignment.inner", "assignment", "assignment (rhs)" },
+				{ "R", "@return.outer", "@return.inner", "return" },
+				{ "A", "@attribute.outer", "@attribute.inner", "attribute/decorator" },
 			}
 			for _, obj in ipairs(textobjects) do
 				local key, outer, inner, name, iname = obj[1], obj[2], obj[3], obj[4], obj[5]
@@ -101,24 +101,36 @@ return {
 				while cur > 0 and vim.fn.getline(cur):match("^%s*$") do
 					cur = cur - 1
 				end
-				if cur == 0 then return end
+				if cur == 0 then
+					return
+				end
 				local ref = vim.fn.indent(cur)
 				local s, e = cur, cur
 				while s > 1 do
 					local prev = s - 1
-					if not vim.fn.getline(prev):match("^%s*$") and vim.fn.indent(prev) < ref then break end
+					if not vim.fn.getline(prev):match("^%s*$") and vim.fn.indent(prev) < ref then
+						break
+					end
 					s = prev
 				end
 				while e < total do
 					local nxt = e + 1
-					if not vim.fn.getline(nxt):match("^%s*$") and vim.fn.indent(nxt) < ref then break end
+					if not vim.fn.getline(nxt):match("^%s*$") and vim.fn.indent(nxt) < ref then
+						break
+					end
 					e = nxt
 				end
-				if not inner and s > 1 then s = s - 1 end
+				if not inner and s > 1 then
+					s = s - 1
+				end
 				vim.cmd("normal! " .. s .. "GV" .. e .. "G")
 			end
-			vim.keymap.set({ "x", "o" }, "ii", function() indent_textobj(true) end,  { desc = "inside indent" })
-			vim.keymap.set({ "x", "o" }, "ai", function() indent_textobj(false) end, { desc = "around indent" })
+			vim.keymap.set({ "x", "o" }, "ii", function()
+				indent_textobj(true)
+			end, { desc = "inside indent" })
+			vim.keymap.set({ "x", "o" }, "ai", function()
+				indent_textobj(false)
+			end, { desc = "around indent" })
 
 			-- Move between functions/classes
 			local rep = require("nvim-treesitter-textobjects.repeatable_move")
@@ -215,7 +227,9 @@ return {
 					local i = cur + 1
 					-- skip past current block
 					while i <= total do
-						if not vim.fn.getline(i):match("^%s*$") and vim.fn.indent(i) < ref then break end
+						if not vim.fn.getline(i):match("^%s*$") and vim.fn.indent(i) < ref then
+							break
+						end
 						i = i + 1
 					end
 					-- find next line at same indent
@@ -229,7 +243,9 @@ return {
 				else
 					local i = cur - 1
 					while i >= 1 do
-						if not vim.fn.getline(i):match("^%s*$") and vim.fn.indent(i) < ref then break end
+						if not vim.fn.getline(i):match("^%s*$") and vim.fn.indent(i) < ref then
+							break
+						end
 						i = i - 1
 					end
 					while i >= 1 do
@@ -241,8 +257,12 @@ return {
 					end
 				end
 			end)
-			vim.keymap.set({ "n", "x", "o" }, "]i", function() indent_move({ forward = true }) end,  { desc = "next same-indent block" })
-			vim.keymap.set({ "n", "x", "o" }, "[i", function() indent_move({ forward = false }) end, { desc = "prev same-indent block" })
+			vim.keymap.set({ "n", "x", "o" }, "]i", function()
+				indent_move({ forward = true })
+			end, { desc = "next same-indent block" })
+			vim.keymap.set({ "n", "x", "o" }, "[i", function()
+				indent_move({ forward = false })
+			end, { desc = "prev same-indent block" })
 
 			-- Quickfix jumps
 			local qf_move = rep.make_repeatable_move(function(opts)
@@ -278,8 +298,12 @@ return {
 			local scroll_h = rep.make_repeatable_move(function(opts)
 				vim.cmd("normal! " .. (opts.forward and "zL" or "zH"))
 			end)
-			vim.keymap.set({ "n", "x" }, "zL", function() scroll_h({ forward = true }) end,  { desc = "Scroll half-screen right (repeatable)" })
-			vim.keymap.set({ "n", "x" }, "zH", function() scroll_h({ forward = false }) end, { desc = "Scroll half-screen left (repeatable)" })
+			vim.keymap.set({ "n", "x" }, "zL", function()
+				scroll_h({ forward = true })
+			end, { desc = "Scroll half-screen right (repeatable)" })
+			vim.keymap.set({ "n", "x" }, "zH", function()
+				scroll_h({ forward = false })
+			end, { desc = "Scroll half-screen left (repeatable)" })
 
 			-- ; and , repeat the last treesitter move (or f/F/t/T if those were last)
 			vim.keymap.set({ "n", "x", "o" }, ";", rep.repeat_last_move, { desc = "repeat last move" })

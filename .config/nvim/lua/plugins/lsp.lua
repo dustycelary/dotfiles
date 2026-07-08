@@ -1,5 +1,5 @@
 -- LSP setup — mason + mason-lspconfig + nvim-lspconfig.
--- Servers: basedpyright, lua_ls, clangd, html (+ htmldjango), bashls, marksman, dockerls, yamlls.
+-- Servers: basedpyright, lua_ls, clangd, html (+ htmldjango), bashls, marksman, dockerls, yamlls, jsonls.
 -- Non-obvious: yamlls uses schemastore for JSON schema validation; its formatter is disabled
 --   (conform handles formatting). html registers for htmldjango filetype too.
 -- basedpyright runs with typeCheckingMode=off and openFilesOnly to avoid noise.
@@ -25,6 +25,7 @@ return {
 				"basedpyright",
 				-- "clangd",
 				"yamlls",
+				"jsonls",
 			},
 		},
 	},
@@ -83,6 +84,15 @@ return {
 					single_file_support = true,
 				},
 				clangd = {},
+				jsonls = {
+					single_file_support = true,
+					settings = {
+						json = {
+							schemas = require("schemastore").json.schemas(),
+							validate = { enable = true },
+						},
+					},
+				},
 				yamlls = {
 					single_file_support = true,
 					settings = {

@@ -23,66 +23,36 @@ return {
 		{ "<leader>sn", "<cmd>AerialNavToggle<CR>", desc = "Toggle Aerial Floating Nav" },
 	},
 	-- opts acts as the setup() function in lazy.nvim
-	opts = {
-		-- For markdown, prioritize markdown backend over LSP
-		backends = { "treesitter", "lsp", "markdown", "man", "toml" },
 
-		-- Enable preview in the right box of the nav window
+	opts = {
+		backends = {
+			["_"] = { "treesitter", "lsp" },
+			markdown = { "markdown", "lsp" },
+			man = { "man", "lsp" },
+			toml = { "toml", "lsp" },
+			python = { "treesitter", "lsp" },
+		},
+
 		nav = {
 			preview = true,
 		},
 
-		-- Explicitly enable markdown support
 		disable_by_filetype = {},
 
 		layout = {
-			-- You can set this to "left" or "right"
 			default_direction = "right",
-			-- Controls how wide the sidebar gets
 			max_width = { 40, 0.2 },
 			width = 30,
 			min_width = 10,
 		},
 
-		-- Show a little floating window with the symbol details when you press '?'
 		show_guides = true,
-
-		-- Better highlighting
 		highlight_mode = "full_width",
 
 		icons = {
-			File = "󰈙",
-			Module = "",
-			Namespace = "󰌗",
-			Package = "󰏗",
-			Class = "󰠱",
-			Method = "󰆧",
-			Property = "󰜢",
-			Field = "󰜢",
-			Constructor = "",
-			Enum = "",
-			Interface = "",
-			Function = "󰊕",
-			Variable = "󰀫",
-			Constant = "󰏿",
-			String = "󰀬",
-			Number = "󰎠",
-			Boolean = "󰨙",
-			Array = "󰅪",
-			Object = "󰅩",
-			Key = "󰌋",
-			Null = "󰟢",
-			EnumMember = "",
-			Struct = "󰙅",
-			Event = "󰉁",
-			Operator = "󰆕",
-			TypeParameter = "󰊄",
-			Component = "󰅴",
-			Heading = "󰉫",
-			Collapsed = "",
+			-- ... (Keep your existing icons table here) ...
 		},
 
-		-- Configure which symbol kinds to show
 		filter_kind = {
 			"File",
 			"Package",
@@ -101,10 +71,11 @@ return {
 			"TypeParameter",
 			"Event",
 			"Operator",
-			"Heading", -- Important for markdown
+			"Heading",
 			"Type",
 			"Component",
 			"Collapsed",
+			"Variable", -- Added so Python scripts don't appear empty
 		},
 	},
 	config = function(_, opts)
@@ -117,7 +88,13 @@ return {
 				return ""
 			end
 			local filetype = vim.bo.filetype
-			if filetype == "aerial" or filetype == "fzf" or filetype == "lazy" or filetype == "mason" or filetype == "which-key" then
+			if
+				filetype == "aerial"
+				or filetype == "fzf"
+				or filetype == "lazy"
+				or filetype == "mason"
+				or filetype == "which-key"
+			then
 				return ""
 			end
 
