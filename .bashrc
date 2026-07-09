@@ -123,39 +123,9 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
       printf "%s" "$query"
     fi
 
-    # Read the response from stdin. The terminal replies with \033]52;c;[base64]\a
+    # Read the response from /dev/tty up to BEL (\a) or timeout (1s)
     local response=""
-    local char
-    while true; do
-      if [[ -n "$ZSH_VERSION" ]]; then
-        if ! read -t 1 -k 1 char < /dev/tty; then
-          break
-        fi
-      else
-        if ! read -t 1 -n 1 -r -s char < /dev/tty; then
-          break
-        fi
-      fi
-
-      if [[ "$char" == $'\a' ]]; then
-        break
-      fi
-
-      if [[ "$char" == $'\033' ]]; then
-        # Read next character to check for ST (\033\\)
-        local next_char=""
-        if [[ -n "$ZSH_VERSION" ]]; then
-          read -t 1 -k 1 next_char < /dev/tty
-        else
-          read -t 1 -n 1 -r -s next_char < /dev/tty
-        fi
-        if [[ "$next_char" == "\\" ]]; then
-          break
-        fi
-        char="$char$next_char"
-      fi
-      response+="$char"
-    done
+    read -t 1 -d $'\a' -r response < /dev/tty
 
     if [[ -n "$old_stty" ]]; then
       stty "$old_stty" 2>/dev/null
@@ -163,11 +133,7 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
     fi
 
     local b64_data
-    if [[ "$response" == *"c;"* ]]; then
-      b64_data="${response#*c;}"
-    else
-      b64_data="$response"
-    fi
+    b64_data="${response##*;}"
     b64_data=$(printf "%s" "$b64_data" | tr -dc 'a-zA-Z0-9+/=')
 
     if [[ -n "$b64_data" ]]; then
