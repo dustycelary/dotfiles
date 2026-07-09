@@ -234,7 +234,7 @@ rga-fzf() {
         --layout=reverse \
         --height=80% \
         --preview-window="right:60%:wrap" \
-        --prompt="Search Content (PDF/DOCX/OCR/Text) > " \
+        --prompt="Search Content (Local) > " \
         --bind "change:reload:$RG_PREFIX {q} || true" \
         --preview "[[ -n {} ]] && rga --pretty --context 3 {q} {}"
   )
@@ -249,18 +249,6 @@ rga-fzf() {
       ${EDITOR:-nvim} "$file"
     fi
   fi
-}
-
-fzf-local-cd-widget() {
-  local selected_dir
-  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . | \
-      fzf --height 50% --layout=reverse \
-          --prompt="Local Dir> " \
-          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
-  if [[ -n "$selected_dir" ]]; then
-      builtin cd "$selected_dir"
-  fi
-  zle reset-prompt
 }
 
 copy-pwd() {
@@ -294,15 +282,66 @@ copy-pwd-widget() {
 zle -N copy-pwd-widget
 bindkey '^y^p' copy-pwd-widget
 
-rga-fzf-widget() {
+# Local Content Search (Ctrl+G)
+rga-fzf-local-widget() {
   rga-fzf
   zle reset-prompt
 }
-zle -N rga-fzf-widget
-bindkey '^g' rga-fzf-widget
+zle -N rga-fzf-local-widget
+bindkey '^g' rga-fzf-local-widget
 
-zle -N fzf-local-cd-widget
-bindkey '^[^g' fzf-local-cd-widget
+# Global File Search (Ctrl+Alt+T)
+fzf-global-file-widget() {
+  local selected_file
+  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+      fzf --height 60% --layout=reverse \
+          --prompt="Global File> " \
+          --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+  if [[ -n "$selected_file" ]]; then
+      LBUFFER+="${(q)selected_file}"
+  fi
+  zle reset-prompt
+}
+zle -N fzf-global-file-widget
+bindkey '^[^t' fzf-global-file-widget
+
+# Local Directory Finder (Alt+C) - Paste to prompt
+fzf-local-dir-widget() {
+  local selected_dir
+  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . | \
+      fzf --height 50% --layout=reverse \
+          --prompt="Local Dir> " \
+          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
+  if [[ -n "$selected_dir" ]]; then
+      LBUFFER+="${(q)selected_dir}"
+  fi
+  zle reset-prompt
+}
+zle -N fzf-local-dir-widget
+bindkey '\ec' fzf-local-dir-widget
+
+# Global Directory Finder (Ctrl+Alt+C) - Paste to prompt
+fzf-global-dir-widget() {
+  local selected_dir
+  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+      fzf --height 50% --layout=reverse \
+          --prompt="Global Dir> " \
+          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
+  if [[ -n "$selected_dir" ]]; then
+      LBUFFER+="${(q)selected_dir}"
+  fi
+  zle reset-prompt
+}
+zle -N fzf-global-dir-widget
+bindkey '^[^c' fzf-global-dir-widget
+
+# Zoxide zi fallback helper
+if ! typeset -f zi >/dev/null; then
+  zi() {
+    local dir
+    dir=$(zoxide query -i "$@") && cd "$dir"
+  }
+fi
 
 # --- [MAC ONLY] ---
 # Ghostty Integration

@@ -246,7 +246,7 @@ rga-fzf() {
         --layout=reverse \
         --height=80% \
         --preview-window="right:60%:wrap" \
-        --prompt="Search Content (PDF/DOCX/OCR/Text) > " \
+        --prompt="Search Content (Local) > " \
         --bind "change:reload:$RG_PREFIX {q} || true" \
         --preview "[[ -n {} ]] && rga --pretty --context 3 {q} {}"
   )
@@ -271,7 +271,90 @@ copy-pwd() {
   echo "Copied: $(pwd)"
 }
 bind -x '"\C-y\C-p": copy-pwd' 2>/dev/null || true
+
+# Local Content Search (Ctrl+G)
 bind -x '"\C-g": rga-fzf' 2>/dev/null || true
+
+# Global File Search (Ctrl+Alt+T)
+fzf-global-file-widget() {
+  local selected_file
+  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+      fzf --height 60% --layout=reverse \
+          --prompt="Global File> " \
+          --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+  if [[ -n "$selected_file" ]]; then
+      local before="${READLINE_LINE:0:READLINE_POINT}"
+      local after="${READLINE_LINE:READLINE_POINT}"
+      READLINE_LINE="${before}${selected_file}${after}"
+      READLINE_POINT=$((READLINE_POINT + ${#selected_file}))
+  fi
+}
+bind -x '"\e\C-t": fzf-global-file-widget' 2>/dev/null || true
+
+# Local Directory Finder (Alt+C) - Paste to prompt
+fzf-local-dir-widget() {
+  local selected_dir
+  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . | \
+      fzf --height 50% --layout=reverse \
+          --prompt="Local Dir> " \
+          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
+  if [[ -n "$selected_dir" ]]; then
+      local before="${READLINE_LINE:0:READLINE_POINT}"
+      local after="${READLINE_LINE:READLINE_POINT}"
+      READLINE_LINE="${before}${selected_dir}${after}"
+      READLINE_POINT=$((READLINE_POINT + ${#selected_dir}))
+  fi
+}
+bind -x '"\ec": fzf-local-dir-widget' 2>/dev/null || true
+
+# Global Directory Finder (Ctrl+Alt+C) - Paste to prompt
+fzf-global-dir-widget() {
+  local selected_dir
+  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+      fzf --height 50% --layout=reverse \
+          --prompt="Global Dir> " \
+          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
+  if [[ -n "$selected_dir" ]]; then
+      local before="${READLINE_LINE:0:READLINE_POINT}"
+      local after="${READLINE_LINE:READLINE_POINT}"
+      READLINE_LINE="${before}${selected_dir}${after}"
+      READLINE_POINT=$((READLINE_POINT + ${#selected_dir}))
+  fi
+}
+bind -x '"\e\C-c": fzf-global-dir-widget' 2>/dev/null || true
+
+# Zoxide zi fallback helper
+if ! declare -f zi >/dev/null; then
+  zi() {
+    local dir
+    dir=$(zoxide query -i "$@") && cd "$dir"
+  }
+fi
+
+# Fuzzy Tab Completion for Paths
+_fzf_path_completion_handler() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  compopt -o default 2>/dev/null
+
+  local search_dir="."
+  local query="$cur"
+  if [[ "$cur" == *"/"* ]]; then
+    search_dir="${cur%/*}"
+    [[ -z "$search_dir" ]] && search_dir="/"
+    query="${cur##*/}"
+  fi
+
+  if [[ -d "$search_dir" ]]; then
+    local selection
+    selection=$(fd --max-depth 3 --follow --exclude .git --exclude venv --exclude node_modules . "$search_dir" 2>/dev/null | \
+      fzf --height 40% --layout=reverse --query="$query" --select-1 --exit-0)
+    if [[ -n "$selection" ]]; then
+      COMPREPLY=( "$selection" )
+      compopt +o default 2>/dev/null
+    fi
+  fi
+}
+complete -F _fzf_path_completion_handler cd nvim cat ls cp mv rm
 
 # --- [MAC ONLY] ---
 # 4. macOS ONLY
