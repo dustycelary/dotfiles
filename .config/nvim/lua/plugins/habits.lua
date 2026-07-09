@@ -7,6 +7,7 @@ return {
 		event = "VeryLazy",
 		opts = {
 			disabled_filetypes = { "qf", "netrw", "NvimTree", "lazy", "mason", "aerial", "fzf" },
+			enabled = false,
 		},
 		keys = {
 			{ "<leader>uh", "<cmd>Hardtime toggle<cr>", desc = "Toggle Hardtime" },
@@ -18,7 +19,7 @@ return {
 		"tris203/precognition.nvim",
 		event = "VeryLazy",
 		opts = {
-			startVisible = true,
+			startVisible = false,
 			showBlankVirtLine = true,
 		},
 		keys = {
