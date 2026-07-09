@@ -217,13 +217,31 @@ fzf-global-file-widget() {
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
   if [[ -n "$selected_file" ]]; then
-      local before="${READLINE_LINE:0:READLINE_POINT}"
-      local after="${READLINE_LINE:READLINE_POINT}"
-      READLINE_LINE="${before}${selected_file}${after}"
-      READLINE_POINT=$((READLINE_POINT + ${#selected_file}))
+      if [[ -n "$READLINE_LINE" && "$READLINE_LINE" != *[[:space:]] ]]; then
+          READLINE_LINE="${READLINE_LINE} "
+      fi
+      READLINE_LINE="${READLINE_LINE}${selected_file}"
+      READLINE_POINT=${#READLINE_LINE}
   fi
 }
 bind -x '"\es": fzf-global-file-widget' 2>/dev/null || true
+
+# Local File Search (Ctrl+T)
+fzf-local-file-widget() {
+  local selected_file
+  selected_file=$(fd --type f --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
+      fzf --height 60% --layout=reverse \
+          --prompt="Local File> " \
+          --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+  if [[ -n "$selected_file" ]]; then
+      if [[ -n "$READLINE_LINE" && "$READLINE_LINE" != *[[:space:]] ]]; then
+          READLINE_LINE="${READLINE_LINE} "
+      fi
+      READLINE_LINE="${READLINE_LINE}${selected_file}"
+      READLINE_POINT=${#READLINE_LINE}
+  fi
+}
+bind -x '"\C-t": fzf-local-file-widget' 2>/dev/null || true
 
 # Local Directory Finder (Alt+C) - Paste to prompt
 fzf-local-dir-widget() {
@@ -233,10 +251,11 @@ fzf-local-dir-widget() {
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
   if [[ -n "$selected_dir" ]]; then
-      local before="${READLINE_LINE:0:READLINE_POINT}"
-      local after="${READLINE_LINE:READLINE_POINT}"
-      READLINE_LINE="${before}${selected_dir}${after}"
-      READLINE_POINT=$((READLINE_POINT + ${#selected_dir}))
+      if [[ -n "$READLINE_LINE" && "$READLINE_LINE" != *[[:space:]] ]]; then
+          READLINE_LINE="${READLINE_LINE} "
+      fi
+      READLINE_LINE="${READLINE_LINE}${selected_dir}"
+      READLINE_POINT=${#READLINE_LINE}
   fi
 }
 bind -x '"\ec": fzf-local-dir-widget' 2>/dev/null || true
@@ -249,10 +268,11 @@ fzf-global-dir-widget() {
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
   if [[ -n "$selected_dir" ]]; then
-      local before="${READLINE_LINE:0:READLINE_POINT}"
-      local after="${READLINE_LINE:READLINE_POINT}"
-      READLINE_LINE="${before}${selected_dir}${after}"
-      READLINE_POINT=$((READLINE_POINT + ${#selected_dir}))
+      if [[ -n "$READLINE_LINE" && "$READLINE_LINE" != *[[:space:]] ]]; then
+          READLINE_LINE="${READLINE_LINE} "
+      fi
+      READLINE_LINE="${READLINE_LINE}${selected_dir}"
+      READLINE_POINT=${#READLINE_LINE}
   fi
 }
 bind -x '"\eg": fzf-global-dir-widget' 2>/dev/null || true
@@ -267,6 +287,11 @@ fi
 
 # Fuzzy Tab Completion for Paths
 _fzf_path_completion_handler() {
+  # If completing the command itself (no arguments typed yet), don't do path completion
+  if [[ $COMP_CWORD -eq 0 ]]; then
+    return
+  fi
+
   local cur="${COMP_WORDS[COMP_CWORD]}"
   compopt -o default 2>/dev/null
 
@@ -278,11 +303,18 @@ _fzf_path_completion_handler() {
     query="${cur##*/}"
   fi
 
-  if [[ -d "$search_dir" ]]; then
+  # Expand tilde ~
+  local search_dir_expanded="${search_dir/#\~/$HOME}"
+
+  if [[ -d "$search_dir_expanded" ]]; then
     local selection
-    selection=$(fd --hidden --max-depth 3 --follow --exclude .git --exclude venv --exclude node_modules . "$search_dir" 2>/dev/null | \
+    selection=$(fd --hidden --max-depth 3 --follow --exclude .git --exclude venv --exclude node_modules . "$search_dir_expanded" 2>/dev/null | \
       fzf --height 40% --layout=reverse --query="$query" --select-1 --exit-0)
     if [[ -n "$selection" ]]; then
+      # If search_dir had a tilde, convert selection prefix back to tilde
+      if [[ "$search_dir" == "~"* ]]; then
+        selection="${selection/#$HOME/\~}"
+      fi
       COMPREPLY=( "$selection" )
       compopt +o default 2>/dev/null
     fi

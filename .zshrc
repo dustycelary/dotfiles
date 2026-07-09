@@ -232,12 +232,35 @@ fzf-global-file-widget() {
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
   if [[ -n "$selected_file" ]]; then
-      LBUFFER+="${(q)selected_file}"
+      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
+          BUFFER+=" "
+      fi
+      BUFFER+="${(q)selected_file}"
+      CURSOR=${#BUFFER}
   fi
   zle reset-prompt
 }
 zle -N fzf-global-file-widget
 bindkey '\es' fzf-global-file-widget
+
+# Local File Search (Ctrl+T)
+fzf-local-file-widget() {
+  local selected_file
+  selected_file=$(fd --type f --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
+      fzf --height 60% --layout=reverse \
+          --prompt="Local File> " \
+          --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+  if [[ -n "$selected_file" ]]; then
+      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
+          BUFFER+=" "
+      fi
+      BUFFER+="${(q)selected_file}"
+      CURSOR=${#BUFFER}
+  fi
+  zle reset-prompt
+}
+zle -N fzf-local-file-widget
+bindkey '^T' fzf-local-file-widget
 
 # Local Directory Finder (Alt+C) - Paste to prompt
 fzf-local-dir-widget() {
@@ -247,7 +270,11 @@ fzf-local-dir-widget() {
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
-      LBUFFER+="${(q)selected_dir}"
+      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
+          BUFFER+=" "
+      fi
+      BUFFER+="${(q)selected_dir}"
+      CURSOR=${#BUFFER}
   fi
   zle reset-prompt
 }
@@ -262,7 +289,11 @@ fzf-global-dir-widget() {
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
-      LBUFFER+="${(q)selected_dir}"
+      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
+          BUFFER+=" "
+      fi
+      BUFFER+="${(q)selected_dir}"
+      CURSOR=${#BUFFER}
   fi
   zle reset-prompt
 }
