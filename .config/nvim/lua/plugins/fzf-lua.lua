@@ -2,12 +2,15 @@
 -- Files use fd (respects .gitignore, hidden files included, common dirs excluded).
 -- Grep uses ripgrep with hidden files. <leader>sF / <leader>sG include ignored files.
 -- Non-obvious: <leader>cR does project-wide rename via grep → quickfix → cfdo.
+-- <C-x> deletes selected file(s) from the files picker after confirmation.
 -- LSP keymaps (grd, grr, gri, go, <leader>ss) open results in fzf instead of quickfix.
 return {
 	"ibhagwan/fzf-lua",
 	-- optional for icons
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
+		local fzf = require("fzf-lua")
+		local fzf_path = require("fzf-lua.path")
 		local fd_excludes = table.concat({
 			"--exclude .git",
 			"--exclude .venv",
@@ -29,8 +32,38 @@ return {
 				rg_opts = "--hidden --column --line-number --no-heading --color=always --smart-case --max-columns=4096",
 				fzf_opts = { ["--scheme"] = "path" },
 			},
+			actions = {
+				["ctrl-x"] = function(selected, opts)
+					if not selected or #selected == 0 then
+						return
+					end
+
+					local prompt = #selected == 1 and ("Delete " .. selected[1] .. "?")
+						or ("Delete " .. #selected .. " selected files?")
+					if vim.fn.confirm(prompt, "&Yes\n&No", 2) ~= 1 then
+						return
+					end
+
+					local failures = {}
+					for _, item in ipairs(selected) do
+						local entry = fzf_path.entry_to_file(item, opts)
+						local path = entry.path or entry.bufname or entry.uri
+						if path and vim.fn.delete(path) ~= 0 then
+							table.insert(failures, path)
+						end
+					end
+
+					if #failures > 0 then
+						vim.notify(
+							"Failed to delete:\n" .. table.concat(failures, "\n"),
+							vim.log.levels.WARN,
+							{ title = "fzf-lua" }
+						)
+					end
+				end,
+			},
 		})
-		require("fzf-lua").register_ui_select()
+		fzf.register_ui_select()
 	end,
 	keys = {
 		{ "<leader>sf", "<cmd>FzfLua files<cr>", desc = "Fzf Files" },

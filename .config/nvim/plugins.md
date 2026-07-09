@@ -108,6 +108,7 @@ Files use `fd` (respects `.gitignore`, includes hidden files, excludes `.git`, `
 | `<leader>sk` | Keymaps |
 | `<leader>so` | Old files (recently opened) |
 | `<leader>sm` | Marks |
+| `<C-x>` | Delete selected file(s) in `files` |
 | `<leader>sw` | Search word under cursor |
 | `<leader>ss` | Workspace LSP symbols |
 | `<leader>sd` | Document diagnostics |
@@ -400,4 +401,3 @@ Enhanced yank and paste experience. Maintains a history of yanks, highlights put
 | `>p` / `<p` | Put and indent right/left |
 | `>P` / `<P` | Put before and indent right/left |
 | `=p` / `=P` | Put after/before applying filter |
-

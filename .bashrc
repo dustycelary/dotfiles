@@ -38,7 +38,7 @@ bind 'set show-all-if-ambiguous on' 2>/dev/null
 eval "$(zoxide init --cmd cd bash)"
 
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude venv'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_COMMAND='fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules'
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --color=always {} 2>/dev/null || ls {}'"
@@ -229,7 +229,7 @@ bind -x '"\es": fzf-global-file-widget' 2>/dev/null || true
 # Local File Search (Ctrl+T)
 fzf-local-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
+  selected_file=$(fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules . | \
       fzf --height 60% --layout=reverse \
           --prompt="Local File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')

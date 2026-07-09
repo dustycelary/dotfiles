@@ -50,20 +50,51 @@ return {
 			vim.api.nvim_create_user_command("LspInfo", lsp_info, { desc = "Show attached LSP clients" })
 			vim.keymap.set("n", "<leader>ci", lsp_info, { desc = "LSP info" })
 
+			local function get_python_path(start_path)
+				local match = vim.fs.find(".venv", {
+					path = start_path or vim.fn.getcwd(),
+					upward = true,
+					type = "directory",
+				})[1]
+				if match then
+					local python_path = match .. "/bin/python"
+					if vim.fn.executable(python_path) == 1 then
+						return python_path
+					end
+				end
+				return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python3"
+			end
+
 			-- lua_ls: lazydev.nvim handles neovim API type stubs automatically
 			local servers = {
 				basedpyright = {
+					root_markers = {
+						"pyrightconfig.json",
+						"pyproject.toml",
+						"setup.py",
+						"setup.cfg",
+						".git",
+						"requirements.txt",
+					},
+					before_init = function(_, config)
+						local root = config.root_dir or vim.fn.getcwd()
+						config.settings = vim.tbl_deep_extend("force", config.settings or {}, {
+							python = {
+								pythonPath = get_python_path(root),
+							},
+						})
+					end,
 					settings = {
 						basedpyright = {
 							analysis = {
 								typeCheckingMode = "off",
 								autoImportCompletions = true,
-								diagnosticMode = "openFilesOnly",
+								diagnosticMode = "workspace",
+								autoSearchPaths = true,
+								useLibraryCodeForTypes = true,
 							},
 						},
-						python = {
-							pythonPath = vim.fn.exepath("python3"),
-						},
+						python = {},
 					},
 				},
 				dockerls = { single_file_support = true },
@@ -113,6 +144,10 @@ return {
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
 					local client = vim.lsp.get_client_by_id(args.data.client_id)
+					if client and client.root_dir then
+						vim.fn.chdir(client.root_dir)
+					end
+
 					if client and client.name == "yamlls" then
 						client.server_capabilities.documentFormattingProvider = false
 					end

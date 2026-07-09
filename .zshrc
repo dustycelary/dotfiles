@@ -49,7 +49,7 @@ _comp_options+=(globdots)
 eval "$(zoxide init zsh)"
 
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude venv'
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_COMMAND='fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules'
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 
@@ -246,7 +246,7 @@ bindkey '\es' fzf-global-file-widget
 # Local File Search (Ctrl+T)
 fzf-local-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
+  selected_file=$(fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules . | \
       fzf --height 60% --layout=reverse \
           --prompt="Local File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
