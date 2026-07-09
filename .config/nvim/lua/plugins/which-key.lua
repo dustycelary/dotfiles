@@ -113,7 +113,7 @@ return {
 			{ "<leader>h", group = "Harpoon" },
 			{ "<leader>s", group = "Search/Find" },
 			{ "<leader>u", group = "UI Toggles" },
-			{ "<leader>w", group = "Windows" },
+			{ "<leader>w", group = "Sandwich" },
 			{ "<leader>x", group = "Trouble/Diagnostics" },
 			-- Clean up 'g' command descriptions
 			{ "gb", desc = "Bookmarks (netrw)" },

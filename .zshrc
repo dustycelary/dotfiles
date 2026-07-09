@@ -314,5 +314,38 @@ fi
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 
 # --- [BOTH] ---
-# Custom prompt to match default bash prompt
-PROMPT='%n@%m:%~$ '
+# Function to shorten intermediate directory components to 3 characters, keeping the last one in full
+shorten_path() {
+  local p="${PWD/#$HOME/~}"
+  local -a parts
+  parts=("${(s:/:)p}")
+  
+  if (( ${#parts} <= 1 )); then
+    echo "$p"
+    return
+  fi
+  
+  local res=""
+  if [[ -z "${parts[1]}" ]]; then
+    for ((i=2; i<${#parts}; i++)); do
+      res+="/${parts[i][1,3]}"
+    done
+  else
+    if [[ "${parts[1]}" == "~" ]]; then
+      res+="~"
+    else
+      res+="${parts[1][1,3]}"
+    fi
+    for ((i=2; i<${#parts}; i++)); do
+      res+="/${parts[i][1,3]}"
+    done
+  fi
+  res+="/${parts[-1]}"
+  echo "$res"
+}
+
+# Enable prompt function/variable substitution
+setopt PROMPT_SUBST
+
+# Custom prompt to match default bash prompt with custom hostname and abbreviated path
+PROMPT='%n@fungus-mac:$(shorten_path)$ '

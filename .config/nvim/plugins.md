@@ -39,7 +39,8 @@ Ghost text shows the top suggestion inline as you type.
 |-----|--------|
 | `<C-n>` / `<Down>` | Next item |
 | `<C-p>` / `<Up>` | Previous item |
-| `<C-y>` / `<CR>` | Confirm |
+| `<C-y>` | Confirm (accept top recommendation) |
+| `<CR>` | Confirm selection (only if an item is explicitly selected) |
 | `<C-e>` | Abort |
 | `<Tab>` | Next item or jump snippet stop |
 | `<S-Tab>` | Previous item or jump snippet stop back |
