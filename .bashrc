@@ -80,7 +80,7 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
     local osc
     if [[ -n "$TMUX" ]]; then
       # Wrap in tmux DCS passthrough sequence
-      osc=$(printf "\033Ptmux;\033\033]52;c;%s\a\033\\\\" "$b64")
+      osc=$(printf "\033Ptmux;\033\033]52;c;%s\a\033\\" "$b64")
     else
       osc=$(printf "\033]52;c;%s\a" "$b64")
     fi
@@ -95,49 +95,67 @@ fi
 
 # Portable pbpaste via OSC 52 (works over SSH)
 if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command -v pbpaste >/dev/null; then
+  _osc52_pbpaste() {
+    if ! command -v python3 >/dev/null; then
+      return 1
+    fi
+
+    local tmux_mode=0
+    [[ -n "$TMUX" ]] && tmux_mode=1
+
+    python3 - "$tmux_mode" <<'PY'
+import base64
+import os
+import re
+import select
+import sys
+import termios
+import time
+import tty
+
+tmux_mode = len(sys.argv) > 1 and sys.argv[1] == "1"
+query = b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\" if tmux_mode else b"\x1b]52;c;?\x07"
+
+with open("/dev/tty", "r+b", buffering=0) as t:
+    fd = t.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        os.write(fd, query)
+
+        buf = bytearray()
+        deadline = time.monotonic() + 1.5
+        while time.monotonic() < deadline:
+            timeout = max(0.0, deadline - time.monotonic())
+            ready, _, _ = select.select([fd], [], [], timeout)
+            if not ready:
+                break
+            chunk = os.read(fd, 4096)
+            if not chunk:
+                break
+            buf.extend(chunk)
+            if b"\x07" in buf or b"\x1b\\" in buf:
+                break
+
+        match = re.search(rb"\]52;[^;]*;([A-Za-z0-9+/=]+)", bytes(buf))
+        if not match:
+            raise SystemExit(1)
+
+        sys.stdout.buffer.write(base64.b64decode(match.group(1), validate=False))
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+PY
+  }
+
   pbpaste() {
     # If a native pbpaste exists and we are NOT under SSH, use it
     if [[ -z "$SSH_CONNECTION" && -z "$SSH_CLIENT" && -z "$SSH_TTY" ]] && command -v pbpaste >/dev/null; then
       command pbpaste "$@"
       return
     fi
-
-    local old_stty
-    old_stty=$(stty -g 2>/dev/null)
-    if [[ -n "$old_stty" ]]; then
-      trap 'stty "$old_stty" 2>/dev/null' EXIT INT TERM HUP
-      stty raw -echo 2>/dev/null
-    fi
-
-    local query
-    if [[ -n "$TMUX" ]]; then
-      # Wrap in tmux DCS passthrough sequence
-      query=$(printf "\033Ptmux;\033\033]52;c;?\a\033\\\\")
-    else
-      query=$(printf "\033]52;c;?\a")
-    fi
-
-    if [ -c /dev/tty ] && [ -w /dev/tty ]; then
-      printf "%s" "$query" > /dev/tty
-    else
-      printf "%s" "$query"
-    fi
-
-    # Read the response from /dev/tty up to BEL (\a) or timeout (1s)
-    local response=""
-    read -t 1 -d $'\a' -r response < /dev/tty
-
-    if [[ -n "$old_stty" ]]; then
-      stty "$old_stty" 2>/dev/null
-      trap - EXIT INT TERM HUP
-    fi
-
-    local b64_data
-    b64_data="${response##*;}"
-    b64_data=$(printf "%s" "$b64_data" | tr -dc 'a-zA-Z0-9+/=')
-
-    if [[ -n "$b64_data" ]]; then
-      printf "%s" "$b64_data" | base64 -d 2>/dev/null
+    if ! _osc52_pbpaste; then
+      echo "pbpaste: failed to read local clipboard via OSC 52" >&2
+      return 1
     fi
   }
 fi
