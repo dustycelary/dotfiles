@@ -101,6 +101,75 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
   }
 fi
 
+# Portable pbpaste via OSC 52 (works over SSH)
+if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command -v pbpaste >/dev/null; then
+  pbpaste() {
+    # If a native pbpaste exists and we are NOT under SSH, use it
+    if [[ -z "$SSH_CONNECTION" && -z "$SSH_CLIENT" && -z "$SSH_TTY" ]] && command -v pbpaste >/dev/null; then
+      command pbpaste "$@"
+      return
+    fi
+
+    local old_stty
+    old_stty=$(stty -g 2>/dev/null)
+    if [[ -n "$old_stty" ]]; then
+      trap 'stty "$old_stty" 2>/dev/null' EXIT INT TERM HUP
+      stty raw -echo 2>/dev/null
+    fi
+
+    local query
+    if [[ -n "$TMUX" ]]; then
+      # Wrap in tmux DCS passthrough sequence
+      query=$(printf "\033Ptmux;\033\033]52;c;?\a\033\\\\")
+    else
+      query=$(printf "\033]52;c;?\a")
+    fi
+
+    if [ -c /dev/tty ] && [ -w /dev/tty ]; then
+      printf "%s" "$query" > /dev/tty
+    else
+      printf "%s" "$query"
+    fi
+
+    # Read the response from stdin. The terminal replies with \033]52;c;[base64]\a
+    local response=""
+    local char
+    while true; do
+      if [[ -n "$ZSH_VERSION" ]]; then
+        if ! read -t 1 -k 1 char < /dev/tty; then
+          break
+        fi
+      else
+        if ! read -t 1 -n 1 -r -s char < /dev/tty; then
+          break
+        fi
+      fi
+
+      if [[ "$char" == $'\a' || "$char" == $'\033' ]]; then
+        break
+      fi
+      response+="$char"
+    done
+
+    if [[ -n "$old_stty" ]]; then
+      stty "$old_stty" 2>/dev/null
+      trap - EXIT INT TERM HUP
+    fi
+
+    local b64_data
+    if [[ "$response" == *"c;"* ]]; then
+      b64_data="${response#*c;}"
+    else
+      b64_data="$response"
+    fi
+    b64_data=$(printf "%s" "$b64_data" | tr -dc 'a-zA-Z0-9+/=')
+
+    if [[ -n "$b64_data" ]]; then
+      printf "%s" "$b64_data" | base64 -d 2>/dev/null
+    fi
+  }
+fi
+
 # Portable open helper
 my_open() {
   if command -v open >/dev/null; then
