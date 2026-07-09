@@ -51,6 +51,61 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 if vim.env.SSH_TTY ~= nil or vim.env.SSH_CONNECTION ~= nil then
+	local function osc52_paste_fresh()
+		if vim.fn.executable("python3") ~= 1 then
+			return {}, "v"
+		end
+
+		local script = [[
+import base64
+import os
+import re
+import select
+import sys
+import termios
+import time
+import tty
+
+tmux_mode = os.environ.get("TMUX") is not None
+query = b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\" if tmux_mode else b"\x1b]52;c;?\x07"
+
+with open("/dev/tty", "r+b", buffering=0) as t:
+    fd = t.fileno()
+    old = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        os.write(fd, query)
+
+        buf = bytearray()
+        deadline = time.monotonic() + 1.5
+        while time.monotonic() < deadline:
+            timeout = max(0.0, deadline - time.monotonic())
+            ready, _, _ = select.select([fd], [], [], timeout)
+            if not ready:
+                break
+            chunk = os.read(fd, 4096)
+            if not chunk:
+                break
+            buf.extend(chunk)
+            if b"\x07" in buf or b"\x1b\\" in buf:
+                break
+
+        match = re.search(rb"\]52;[^;]*;([A-Za-z0-9+/=]+)", bytes(buf))
+        if not match:
+            raise SystemExit(1)
+
+        sys.stdout.buffer.write(base64.b64decode(match.group(1), validate=False))
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old)
+]]
+
+		local output = vim.fn.systemlist({ "python3", "-c", script })
+		if vim.v.shell_error ~= 0 then
+			return {}, "v"
+		end
+		return output, "v"
+	end
+
 	vim.g.clipboard = {
 		name = "OSC 52",
 		copy = {
@@ -58,9 +113,10 @@ if vim.env.SSH_TTY ~= nil or vim.env.SSH_CONNECTION ~= nil then
 			["*"] = require("vim.ui.clipboard.osc52").copy("*"),
 		},
 		paste = {
-			["+"] = require("vim.ui.clipboard.osc52").paste("+"),
-			["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+			["+"] = osc52_paste_fresh,
+			["*"] = osc52_paste_fresh,
 		},
+		cache_enabled = 0,
 	}
 end
 
