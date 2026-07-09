@@ -37,7 +37,7 @@ bind 'set show-all-if-ambiguous on' 2>/dev/null
 # 2. Tool Integrations
 eval "$(zoxide init --cmd cd bash)"
 
-export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git --exclude venv'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude venv'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
@@ -275,10 +275,10 @@ bind -x '"\C-y\C-p": copy-pwd' 2>/dev/null || true
 # Local Content Search (Ctrl+G)
 bind -x '"\C-g": rga-fzf' 2>/dev/null || true
 
-# Global File Search (Ctrl+Alt+T)
+# Global File Search (Alt+S)
 fzf-global-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
       fzf --height 60% --layout=reverse \
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
@@ -289,12 +289,12 @@ fzf-global-file-widget() {
       READLINE_POINT=$((READLINE_POINT + ${#selected_file}))
   fi
 }
-bind -x '"\e\C-t": fzf-global-file-widget' 2>/dev/null || true
+bind -x '"\es": fzf-global-file-widget' 2>/dev/null || true
 
 # Local Directory Finder (Alt+C) - Paste to prompt
 fzf-local-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . | \
+  selected_dir=$(fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
       fzf --height 50% --layout=reverse \
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
@@ -307,10 +307,10 @@ fzf-local-dir-widget() {
 }
 bind -x '"\ec": fzf-local-dir-widget' 2>/dev/null || true
 
-# Global Directory Finder (Ctrl+Alt+C) - Paste to prompt
+# Global Directory Finder (Alt+G) - Paste to prompt
 fzf-global-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
       fzf --height 50% --layout=reverse \
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
@@ -321,7 +321,7 @@ fzf-global-dir-widget() {
       READLINE_POINT=$((READLINE_POINT + ${#selected_dir}))
   fi
 }
-bind -x '"\e\C-c": fzf-global-dir-widget' 2>/dev/null || true
+bind -x '"\eg": fzf-global-dir-widget' 2>/dev/null || true
 
 # Zoxide zi fallback helper
 if ! declare -f zi >/dev/null; then
@@ -346,7 +346,7 @@ _fzf_path_completion_handler() {
 
   if [[ -d "$search_dir" ]]; then
     local selection
-    selection=$(fd --max-depth 3 --follow --exclude .git --exclude venv --exclude node_modules . "$search_dir" 2>/dev/null | \
+    selection=$(fd --hidden --max-depth 3 --follow --exclude .git --exclude venv --exclude node_modules . "$search_dir" 2>/dev/null | \
       fzf --height 40% --layout=reverse --query="$query" --select-1 --exit-0)
     if [[ -n "$selection" ]]; then
       COMPREPLY=( "$selection" )

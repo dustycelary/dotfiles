@@ -42,17 +42,18 @@ setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS HIST_VERIFY
 setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT INTERACTIVE_COMMENTS EXTENDED_GLOB
 unsetopt BEEP
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+_comp_options+=(globdots)
 
 # --- [BOTH] ---
 # 3. Tool Integrations & FZF
 eval "$(zoxide init zsh)"
 
-export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git --exclude venv'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude venv'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 
-export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
+export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}'"
 
 # --- [BOTH] ---
@@ -290,10 +291,10 @@ rga-fzf-local-widget() {
 zle -N rga-fzf-local-widget
 bindkey '^g' rga-fzf-local-widget
 
-# Global File Search (Ctrl+Alt+T)
+# Global File Search (Alt+S)
 fzf-global-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
       fzf --height 60% --layout=reverse \
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
@@ -303,12 +304,12 @@ fzf-global-file-widget() {
   zle reset-prompt
 }
 zle -N fzf-global-file-widget
-bindkey '^[^t' fzf-global-file-widget
+bindkey '\es' fzf-global-file-widget
 
 # Local Directory Finder (Alt+C) - Paste to prompt
 fzf-local-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . | \
+  selected_dir=$(fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
       fzf --height 50% --layout=reverse \
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
@@ -320,10 +321,10 @@ fzf-local-dir-widget() {
 zle -N fzf-local-dir-widget
 bindkey '\ec' fzf-local-dir-widget
 
-# Global Directory Finder (Ctrl+Alt+C) - Paste to prompt
+# Global Directory Finder (Alt+G) - Paste to prompt
 fzf-global-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude node_modules . "$HOME" | \
+  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
       fzf --height 50% --layout=reverse \
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
@@ -333,7 +334,7 @@ fzf-global-dir-widget() {
   zle reset-prompt
 }
 zle -N fzf-global-dir-widget
-bindkey '^[^c' fzf-global-dir-widget
+bindkey '\eg' fzf-global-dir-widget
 
 # Zoxide zi fallback helper
 if ! typeset -f zi >/dev/null; then
