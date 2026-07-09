@@ -145,8 +145,22 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
         fi
       fi
 
-      if [[ "$char" == $'\a' || "$char" == $'\033' ]]; then
+      if [[ "$char" == $'\a' ]]; then
         break
+      fi
+
+      if [[ "$char" == $'\033' ]]; then
+        # Read next character to check for ST (\033\\)
+        local next_char=""
+        if [[ -n "$ZSH_VERSION" ]]; then
+          read -t 1 -k 1 next_char < /dev/tty
+        else
+          read -t 1 -n 1 -r -s next_char < /dev/tty
+        fi
+        if [[ "$next_char" == "\\" ]]; then
+          break
+        fi
+        char="$char$next_char"
       fi
       response+="$char"
     done
