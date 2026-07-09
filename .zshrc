@@ -5,9 +5,9 @@
 # =============================================================================
 # 1. SHARED (macOS & Raspberry Pi) - Instant Prompt & Env
 # =============================================================================
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
+# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+# fi
 
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR='nvim'
@@ -24,7 +24,8 @@ export NVM_DIR="$HOME/.nvm"
 # =============================================================================
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_DISABLE_COMPFIX=true
-ZSH_THEME="powerlevel10k/powerlevel10k"
+# ZSH_THEME="powerlevel10k/powerlevel10k"
+ZSH_THEME=""
 
 # Cleaned up plugin list (removed jump, copypath, copyfile)
 plugins=(
@@ -356,4 +357,7 @@ bindkey '^[^g' fzf-local-cd-widget
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 
 # P10k configuration
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# Custom prompt to match default bash prompt
+PROMPT='%n@%m:%~$ '
