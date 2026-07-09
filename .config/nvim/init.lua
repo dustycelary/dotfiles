@@ -19,7 +19,7 @@ vim.opt.undofile = true
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
 vim.opt.cursorline = true
-vim.opt.clipboard = "unnamedplus" -- Use system clipboard by default
+-- vim.opt.clipboard = "unnamedplus" -- Use system clipboard by default
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
