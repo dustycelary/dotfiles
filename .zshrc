@@ -2,13 +2,8 @@
 #  ~/.zshrc
 # =============================================================================
 
-# =============================================================================
-# 1. SHARED (macOS & Raspberry Pi) - Instant Prompt & Env
-# =============================================================================
-# if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-#   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-# fi
-
+# --- [BOTH] ---
+# 1. Environment & Paths
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
@@ -19,26 +14,25 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# =============================================================================
-# 2. SHARED (macOS & Raspberry Pi) - Oh My Zsh & Options
-# =============================================================================
+# --- [BOTH] ---
+# 2. Oh My Zsh & Options
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_DISABLE_COMPFIX=true
-# ZSH_THEME="powerlevel10k/powerlevel10k"
-ZSH_THEME=""
 
-# Cleaned up plugin list (removed jump, copypath, copyfile)
+# Cleaned up plugin list
 plugins=(
   git history fzf virtualenv you-should-use
   colored-man-pages extract
   fzf-tab zsh-completions zsh-autosuggestions zsh-syntax-highlighting
 )
 
+# --- [MAC ONLY] ---
 # Conditional Zsh Plugins
 if [[ "$OSTYPE" == "darwin"* ]]; then
   plugins+=(macos)
 fi
 
+# --- [BOTH] ---
 source $ZSH/oh-my-zsh.sh
 
 # History & Options
@@ -49,10 +43,8 @@ setopt AUTO_CD AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT INTERACTIVE_COMMENTS EX
 unsetopt BEEP
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 
-# =============================================================================
-# 3. SHARED (macOS & Raspberry Pi) - Tool Integrations & FZF
-# =============================================================================
-# zoxide - maps cd to zoxide (note: we still define cd wrapper below)
+# --- [BOTH] ---
+# 3. Tool Integrations & FZF
 eval "$(zoxide init zsh)"
 
 export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git --exclude venv'
@@ -63,10 +55,10 @@ export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/
 export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}'"
 
-# =============================================================================
-# 4. SHARED (macOS & Raspberry Pi) - Aliases & Functions
-# =============================================================================
+# --- [BOTH] ---
+# 4. Aliases & Functions
 alias rezsh='source ~/.zshrc'
+alias ezsh='nvim ~/.zshrc'
 alias envim='nvim ~/.config/nvim/init.lua'
 
 command -v eza >/dev/null && alias ls='eza --group-directories-first --icons' \
@@ -88,7 +80,6 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
     
     local osc
     if [[ -n "$TMUX" ]]; then
-      # Wrap in tmux DCS passthrough sequence
       osc=$(printf "\033Ptmux;\033\033]52;c;%s\a\033\\" "$b64")
     else
       osc=$(printf "\033]52;c;%s\a" "$b64")
@@ -157,7 +148,6 @@ PY
   }
 
   pbpaste() {
-    # If a native pbpaste exists and we are NOT under SSH, use it
     if [[ -z "$SSH_CONNECTION" && -z "$SSH_CLIENT" && -z "$SSH_TTY" ]] && command -v pbpaste >/dev/null; then
       command pbpaste "$@"
       return
@@ -186,7 +176,6 @@ vf() { nvim "$(fd --type f | fzf)"; }
 bin() { mkdir -p ~/Desktop/rubbish; mv "$@" ~/Desktop/rubbish/; echo "Moved to rubbish: $@"; }
 
 cd() {
-  # If the directory exists, is empty, or is "-", run normal cd (through zoxide if present)
   if [[ -d "$1" || -z "$1" || "$1" == "-" ]]; then
     if typeset -f __zoxide_z >/dev/null; then
       __zoxide_z "$@"
@@ -196,22 +185,16 @@ cd() {
     return
   fi
 
-  # If it doesn't exist, search for a similar directory using Zsh's approximate globbing.
-  # (#ia1) allows case-insensitivity + 1 typo, (#ia2) allows case-insensitivity + 2 typos.
-  # (/) ensures we only match directories.
   setopt localoptions extendedglob
   local target="$1"
   local matches
   
-  # Try with 1 typo first (case-insensitive)
   matches=( (#ia1)"$target"(N/) )
 
-  # If no match, try with 2 typos (case-insensitive)
   if [[ ${#matches} -eq 0 ]]; then
     matches=( (#ia2)"$target"(N/) )
   fi
 
-  # If we found exactly one matching directory, go straight into it!
   if [[ ${#matches} -eq 1 ]]; then
     echo "Correcting cd to: ${matches[1]}"
     if typeset -f __zoxide_z >/dev/null; then
@@ -234,7 +217,6 @@ cd() {
     return
   fi
 
-  # Otherwise, pass through to let zoxide query database or print directory not found
   if typeset -f __zoxide_z >/dev/null; then
     __zoxide_z "$@"
   else
@@ -243,7 +225,7 @@ cd() {
 }
 
 rga-fzf() {
-  local RG_PREFIX="rga --files-with-matches --smart-case"
+  local RG_PREFIX="rga --files-with-matches --smart-case --glob '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}' --glob '!**/screenshots/**' --glob '!**Screenshots**'"
   local file
   file=$(
     FZF_DEFAULT_COMMAND="$RG_PREFIX ''" \
@@ -286,9 +268,8 @@ copy-pwd() {
   echo "Copied: $(pwd)"
 }
 
-# =============================================================================
-# 5. macOS ONLY
-# =============================================================================
+# --- [MAC ONLY] ---
+# 5. macOS ONLY Configurations
 if [[ "$OSTYPE" == "darwin"* ]]; then
   # Homebrew
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -298,41 +279,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init -)"
 
-  alias ezsh='nvim ~/.zshrc'
   alias eghostty='nvim ~/.config/ghostty/config'
   alias pbsync='pbpaste | ssh fungus@100.112.31.8 "xclip -selection clipboard"'
   alias nf='cat ~/nerdfont.csv | fzf -d "," --with-nth=1,2,3 | awk -F"," "{printf \$3}" | pbcopy'
   alias bb='cd "/Users/fungus/Library/Mobile Documents/iCloud~md~obsidian/Documents/beep-boop" && nvim .'
-
-  vgr() {
-    local id=$(vimgolf list | python3 -c "import sys, random; ids = [line.split('(')[-1].split(')')[0] for line in sys.stdin if '(' in line]; print(random.choice(ids))")
-    if [ -z "$id" ]; then
-      echo "Error: Could not retrieve a challenge ID."
-      return 1
-    fi
-    local url="https://www.vimgolf.com/challenges/$id"
-    echo "$url" | pbcopy
-    echo "--------------------------------------------------------"
-    echo "🎯 Challenge URL (Copied to Clipboard!):"
-    echo "   $url"
-    echo "--------------------------------------------------------"
-    echo "Press [Enter] to launch Neovim and start the challenge..."
-    read -r
-    vimgolf put "$id"
-  }
 fi
 
-# =============================================================================
-# 6. RASPBERRY PI / LINUX ONLY
-# =============================================================================
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  alias ezsh='nvim ~/.zshrc'
-fi
-
-# =============================================================================
-# 7. Zsh Keybindings & Widget Registration
-# =============================================================================
-# Ctrl+Y Ctrl+P for copy-pwd
+# --- [BOTH] ---
+# 6. Zsh Keybindings & Widget Registration
 copy-pwd-widget() {
   copy-pwd
   zle reset-prompt
@@ -340,7 +294,6 @@ copy-pwd-widget() {
 zle -N copy-pwd-widget
 bindkey '^y^p' copy-pwd-widget
 
-# Ctrl+G for interactive rga content search
 rga-fzf-widget() {
   rga-fzf
   zle reset-prompt
@@ -348,16 +301,14 @@ rga-fzf-widget() {
 zle -N rga-fzf-widget
 bindkey '^g' rga-fzf-widget
 
-# Ctrl+Alt+G for local directory cd widget
 zle -N fzf-local-cd-widget
 bindkey '^[^g' fzf-local-cd-widget
 
+# --- [MAC ONLY] ---
 # Ghostty Integration
 [[ -n $GHOSTTY_RESOURCES_DIR && -z $TMUX ]] && \
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 
-# P10k configuration
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
+# --- [BOTH] ---
 # Custom prompt to match default bash prompt
 PROMPT='%n@%m:%~$ '

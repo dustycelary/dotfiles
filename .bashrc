@@ -2,9 +2,8 @@
 #  ~/.bashrc
 # =============================================================================
 
-# =============================================================================
-# 1. SHARED (macOS & Raspberry Pi) - Environment & History
-# =============================================================================
+# --- [BOTH] ---
+# 1. Environment & History
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR='nvim'
 export VISUAL='nvim'
@@ -34,30 +33,38 @@ bind 'set bell-style none' 2>/dev/null
 bind 'set completion-ignore-case on' 2>/dev/null
 bind 'set show-all-if-ambiguous on' 2>/dev/null
 
-# =============================================================================
-# 2. SHARED (macOS & Raspberry Pi) - Tool Integrations
-# =============================================================================
-# zoxide - smart directory jumping
+# --- [BOTH] ---
+# 2. Tool Integrations
 eval "$(zoxide init --cmd cd bash)"
 
-# fzf - fuzzy finder
 export FZF_DEFAULT_COMMAND='fd --type f --follow --exclude .git --exclude venv'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --color=always {} 2>/dev/null || ls {}'"
 
+# Source FZF completions and keybindings
+if [[ -d "/opt/homebrew/opt/fzf" ]]; then
+  source "/opt/homebrew/opt/fzf/shell/key-bindings.bash" 2>/dev/null
+  source "/opt/homebrew/opt/fzf/shell/completion.bash" 2>/dev/null
+elif [[ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ]]; then
+  source "/usr/share/doc/fzf/examples/key-bindings.bash" 2>/dev/null
+  source "/usr/share/doc/fzf/examples/completion.bash" 2>/dev/null
+elif [[ -f "$HOME/.fzf.bash" ]]; then
+  source "$HOME/.fzf.bash" 2>/dev/null
+fi
+
 # Version Manager: NVM
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-# =============================================================================
-# 3. SHARED (macOS & Raspberry Pi) - Aliases & Functions
-# =============================================================================
+# --- [BOTH] ---
+# 3. Aliases & Functions
 alias envim='nvim ~/.config/nvim/init.lua'
 alias etmux='nvim ~/.tmux.conf'
 alias rebash='source ~/.bashrc'
+alias ebash='nvim ~/.bashrc'
 
 # Modern CLI replacements
 command -v eza >/dev/null && alias ls='eza --group-directories-first --icons' \
@@ -79,7 +86,6 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
     
     local osc
     if [[ -n "$TMUX" ]]; then
-      # Wrap in tmux DCS passthrough sequence
       osc=$(printf "\033Ptmux;\033\033]52;c;%s\a\033\\" "$b64")
     else
       osc=$(printf "\033]52;c;%s\a" "$b64")
@@ -148,7 +154,6 @@ PY
   }
 
   pbpaste() {
-    # If a native pbpaste exists and we are NOT under SSH, use it
     if [[ -z "$SSH_CONNECTION" && -z "$SSH_CLIENT" && -z "$SSH_TTY" ]] && command -v pbpaste >/dev/null; then
       command pbpaste "$@"
       return
@@ -184,9 +189,8 @@ bin() {
   echo "Moved to rubbish: $@"
 }
 
-# Smart cd wrapper that automatically corrects spelling typos for local/relative paths
+# Smart cd wrapper
 cd() {
-  # If the directory exists, is empty, or is "-", run normal cd (through zoxide if present)
   if [[ -d "$1" || -z "$1" || "$1" == "-" ]]; then
     if declare -f __zoxide_z >/dev/null; then
       __zoxide_z "$@"
@@ -196,33 +200,24 @@ cd() {
     return
   fi
 
-  # In Bash, we don't have Zsh's approximate globbing (#ia1), but we can enable
-  # case-insensitive globbing (nocaseglob) and spelling correction (cdspell).
-  # We can also do a quick check to see if there is a case-insensitive match.
   local target="$1"
-  
-  # Enable nocaseglob and nullglob temporarily to search for case-insensitive matches
   local nocaseglob_unset=0
   local nullglob_unset=0
   shopt -q nocaseglob || { shopt -s nocaseglob; nocaseglob_unset=1; }
   shopt -q nullglob || { shopt -s nullglob; nullglob_unset=1; }
   
   local matches=()
-  # Use glob to find case-insensitive matching directories
   local glob_pattern="${target}/"
   local glob_matches=( $glob_pattern )
   
-  # If no direct match, try matching directories starting with target
   if [[ ${#glob_matches[@]} -eq 0 || ! -d "${glob_matches[0]}" ]]; then
     glob_pattern="${target}"*/
     glob_matches=( $glob_pattern )
   fi
   
-  # Restore options
   [[ $nocaseglob_unset -eq 1 ]] && shopt -u nocaseglob
   [[ $nullglob_unset -eq 1 ]] && shopt -u nullglob
   
-  # If we found exactly one matching directory, go straight into it!
   if [[ ${#glob_matches[@]} -eq 1 && -d "${glob_matches[0]}" ]]; then
     local corrected="${glob_matches[0]%/}"
     echo "Correcting cd to: $corrected"
@@ -234,7 +229,6 @@ cd() {
     return
   fi
 
-  # Otherwise, pass through to let zoxide query database or print directory not found
   if declare -f __zoxide_z >/dev/null; then
     __zoxide_z "$@"
   else
@@ -243,7 +237,7 @@ cd() {
 }
 
 rga-fzf() {
-  local RG_PREFIX="rga --files-with-matches --smart-case"
+  local RG_PREFIX="rga --files-with-matches --smart-case --glob '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}' --glob '!**/screenshots/**' --glob '!**Screenshots**'"
   local file
   file=$(
     FZF_DEFAULT_COMMAND="$RG_PREFIX ''" \
@@ -279,23 +273,12 @@ copy-pwd() {
 bind -x '"\C-y\C-p": copy-pwd' 2>/dev/null || true
 bind -x '"\C-g": rga-fzf' 2>/dev/null || true
 
-
-# =============================================================================
+# --- [MAC ONLY] ---
 # 4. macOS ONLY
-# =============================================================================
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  alias ebash='nvim ~/.bashrc'
   alias eghostty='nvim ~/.config/ghostty/config'
   alias ehammer='nvim ~/.hammerspoon/init.lua'
   alias pbsync='pbpaste | ssh fungus@100.112.31.8 "xclip -selection clipboard"'
   alias nf='cat ~/nerdfont.csv | fzf -d "," --with-nth=1,2,3 | awk -F"," "{printf \$3}" | pbcopy'
   alias bb='cd "/Users/fungus/Library/Mobile Documents/iCloud~md~obsidian/Documents/beep-boop" && nvim .'
-fi
-
-
-# =============================================================================
-# 5. RASPBERRY PI / LINUX ONLY
-# =============================================================================
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  alias ebash='nvim ~/.bashrc'
 fi
