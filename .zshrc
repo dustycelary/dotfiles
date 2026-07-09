@@ -84,7 +84,11 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
     fi
     local b64
     b64=$(printf "%s" "$data" | base64 | tr -d '\r\n')
-    printf "\e]52;c;%s\a" "$b64"
+    if [ -c /dev/tty ] && [ -w /dev/tty ]; then
+      printf "\e]52;c;%s\a" "$b64" > /dev/tty
+    else
+      printf "\e]52;c;%s\a" "$b64"
+    fi
   }
 fi
 
