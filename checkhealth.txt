@@ -1,0 +1,45 @@
+
+==============================================================================
+vim.provider:                                                             4 ⚠️
+
+Clipboard (optional) ~
+- ✅ OK Clipboard tool found: pbcopy
+
+Node.js provider (optional) ~
+- Node.js: 26.0.0
+- Nvim node.js host: /opt/homebrew/lib/node_modules/neovim/bin/cli.js
+- ✅ OK Latest "neovim" npm/yarn/pnpm package is installed: 5.4.0
+
+
+Perl provider (optional) ~
+- ⚠️ WARNING "Neovim::Ext" cpan module is not installed
+  - ADVICE:
+    - See :help |provider-perl| for more information.
+    - You can disable this provider (and warning) by adding `let g:loaded_perl_provider = 0` to your init.vim
+- ⚠️ WARNING No usable perl executable found
+
+Python 3 provider (optional) ~
+- pyenv: Path: /opt/homebrew/Cellar/pyenv/2.6.27/libexec/pyenv
+- pyenv: Root: /Users/fungus/.pyenv
+- `g:python3_host_prog` is not set. Searching for pynvim-python in the environment.
+- ⚠️ WARNING pyenv is not set up optimally.
+  - ADVICE:
+    - Create a virtualenv specifically for Nvim using pyenv, and set `g:python3_host_prog`.  This will avoid the need to install the pynvim module in each version/virtualenv.
+- Executable: /Users/fungus/.pyenv/versions/3.14.3/bin/pynvim-python
+- Python version: 3.14.3
+- pynvim version: 0.6.0
+- ✅ OK Latest pynvim is installed.
+
+Python virtualenv ~
+- ✅ OK no $VIRTUAL_ENV
+
+Ruby provider (optional) ~
+- Ruby: 2.6.10
+- ⚠️ WARNING `neovim-ruby-host` not found.
+  - ADVICE:
+    - Run `gem install neovim` to ensure the neovim RubyGem is installed.
+    - Run `gem environment` to ensure the gem bin directory is in $PATH.
+    - If you are using rvm/rbenv/chruby, try "rehashing".
+    - See :help |g:ruby_host_prog| for non-standard gem installations.
+    - You can disable this provider (and warning) by adding `let g:loaded_ruby_provider = 0` to your init.vim
+

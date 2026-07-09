@@ -19,6 +19,7 @@ vim.opt.undofile = true
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
 vim.opt.cursorline = true
+vim.opt.clipboard = "unnamedplus" -- Use system clipboard by default
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
@@ -50,72 +51,20 @@ vim.api.nvim_create_autocmd("FileType", {
 	end,
 })
 
-if vim.env.SSH_TTY ~= nil or vim.env.SSH_CONNECTION ~= nil then
-	local function osc52_paste_fresh()
-		if vim.fn.executable("python3") ~= 1 then
-			return {}, "v"
-		end
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+	local osc52 = require("vim.ui.clipboard.osc52")
+	local function no_clipboard_paste()
+		return {}, "v"
+	end
 
-		local script = [[
-import base64
-import os
-import re
-import select
-import sys
-import termios
-import time
-import tty
-
-tmux_mode = os.environ.get("TMUX") is not None
-query = b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\" if tmux_mode else b"\x1b]52;c;?\x07"
-
-with open("/dev/tty", "r+b", buffering=0) as t:
-    fd = t.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        os.write(fd, query)
-
-        buf = bytearray()
-        deadline = time.monotonic() + 1.5
-        while time.monotonic() < deadline:
-            timeout = max(0.0, deadline - time.monotonic())
-            ready, _, _ = select.select([fd], [], [], timeout)
-            if not ready:
-                break
-            chunk = os.read(fd, 4096)
-            if not chunk:
-                break
-            buf.extend(chunk)
-            if b"\x07" in buf or b"\x1b\\" in buf:
-                break
-
-        match = re.search(rb"\]52;[^;]*;([A-Za-z0-9+/=]+)", bytes(buf))
-        if not match:
-            raise SystemExit(1)
-
-        sys.stdout.buffer.write(base64.b64decode(match.group(1), validate=False))
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-]]
-
-		local output = vim.fn.systemlist({ "python3", "-c", script })
-		if vim.v.shell_error ~= 0 then
-			return {}, "v"
-		end
-		return output, "v"
+	local function both_registers(value)
+		return { ["+"] = value, ["*"] = value }
 	end
 
 	vim.g.clipboard = {
 		name = "OSC 52",
-		copy = {
-			["+"] = require("vim.ui.clipboard.osc52").copy("+"),
-			["*"] = require("vim.ui.clipboard.osc52").copy("*"),
-		},
-		paste = {
-			["+"] = osc52_paste_fresh,
-			["*"] = osc52_paste_fresh,
-		},
+		copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+		paste = both_registers(no_clipboard_paste),
 		cache_enabled = 0,
 	}
 end

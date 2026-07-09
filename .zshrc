@@ -94,72 +94,6 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
   }
 fi
 
-# Portable pbpaste via OSC 52 (works over SSH)
-if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command -v pbpaste >/dev/null; then
-  _osc52_pbpaste() {
-    if ! command -v python3 >/dev/null; then
-      return 1
-    fi
-
-    local tmux_mode=0
-    [[ -n "$TMUX" ]] && tmux_mode=1
-
-    python3 - "$tmux_mode" <<'PY'
-import base64
-import os
-import re
-import select
-import sys
-import termios
-import time
-import tty
-
-tmux_mode = len(sys.argv) > 1 and sys.argv[1] == "1"
-query = b"\x1bPtmux;\x1b\x1b]52;c;?\x07\x1b\\" if tmux_mode else b"\x1b]52;c;?\x07"
-
-with open("/dev/tty", "r+b", buffering=0) as t:
-    fd = t.fileno()
-    old = termios.tcgetattr(fd)
-    try:
-        tty.setraw(fd)
-        os.write(fd, query)
-
-        buf = bytearray()
-        deadline = time.monotonic() + 1.5
-        while time.monotonic() < deadline:
-            timeout = max(0.0, deadline - time.monotonic())
-            ready, _, _ = select.select([fd], [], [], timeout)
-            if not ready:
-                break
-            chunk = os.read(fd, 4096)
-            if not chunk:
-                break
-            buf.extend(chunk)
-            if b"\x07" in buf or b"\x1b\\" in buf:
-                break
-
-        match = re.search(rb"\]52;[^;]*;([A-Za-z0-9+/=]+)", bytes(buf))
-        if not match:
-            raise SystemExit(1)
-
-        sys.stdout.buffer.write(base64.b64decode(match.group(1), validate=False))
-    finally:
-        termios.tcsetattr(fd, termios.TCSADRAIN, old)
-PY
-  }
-
-  pbpaste() {
-    if [[ -z "$SSH_CONNECTION" && -z "$SSH_CLIENT" && -z "$SSH_TTY" ]] && command -v pbpaste >/dev/null; then
-      command pbpaste "$@"
-      return
-    fi
-    if ! _osc52_pbpaste; then
-      echo "pbpaste: failed to read local clipboard via OSC 52" >&2
-      return 1
-    fi
-  }
-fi
-
 # Portable open helper
 my_open() {
   if command -v open >/dev/null; then
@@ -269,7 +203,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   eval "$(pyenv init -)"
 
   alias eghostty='nvim ~/.config/ghostty/config'
-  alias pbsync='pbpaste | ssh fungus@100.112.31.8 "xclip -selection clipboard"'
   alias nf='cat ~/nerdfont.csv | fzf -d "," --with-nth=1,2,3 | awk -F"," "{printf \$3}" | pbcopy'
   alias bb='cd "/Users/fungus/Library/Mobile Documents/iCloud~md~obsidian/Documents/beep-boop" && nvim .'
 fi
