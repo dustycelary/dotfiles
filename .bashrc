@@ -76,10 +76,19 @@ if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command 
     fi
     local b64
     b64=$(printf "%s" "$data" | base64 | tr -d '\r\n')
-    if [ -c /dev/tty ] && [ -w /dev/tty ]; then
-      printf "\e]52;c;%s\a" "$b64" > /dev/tty
+    
+    local osc
+    if [[ -n "$TMUX" ]]; then
+      # Wrap in tmux DCS passthrough sequence
+      osc=$(printf "\033Ptmux;\033\033]52;c;%s\a\033\\\\" "$b64")
     else
-      printf "\e]52;c;%s\a" "$b64"
+      osc=$(printf "\033]52;c;%s\a" "$b64")
+    fi
+
+    if [ -c /dev/tty ] && [ -w /dev/tty ]; then
+      printf "%s" "$osc" > /dev/tty
+    else
+      printf "%s" "$osc"
     fi
   }
 fi
