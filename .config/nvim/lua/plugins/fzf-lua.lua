@@ -4,8 +4,8 @@
 -- Non-obvious: <leader>cR does project-wide rename via grep → quickfix → cfdo.
 -- <C-e> opens the parent directory of the selected file in netrw.
 -- <C-d> prompts to delete the selected file.
--- <C-i> toggles ignored files (.gitignore). (Note: May overlap with Tab key)
--- <C-h> toggles hidden files.
+-- <M-i> (alt-i) toggles ignored files (.gitignore).
+-- <M-h> (alt-h) toggles hidden files.
 -- LSP keymaps (grd, grr, gri, go, <leader>ss) open results in fzf instead of quickfix.
 return {
 	"ibhagwan/fzf-lua",
@@ -67,6 +67,10 @@ return {
 		end
 
 		require("fzf-lua").setup({
+			defaults = {
+				no_ignore = true,
+				hidden = true,
+			},
 			actions = {
 				files = {
 					-- Explicit standard actions
@@ -82,8 +86,8 @@ return {
 					["ctrl-d"] = delete_file,
 
 					-- Toggles
-					["ctrl-g"] = { fzf.actions.toggle_ignore },
-					["ctrl-h"] = { fzf.actions.toggle_hidden },
+					["alt-i"] = { fzf.actions.toggle_ignore },
+					["alt-h"] = { fzf.actions.toggle_hidden },
 				},
 				grep = {
 					-- Grep needs its own explicit mapping to use the toggles
@@ -95,18 +99,22 @@ return {
 					["alt-l"] = fzf.actions.file_sel_to_ll,
 
 					-- Toggles
-					["ctrl-i"] = { fzf.actions.toggle_ignore },
-					["ctrl-h"] = { fzf.actions.toggle_hidden },
+					["alt-i"] = { fzf.actions.toggle_ignore },
+					["alt-h"] = { fzf.actions.toggle_hidden },
 				},
 			},
 			files = {
 				-- Kept clean so the toggles work bidirectionally
 				cmd = "fd --type f " .. fd_excludes .. " 2>/dev/null",
 				fzf_opts = { ["--scheme"] = "path" },
+				no_ignore = true,
+				hidden = true,
 			},
 			grep = {
 				rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096",
 				fzf_opts = { ["--scheme"] = "path" },
+				no_ignore = true,
+				hidden = true,
 			},
 		})
 

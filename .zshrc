@@ -374,3 +374,51 @@ setopt PROMPT_SUBST
 
 # Custom prompt to match default bash prompt with custom hostname and abbreviated path
 PROMPT='%n@fungus-mac:$(shorten_path)$ '
+
+# --- [BOTH] ---
+# 8. Python Virtual Environment Auto-Activation
+auto_activate_venv() {
+  local venv_dirs=(".venv" "venv")
+  local found_venv=""
+
+  # Check if we are currently in a directory that matches the active venv
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    local active_venv_dir="${VIRTUAL_ENV:h}"
+    if [[ "$PWD" == "$active_venv_dir" || "$PWD" == "$active_venv_dir"/* ]]; then
+      # If deactivate function is also defined, we are fully activated.
+      if (( $+functions[deactivate] )); then
+        return
+      fi
+      # If deactivate function is not defined (e.g., inherited environment),
+      # we will proceed to re-source the activation script below.
+    else
+      # We left the active venv directory. Deactivate/cleanup.
+      if (( $+functions[deactivate] )); then
+        deactivate 2>/dev/null
+      else
+        # Manual cleanup for inherited env
+        PATH="${PATH//${VIRTUAL_ENV}\/bin:/}"
+        PATH="${PATH//:${VIRTUAL_ENV}\/bin/}"
+        unset VIRTUAL_ENV
+      fi
+      print -P "%F{208}⚡ Deactivated virtual environment%f"
+    fi
+  fi
+
+  # Search for a venv in the current directory
+  local d
+  for d in "${venv_dirs[@]}"; do
+    if [[ -f "$PWD/$d/bin/activate" ]]; then
+      source "$PWD/$d/bin/activate"
+      print -P "%F{82}🐍 Activated Python virtual environment: %F{51}$d%f %F{244}(%~)%f"
+      return
+    fi
+  done
+}
+
+# Run on shell startup
+auto_activate_venv
+
+# Run whenever we change directory
+autoload -U add-zsh-hook
+add-zsh-hook chpwd auto_activate_venv

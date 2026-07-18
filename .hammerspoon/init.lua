@@ -8,6 +8,7 @@ require("hammer-control.init")
 -- Create new spaces in the macOS menu bar
 agyMenu = hs.menubar.new()
 appMenu = hs.menubar.new()
+ollamaMenu = hs.menubar.new()
 
 local function updateStatus()
 	-- 1. Ask the system directly for all processes (CPU and Command line)
@@ -18,6 +19,7 @@ local function updateStatus()
 	if not output then
 		agyMenu:setTitle("🤖 ERR")
 		appMenu:setTitle("🛸 ERR")
+		ollamaMenu:setTitle("🦙 ERR")
 		return
 	end
 
@@ -26,6 +28,9 @@ local function updateStatus()
 	
 	local appCpu = 0
 	local appRunning = false
+
+	local ollamaCpu = 0
+	local ollamaRunning = false
 
 	-- 2. Loop through every single line of the output
 	for line in string.gmatch(output, "[^\r\n]+") do
@@ -42,6 +47,11 @@ local function updateStatus()
 				if string.find(string.lower(line), "antigravity") then
 					appCpu = appCpu + cpu
 					appRunning = true
+				end
+				-- Check for Ollama
+				if string.find(string.lower(line), "ollama") then
+					ollamaCpu = ollamaCpu + cpu
+					ollamaRunning = true
 				end
 			end
 		end
@@ -64,6 +74,15 @@ local function updateStatus()
 		appMenu:setTitle("🛸 ⚠ " .. string.format("%.1f", appCpu) .. "%")
 	else
 		appMenu:setTitle("🛸 IDLE")
+	end
+
+	-- Ollama
+	if not ollamaRunning then
+		ollamaMenu:setTitle("🦙 OFF")
+	elseif ollamaCpu > 10.0 then
+		ollamaMenu:setTitle("🦙 ⚠ " .. string.format("%.1f", ollamaCpu) .. "%")
+	else
+		ollamaMenu:setTitle("🦙 IDLE")
 	end
 end
 
