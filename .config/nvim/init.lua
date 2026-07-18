@@ -1,5 +1,5 @@
 -- User configuration for Neovim
--- Leader keys
+-- TODO: fix keymap grouping so that they all make sense, such as LSP and code actions
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
@@ -13,7 +13,8 @@ vim.opt.background = "dark"
 
 vim.opt.autoindent = true -- Keep identation from previous line
 vim.opt.smarttab = true
-vim.opt.smartindent = true
+-- vim.opt.smartindent = true
+vim.opt.expandtab = true -- Convert tabs to spaces by default
 
 vim.opt.undofile = true
 vim.opt.scrolloff = 8
@@ -75,11 +76,13 @@ vim.opt.timeoutlen = 1000
 vim.opt.wrap = false
 
 -- Folding
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldmethod = "manual"
+-- vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99 -- start with all folds open
 vim.opt.foldlevelstart = 99 -- files open with all folds open
-vim.opt.foldnestmax = 4 -- limit nesting depth
+vim.opt.foldcolumn = "0"
+vim.opt.foldtext = ""
+-- vim.opt.foldnestmax = 4 -- limit nesting depth
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then

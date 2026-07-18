@@ -5,6 +5,7 @@ vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
 vim.keymap.set("n", "<C-CR>", "o", { desc = "Insert line below" })
 vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert line below" })
+vim.keymap.set("i", "<S-CR>", "<C-o>$", { desc = "Move cursor to last character of line" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 vim.keymap.set("n", "S", function()
 	local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -93,8 +94,8 @@ end, { desc = "Equalize windows" })
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
 
 -- [[ Buffers & Tabs ]]
-vim.keymap.set("n", "<C-Space>", "<cmd>bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<M-Space>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<M-Space>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<C-Space>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
 
 vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Close buffer" })
 vim.keymap.set("n", "<leader>bn", "<cmd>bnext<CR>", { desc = "Next buffer" })
@@ -109,6 +110,14 @@ vim.keymap.set("n", "<leader>bo", "<cmd>tabonly<CR>", { desc = "Close all other 
 vim.keymap.set("n", "<leader>bm", ":tabmove ", { desc = "Move tab" })
 
 -- [[ UI toggles ]]
+vim.keymap.set("n", "<leader>ui", function()
+	local current = vim.bo.shiftwidth
+	local new_size = (current == 2) and 4 or 2
+	vim.bo.shiftwidth = new_size
+	vim.bo.tabstop = new_size
+	vim.bo.softtabstop = new_size
+	vim.notify("Indent size set to " .. new_size, vim.log.levels.INFO, { title = "Indentation" })
+end, { desc = "Toggle indent size (2 <-> 4)" })
 
 -- [[ Code / LSP ]]
 -- Replace: buffer-local word under cursor

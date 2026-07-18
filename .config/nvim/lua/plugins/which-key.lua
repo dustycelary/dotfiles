@@ -110,6 +110,8 @@ return {
 		spec = {
 			{ "<leader>b", group = "Buffers/Tabs" },
 			{ "<leader>c", group = "Code/LSP" },
+			{ "<leader>cx", desc = "Swap argument next" },
+			{ "<leader>cX", desc = "Swap argument prev" },
 			{ "<leader>h", group = "Harpoon" },
 			{ "<leader>s", group = "Search/Find" },
 			{ "<leader>u", group = "UI Toggles" },

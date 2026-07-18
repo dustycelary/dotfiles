@@ -1,16 +1,19 @@
 -- fzf-lua — fuzzy finder for files, grep, buffers, LSP, and more.
--- Files use fd (respects .gitignore, hidden files included, common dirs excluded).
--- Grep uses ripgrep with hidden files. <leader>sF / <leader>sG include ignored files.
+-- Files use fd (excludes common dirs).
+-- Grep uses ripgrep.
 -- Non-obvious: <leader>cR does project-wide rename via grep → quickfix → cfdo.
--- <C-x> deletes selected file(s) from the files picker after confirmation.
+-- <C-e> opens the parent directory of the selected file in netrw.
+-- <C-d> prompts to delete the selected file.
+-- <C-i> toggles ignored files (.gitignore). (Note: May overlap with Tab key)
+-- <C-h> toggles hidden files.
 -- LSP keymaps (grd, grr, gri, go, <leader>ss) open results in fzf instead of quickfix.
 return {
 	"ibhagwan/fzf-lua",
-	-- optional for icons
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
 		local fzf = require("fzf-lua")
 		local fzf_path = require("fzf-lua.path")
+
 		local fd_excludes = table.concat({
 			"--exclude .git",
 			"--exclude .venv",
@@ -22,70 +25,96 @@ return {
 			"--exclude build",
 		}, " ")
 
+		-- Custom Action: Open parent directory in Netrw
+		local open_in_netrw = function(selected, opts)
+			if not selected or #selected == 0 then
+				return
+			end
+			local entry = fzf_path.entry_to_file(selected[1], opts)
+			local path = entry.path or entry.bufname or entry.uri
+			if path then
+				local dir = vim.fn.isdirectory(path) == 1 and path or vim.fn.fnamemodify(path, ":h")
+				vim.cmd("edit " .. vim.fn.fnameescape(dir))
+			end
+		end
+
+		-- Custom Action: Delete the selected file
+		local delete_file = function(selected, opts)
+			if not selected or #selected == 0 then
+				return
+			end
+			local entry = fzf_path.entry_to_file(selected[1], opts)
+			local path = entry.path or entry.bufname or entry.uri
+			if not path then
+				return
+			end
+
+			local confirm = vim.fn.input(string.format("Delete '%s'? [y/N]: ", vim.fn.fnamemodify(path, ":t")))
+			vim.cmd("redraw") -- clear the command line
+
+			if confirm:lower() == "y" then
+				local success, err = os.remove(path)
+				if success then
+					vim.notify("File deleted: " .. path, vim.log.levels.INFO)
+					-- Reopen the fzf window (resume) to refresh the file list
+					fzf.actions.resume(selected, opts)
+				else
+					vim.notify("Error deleting file: " .. tostring(err), vim.log.levels.ERROR)
+				end
+			else
+				vim.notify("Deletion cancelled", vim.log.levels.WARN)
+			end
+		end
+
 		require("fzf-lua").setup({
+			actions = {
+				files = {
+					-- Explicit standard actions
+					["default"] = fzf.actions.file_edit,
+					["ctrl-s"] = fzf.actions.file_split,
+					["ctrl-v"] = fzf.actions.file_vsplit,
+					["ctrl-t"] = fzf.actions.file_tabedit,
+					["alt-q"] = fzf.actions.file_sel_to_qf,
+					["alt-l"] = fzf.actions.file_sel_to_ll,
+
+					-- Custom integrations
+					["ctrl-e"] = open_in_netrw,
+					["ctrl-d"] = delete_file,
+
+					-- Toggles
+					["ctrl-g"] = { fzf.actions.toggle_ignore },
+					["ctrl-h"] = { fzf.actions.toggle_hidden },
+				},
+				grep = {
+					-- Grep needs its own explicit mapping to use the toggles
+					["default"] = fzf.actions.file_edit,
+					["ctrl-s"] = fzf.actions.file_split,
+					["ctrl-v"] = fzf.actions.file_vsplit,
+					["ctrl-t"] = fzf.actions.file_tabedit,
+					["alt-q"] = fzf.actions.file_sel_to_qf,
+					["alt-l"] = fzf.actions.file_sel_to_ll,
+
+					-- Toggles
+					["ctrl-i"] = { fzf.actions.toggle_ignore },
+					["ctrl-h"] = { fzf.actions.toggle_hidden },
+				},
+			},
 			files = {
-				cmd = "fd --type f --hidden " .. fd_excludes .. " 2>/dev/null",
+				-- Kept clean so the toggles work bidirectionally
+				cmd = "fd --type f " .. fd_excludes .. " 2>/dev/null",
 				fzf_opts = { ["--scheme"] = "path" },
 			},
 			grep = {
-				-- respects .gitignore; .git is always skipped by rg
-				rg_opts = "--hidden --column --line-number --no-heading --color=always --smart-case --max-columns=4096",
+				rg_opts = "--column --line-number --no-heading --color=always --smart-case --max-columns=4096",
 				fzf_opts = { ["--scheme"] = "path" },
 			},
-			actions = {
-				["ctrl-x"] = function(selected, opts)
-					if not selected or #selected == 0 then
-						return
-					end
-
-					local prompt = #selected == 1 and ("Delete " .. selected[1] .. "?")
-						or ("Delete " .. #selected .. " selected files?")
-					if vim.fn.confirm(prompt, "&Yes\n&No", 2) ~= 1 then
-						return
-					end
-
-					local failures = {}
-					for _, item in ipairs(selected) do
-						local entry = fzf_path.entry_to_file(item, opts)
-						local path = entry.path or entry.bufname or entry.uri
-						if path and vim.fn.delete(path) ~= 0 then
-							table.insert(failures, path)
-						end
-					end
-
-					if #failures > 0 then
-						vim.notify(
-							"Failed to delete:\n" .. table.concat(failures, "\n"),
-							vim.log.levels.WARN,
-							{ title = "fzf-lua" }
-						)
-					end
-				end,
-			},
 		})
+
 		fzf.register_ui_select()
 	end,
 	keys = {
 		{ "<leader>sf", "<cmd>FzfLua files<cr>", desc = "Fzf Files" },
-		{
-			"<leader>sF",
-			function()
-				require("fzf-lua").files({
-					cmd = "fd --type f --hidden --no-ignore --exclude .git 2>/dev/null",
-				})
-			end,
-			desc = "Fzf Files (all, inc. ignored)",
-		},
 		{ "<leader>sg", "<cmd>FzfLua live_grep<cr>", desc = "Fzf Grep" },
-		{
-			"<leader>sG",
-			function()
-				require("fzf-lua").live_grep({
-					rg_opts = "--no-ignore --hidden --column --line-number --no-heading --color=always --smart-case --max-columns=4096",
-				})
-			end,
-			desc = "Fzf Grep (all, inc. ignored)",
-		},
 		{ "<leader>sb", "<cmd>FzfLua buffers<cr>", desc = "Fzf Buffers" },
 		{ "<leader>sh", "<cmd>FzfLua help_tags<cr>", desc = "Fzf Help" },
 		{ "<leader>sr", "<cmd>FzfLua resume<cr>", desc = "Fzf Resume" },
@@ -132,8 +161,7 @@ return {
 						actions = {
 							["default"] = function(selected)
 								if selected and selected[1] then
-									vim.cmd("tcd " .. vim.fn.fnameescape(selected[1]))
-									vim.notify("cwd: " .. selected[1], vim.log.levels.INFO)
+									vim.cmd("edit " .. vim.fn.fnameescape(selected[1]))
 								end
 							end,
 						},

@@ -83,42 +83,54 @@ return {
 
 		-- Global winbar function to display breadcrumbs dynamically
 		function _G.get_winbar()
-			local buftype = vim.bo.buftype
-			if buftype == "nofile" or buftype == "prompt" or buftype == "quickfix" or buftype == "terminal" then
-				return ""
-			end
-			local filetype = vim.bo.filetype
-			if
-				filetype == "aerial"
-				or filetype == "fzf"
-				or filetype == "lazy"
-				or filetype == "mason"
-				or filetype == "which-key"
-			then
-				return ""
-			end
-
-			local ok, aerial = pcall(require, "aerial")
-			if not ok or not aerial.get_location then
-				return ""
-			end
-
-			local symbols = aerial.get_location(true)
-			if not symbols or #symbols == 0 then
-				return " %f"
-			end
-
-			local parts = {}
-			for _, symbol in ipairs(symbols) do
-				if symbol.icon and symbol.icon ~= "" then
-					table.insert(parts, symbol.icon .. " " .. symbol.name)
-				else
-					table.insert(parts, symbol.name)
-				end
-			end
-
-			return " %f  ›  " .. table.concat(parts, " › ")
+			return vim.b.winbar_cache or " %f"
 		end
+
+		local winbar_group = vim.api.nvim_create_augroup("AerialWinbar", { clear = true })
+		vim.api.nvim_create_autocmd({ "CursorMoved", "BufEnter" }, {
+			group = winbar_group,
+			callback = function()
+				local buftype = vim.bo.buftype
+				if buftype == "nofile" or buftype == "prompt" or buftype == "quickfix" or buftype == "terminal" then
+					vim.b.winbar_cache = ""
+					return
+				end
+				local filetype = vim.bo.filetype
+				if
+					filetype == "aerial"
+					or filetype == "fzf"
+					or filetype == "lazy"
+					or filetype == "mason"
+					or filetype == "which-key"
+				then
+					vim.b.winbar_cache = ""
+					return
+				end
+
+				local ok, aerial = pcall(require, "aerial")
+				if not ok or not aerial.get_location then
+					vim.b.winbar_cache = ""
+					return
+				end
+
+				local symbols = aerial.get_location(true)
+				if not symbols or #symbols == 0 then
+					vim.b.winbar_cache = " %f"
+					return
+				end
+
+				local parts = {}
+				for _, symbol in ipairs(symbols) do
+					if symbol.icon and symbol.icon ~= "" then
+						table.insert(parts, symbol.icon .. " " .. symbol.name)
+					else
+						table.insert(parts, symbol.name)
+					end
+				end
+
+				vim.b.winbar_cache = " %f  ›  " .. table.concat(parts, " › ")
+			end,
+		})
 
 		vim.o.winbar = "%{%v:lua.get_winbar()%}"
 	end,

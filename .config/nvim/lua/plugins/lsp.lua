@@ -89,7 +89,7 @@ return {
 							analysis = {
 								typeCheckingMode = "off",
 								autoImportCompletions = true,
-								diagnosticMode = "workspace",
+								diagnosticMode = "openFilesOnly", -- "workspace"
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
 							},

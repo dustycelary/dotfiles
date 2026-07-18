@@ -27,8 +27,8 @@ return {
 		},
 
 		options = {
-			-- Snap to cursor movement with no delay
-			throttle = 0,
+			-- Snap to cursor movement with a slight delay to avoid lag
+			throttle = 50,
 
 			-- Wrap long messages instead of truncating
 			softwrap = 40,

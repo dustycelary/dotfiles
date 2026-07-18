@@ -49,18 +49,10 @@ Ghost text shows the top suggestion inline as you type.
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
 
----
+## gruvbox.nvim
+Colorscheme using the Gruvbox Dark Hard variant — retro groove color palette with high-contrast dark background.
 
-## nightfox.nvim (carbonfox)
-Colorscheme using the carbonfox variant — dark background, IBM Carbon-inspired palette.
-
-Deuteranomaly (green weakness) colorblind correction enabled at severity 0.6. This shifts the palette via daltonization to improve contrast for red-green confusion.
-
-Styles applied: italic comments, italic types, bold keywords, bold functions.
-
-Visual selection overridden to steel blue (`#1e3a5f`) — the carbonfox default (`#2a2a2a`) is nearly invisible on the dark background.
-
-Run `:NightfoxCompile` after editing this file to recompile the cache.
+Styles applied: italic comments, strings, emphasis, and folds; bold text supported.
 
 ---
 
@@ -94,12 +86,12 @@ Renders CSV and TSV files as an aligned table with cell borders. Auto-enables on
 ## fzf-lua
 Fuzzy finder for files, grep, buffers, LSP symbols, diagnostics, and more.
 
-Files use `fd` (respects `.gitignore`, includes hidden files, excludes `.git`, `.venv`, `node_modules`, `__pycache__`, etc.). Grep uses `ripgrep` with hidden files included. The `<leader>sF` and `<leader>sG` variants bypass `.gitignore`.
+Files use `fd` (includes gitignored files by default, includes hidden files, excludes `.git`, `.venv`, `node_modules`, `__pycache__`, etc.). Grep uses `ripgrep` with hidden files included. The `<leader>sF` keymap respects `.gitignore`, and the `<leader>sG` variant bypasses `.gitignore`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>sf` | Files |
-| `<leader>sF` | Files (including gitignored) |
+| `<leader>sf` | Files (including gitignored) |
+| `<leader>sF` | Files (respecting gitignore) |
 | `<leader>sg` | Live grep |
 | `<leader>sG` | Live grep (including gitignored) |
 | `<leader>sb` | Buffers |
@@ -116,7 +108,7 @@ Files use `fd` (respects `.gitignore`, includes hidden files, excludes `.git`, `
 | `<leader>sD` | Workspace diagnostics |
 | `<leader>sc` | Commands |
 | `<leader>sa` | Aerial symbols |
-| `<leader>st` | TODO comments |
+| `<leader>st` | Markdown and .env TODO search |
 | `grd` | Go to definition |
 | `grr` | References |
 | `gri` | Implementations |
@@ -285,7 +277,7 @@ Highlights `TODO`, `FIXME`, `HACK`, `NOTE`, `WARN`, `PERF`, `TEST` comments with
 |-----|--------|
 | `]t` | Next TODO comment (repeatable) |
 | `[t` | Previous TODO comment (repeatable) |
-| `<leader>st` | Search all TODOs (fzf) |
+| `<leader>st` | Search Markdown and .env TODOs (fzf) |
 
 ---
 
