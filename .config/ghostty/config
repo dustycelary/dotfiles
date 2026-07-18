@@ -1,5 +1,5 @@
-# font-family = Iosevka Custom
-font-family = Hack Nerd Font Mono
+font-family = Iosevka Custom
+# font-family = Hack Nerd Font Mono
 font-size = 13
 font-thicken = true
 selection-background = #13c2c2
@@ -11,8 +11,8 @@ selection-foreground = #000000
 # theme = Github Light High Contrast 
 
 # theme = Catppuccin Latte
-# theme = Gruvbox Dark
-theme = Carbonfox
+theme = Gruvbox Dark Hard
+# theme = Carbonfox
 # theme = Kanagawa Wave
 # background = #1d2021
 # foreground = #d4be98

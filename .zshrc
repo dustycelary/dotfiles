@@ -61,6 +61,7 @@ export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relat
 alias rezsh='source ~/.zshrc'
 alias ezsh='nvim ~/.zshrc'
 alias envim='nvim ~/.config/nvim/init.lua'
+alias spotify-db="docker exec -it postgres psql -U dev_user -d spotify_rag"
 
 command -v eza >/dev/null && alias ls='eza --group-directories-first --icons' \
                            && alias ll='eza -la --group-directories-first --icons --git' \
@@ -314,33 +315,57 @@ fi
   source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 
 # --- [BOTH] ---
-# Function to shorten intermediate directory components to 3 characters, keeping the last one in full
+# Function to shorten each directory level to 4 characters, showing at most 3 parents up
 shorten_path() {
   local p="${PWD/#$HOME/~}"
   local -a parts
   parts=("${(s:/:)p}")
   
-  if (( ${#parts} <= 1 )); then
-    echo "$p"
-    return
+  local is_absolute=0
+  if [[ "$p" == /* ]]; then
+    is_absolute=1
   fi
   
-  local res=""
-  if [[ -z "${parts[1]}" ]]; then
-    for ((i=2; i<${#parts}; i++)); do
-      res+="/${parts[i][1,3]}"
-    done
-  else
-    if [[ "${parts[1]}" == "~" ]]; then
-      res+="~"
-    else
-      res+="${parts[1][1,3]}"
+  local -a clean_parts
+  local part
+  for part in "${parts[@]}"; do
+    if [[ -n "$part" ]]; then
+      clean_parts+=("$part")
     fi
-    for ((i=2; i<${#parts}; i++)); do
-      res+="/${parts[i][1,3]}"
-    done
+  done
+  
+  local num_parts=${#clean_parts}
+  local -a to_show
+  local truncated=0
+  
+  # Only show 3 parents up + current directory = at most 4 components
+  if (( num_parts > 4 )); then
+    to_show=("${clean_parts[@]: -4}")
+    truncated=1
+  else
+    to_show=("${clean_parts[@]}")
   fi
-  res+="/${parts[-1]}"
+  
+  # Shrink each level to 4 characters
+  local -a shrunk_parts
+  for part in "${to_show[@]}"; do
+    if [[ "$part" == "~" ]]; then
+      shrunk_parts+=("~")
+    else
+      shrunk_parts+=("${part[1,4]}")
+    fi
+  done
+  
+  local res=""
+  if (( truncated )); then
+    res=".../${(j:/:)shrunk_parts}"
+  else
+    if (( is_absolute )) && [[ "${to_show[1]}" != "~" ]]; then
+      res="/${(j:/:)shrunk_parts}"
+    else
+      res="${(j:/:)shrunk_parts}"
+    fi
+  fi
   echo "$res"
 }
 
