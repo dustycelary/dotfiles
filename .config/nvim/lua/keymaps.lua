@@ -117,8 +117,8 @@ end, { desc = "Equalize windows" })
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- [[ Buffers & Tabs ]]
--- vim.keymap.set("n", "<C-Space>", "<cmd>bnext<CR>", { desc = "Next buffer" })
--- vim.keymap.set("n", "<S-Space>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<M-n>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<M-p>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
 
 vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Close buffer" })
 vim.keymap.set("n", "<leader>bn", "<cmd>bnext<CR>", { desc = "Next buffer" })

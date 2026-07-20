@@ -99,10 +99,10 @@ return {
 				lua_ls = {
 					settings = { Lua = { telemetry = { enable = false } } },
 				},
-				html = {
-					filetypes = { "html", "htmldjango" },
-					init_options = { provideFormatter = false },
-				},
+				-- html = {
+				-- 	filetypes = { "html", "htmldjango" },
+				-- 	init_options = { provideFormatter = false },
+				-- },
 				jsonls = {
 					settings = {
 						json = {
@@ -181,34 +181,21 @@ return {
 						{ buffer = args.buf, desc = "Code actions (range)" }
 					)
 
-					local rep = require("nvim-treesitter-textobjects.repeatable_move")
-					local diag_move = rep.make_repeatable_move(function(opts)
-						if opts.forward then
-							vim.diagnostic.goto_next()
-						else
-							vim.diagnostic.goto_prev()
-						end
-					end)
-					local err_move = rep.make_repeatable_move(function(opts)
-						local diag_opts = { severity = vim.diagnostic.severity.ERROR }
-						if opts.forward then
-							vim.diagnostic.goto_next(diag_opts)
-						else
-							vim.diagnostic.goto_prev(diag_opts)
-						end
-					end)
 					vim.keymap.set("n", "[d", function()
-						diag_move({ forward = false })
+						vim.diagnostic.goto_prev()
 					end, { buffer = args.buf, desc = "Previous diagnostic" })
 					vim.keymap.set("n", "]d", function()
-						diag_move({ forward = true })
+						vim.diagnostic.goto_next()
 					end, { buffer = args.buf, desc = "Next diagnostic" })
+
+					local diag_opts = { severity = vim.diagnostic.severity.ERROR }
 					vim.keymap.set("n", "[e", function()
-						err_move({ forward = false })
+						vim.diagnostic.goto_prev(diag_opts)
 					end, { buffer = args.buf, desc = "Previous error" })
 					vim.keymap.set("n", "]e", function()
-						err_move({ forward = true })
+						vim.diagnostic.goto_next(diag_opts)
 					end, { buffer = args.buf, desc = "Next error" })
+
 					vim.keymap.set(
 						"n",
 						"<leader>ce",

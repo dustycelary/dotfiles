@@ -344,43 +344,50 @@ Three plugins bundled together.
 
 **nvim-treesitter** — syntax parsing for lua, python, js/ts, html, css, json, yaml, toml, bash, markdown and more. HTMLDjango is aliased to the HTML parser.
 
-**nvim-treesitter-textobjects** — text objects and motions based on the syntax tree.
+**nvim-treesitter-textobjects** — text objects and motions based on the syntax tree and document structure.
 
-Text objects (use with `v`, `d`, `c`, `y`, etc.):
+Text objects (use with operators like `v`, `d`, `c`, `y`):
 
-| Key | Object |
-|-----|--------|
-| `af` / `if` | around/inside function |
-| `ac` / `ic` | around/inside class |
-| `aa` / `ia` | around/inside argument |
-| `ab` / `ib` | around/inside block |
-| `aI` / `iI` | around/inside conditional |
-| `al` / `il` | around/inside loop |
-| `am` / `im` | around/inside call |
-| `aK` / `iK` | around/inside comment |
-| `a=` / `i=` | around/inside assignment |
-| `aR` / `iR` | around/inside return |
-| `aA` / `iA` | around/inside attribute/decorator |
-| `iN` | inside number |
+| Key | Object | Meaning / Selection |
+|-----|--------|---------------------|
+| `af` / `if` | Function | around function (def & body) vs inside function body |
+| `ac` / `ic` | Class | around class (def & body) vs inside class body |
+| `aa` / `ia` | Argument / Parameter | around parameter (incl. comma) vs inside parameter |
+| `ab` / `ib` | Block | around block / curly braces `{}` vs inside block contents |
+| `aI` / `iI` | Conditional | around `if`/`else` statement vs inside conditional body |
+| `al` / `il` | Loop | around `for`/`while` statement vs inside loop body |
+| `am` / `im` | Function Call | around function call (`func(a, b)`) vs inside call args (`a, b`) |
+| `aK` / `iK` | Comment | around comment block vs inside comment text |
+| `a=` / `i=` | Assignment | around full assignment (`var = val`) vs inside RHS value (`val`) |
+| `aR` / `iR` | Return | around return statement (`return val`) vs inside return expression (`val`) |
+| `aA` / `iA` | Attribute | around decorator/attribute (`@decorator`) vs inside attribute name |
+| `ai` / `ii` | Indent Block | around indent block (+ line above) vs inside same-indent block |
+| `ak` / `ik` | Dict / JSON Key | around key (`"key":`) vs inside key name (`"key"`) |
+| `av` / `iv` | Dict / JSON Value | around value (`: "val"`) vs inside value text (`"val"`) |
+| `ao` / `io` | Dict / JSON Object | around object/pair (`{...}` / `"k": "v"`) vs inside pair content |
+| `aq` / `iq` | Any Quote | around any quote (`"`, `'`, `` ` ``) vs inside quote contents |
+| `ag` / `ig` | Buffer / File | around entire file vs inside buffer (excl. blank margins) |
+| `au` / `iu` | URL | around URL/link vs inside URL |
+| `iN` | Number | inside number literal |
 
-Motions (all repeatable with `;` / `,`):
+Motions:
 
-| Key | Motion |
-|-----|--------|
-| `]f` / `[f` | Next/prev function start |
-| `]F` / `[F` | Next/prev function end |
-| `]c` / `[c` | Next/prev class start |
-| `]b` / `[b` | Next/prev block start |
-| `]}` / `[{` | Next/prev block end/start (vim native) |
-| `]]` / `[[` | Next/prev section start |
-| `][` / `[]` | Next/prev section end |
-| `]d` / `[d` | Next/prev diagnostic |
-| `]e` / `[e` | Next/prev error |
-| `]t` / `[t` | Next/prev TODO comment |
-| `]q` / `[q` | Next/prev quickfix entry |
-| `]l` / `[l` | Next/prev loclist entry |
-
-`;` and `,` repeat the last treesitter motion (or `f`/`F`/`t`/`T` if those were last). `f`, `F`, `t`, `T` are wrapped to participate in the same repeat system.
+| Key | Motion | Explanation |
+|-----|--------|-------------|
+| `]i` / `[i` | Same-Indent Block | Jump to next / previous block at the same indent level (e.g. between `{}` blocks in JSON or code) |
+| `]s` / `[s` | AST Sibling | Jump to next / previous AST sibling node in treesitter |
+| `]f` / `[f` | Function Start | Jump to next / previous function definition start |
+| `]F` / `[F` | Function End | Jump to next / previous function definition end |
+| `]c` / `[c` | Class Start | Jump to next / previous class definition start |
+| `]b` / `[b` | Block Start | Jump to next / previous block start |
+| `]}` / `[{` | Brace End/Start | Jump to next closing brace `}` / previous unclosed opening brace `{` |
+| `]]` / `[[` | Section Start | Jump to next / previous section start |
+| `][` / `[]` | Section End | Jump to next / previous section end |
+| `]d` / `[d` | Diagnostic | Jump to next / previous diagnostic / error |
+| `]e` / `[e` | Error | Jump to next / previous error diagnostic |
+| `]t` / `[t` | TODO Comment | Jump to next / previous TODO comment |
+| `]q` / `[q` | Quickfix | Jump to next / previous quickfix item |
+| `]l` / `[l` | Loclist | Jump to next / previous loclist item |
 
 ---
 
@@ -400,9 +407,9 @@ The `i` recipe lets you type arbitrary open/close strings when adding or replaci
 ---
 
 ## which-key.nvim
-Popup showing available keymaps after a 1500ms pause. Helix preset, displayed at bottom center.
+Popup showing available keymaps, text objects, and motions after a short pause (300ms). Helix preset, displayed in a rounded floating panel.
 
-LSP mappings are hidden when no LSP client is attached to the current buffer. Treesitter mappings are hidden when no treesitter parser is active. Descriptions are truncated to 20 characters.
+When pressing an operator like `d`, `c`, `y`, or entering visual mode `v`, typing `a` or `i` opens WhichKey showing a complete, categorized breakdown of all available **Around** and **Inside** text objects with detailed explanations of what will be selected.
 
 Key group prefixes:
 
@@ -416,7 +423,8 @@ Key group prefixes:
 | `<leader>w` | Surrounds (sandwich) |
 | `<leader>x` | Trouble / Diagnostics |
 | `gr` | LSP / References |
-| `]` / `[` | Next / Prev |
+| `]` / `[` | Next / Prev Motions |
+| `a` / `i` (in `o`/`x` mode) | Around / Inside Text Objects |
 
 ---
 

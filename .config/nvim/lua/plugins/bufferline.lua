@@ -1,5 +1,5 @@
 -- bufferline.nvim — tab bar showing open buffers with LSP diagnostic counts.
--- Navigated with <Tab>/<S-Tab> (keymaps.lua). Close icons hidden to reduce noise.
+-- Navigated with <M-n>/<M-p> (keymaps.lua). Close icons hidden to reduce noise.
 return {
 	"akinsho/bufferline.nvim",
 	version = "*",

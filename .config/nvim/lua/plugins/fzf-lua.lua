@@ -100,7 +100,7 @@ return {
 
 					-- Toggles
 					["alt-i"] = { fzf.actions.toggle_ignore },
-					["alt-h"] = { fzf.actions.toggle_hidden },
+					["alt-u"] = { fzf.actions.toggle_hidden },
 				},
 			},
 			files = {
