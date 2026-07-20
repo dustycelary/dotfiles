@@ -233,6 +233,46 @@ Diagnostic virtual text and virtual lines are disabled globally in `init.lua` â€
 ## neoscroll.nvim
 Smooth animated scrolling for `<C-u>`, `<C-d>`, `<C-b>`, `<C-f>`, `<C-y>`, `<C-e>`, `zt`, `zz`, `zb`. Cursor is hidden during scroll. Does not respect `scrolloff`. Stops at EOF.
 
+## mini.files
+Miller columns (cascading floating window panels) file explorer. Allows navigating directories like macOS Finder column view using `h`/`j`/`k`/`l`, creating/moving files, and live file preview.
+
+| Key | Action |
+|-----|--------|
+| `<leader>ef` | Toggle mini.files (Column Explorer) |
+| `l` / `<CR>` | Enter directory / open file |
+| `h` | Go up to parent directory column |
+| `=` | Synchronize/save changes to disk |
+| `q` | Close mini.files |
+| `g?` | Show help |
+
+---
+
+## oil.nvim
+File explorer that lets you edit the filesystem like a normal Vim buffer. Replaces netrw. You can create, rename, delete, move, and copy files and directories using standard Vim commands (`dd`, `cw`, `o`, `:%s`, `:w`).
+
+| Key | Action |
+|-----|--------|
+| `-` / `<leader>e` | Open parent/directory in Oil |
+| `<CR>` | Open file or enter directory |
+| `-` | Go up to parent directory |
+| `<C-p>` | Toggle live floating preview |
+| `<C-v>` | Open file in vertical split |
+| `<C-h>` | Open file in horizontal split |
+| `<C-t>` | Open file in new tab |
+| `g.` | Toggle hidden files (dotfiles) |
+| `_` | Open Neovim's working directory (`cwd`) |
+| `` ` `` | `:cd` Neovim working directory to current Oil directory |
+| `g\` | Toggle trash mode |
+| `gx` | Open file/folder in system app (Finder) |
+| `g?` | Show help overlay |
+
+### Workflows & Features
+- **Rename**: Edit filename text on line (`cw`) and save (`:w`).
+- **Move**: Change path text on line (e.g. `subfolder/file.txt` or `../file.txt`) and save (`:w`). Or cut lines (`dd`), navigate to target folder in Oil, paste (`p`), and save (`:w`).
+- **Create**: Insert new line (`o`), type filename or `nested/dir/file.txt`, and save (`:w`).
+- **Batch Operations**: Use Vim commands like `:%s/old/new/g`, Visual Block (`<C-v>`), or macros (`q`), then save (`:w`).
+- **Delete**: Delete lines (`dd`) and save (`:w`).
+
 ---
 
 ## precognition.nvim

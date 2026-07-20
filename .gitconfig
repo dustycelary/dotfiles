@@ -27,3 +27,5 @@
 	conflictstyle = zdiff3
 [commit]
 	gpgsign = false
+[pull]
+	rebase = false

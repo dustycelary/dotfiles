@@ -111,112 +111,111 @@ return {
 			},
 		})
 	end,
-	keys = function()
-		local harpoon = require("harpoon")
-		return {
-			{
-				"<leader>ha",
-				function()
-					harpoon:list():add()
-				end,
-				desc = "Harpoon add file",
-			},
-			{
-				"<leader>hh",
-				function()
-					harpoon.ui:toggle_quick_menu(harpoon:list())
-				end,
-				desc = "Harpoon menu",
-			},
-			{
-				"<leader>1",
-				function()
-					harpoon:list():select(1)
-				end,
-				desc = "Harpoon file 1",
-			},
-			{
-				"<leader>2",
-				function()
-					harpoon:list():select(2)
-				end,
-				desc = "Harpoon file 2",
-			},
-			{
-				"<leader>3",
-				function()
-					harpoon:list():select(3)
-				end,
-				desc = "Harpoon file 3",
-			},
-			{
-				"<leader>4",
-				function()
-					harpoon:list():select(4)
-				end,
-				desc = "Harpoon file 4",
-			},
-			{
-				"<leader>hn",
-				function()
-					harpoon:list():next()
-				end,
-				desc = "Harpoon next",
-			},
-			{
-				"<leader>hp",
-				function()
-					harpoon:list():prev()
-				end,
-				desc = "Harpoon prev",
-			},
-			{
-				"<leader>hc",
-				function()
-					harpoon.ui:toggle_quick_menu(harpoon:list("cmd"))
-				end,
-				desc = "Harpoon command menu",
-			},
-			{
-				"<leader>hC",
-				function()
-					vim.ui.input({ prompt = "Add terminal command: " }, function(input)
-						if input and input ~= "" then
-							harpoon:list("cmd"):add(input)
-							vim.notify("Added command: " .. input, vim.log.levels.INFO, { title = "Harpoon" })
-						end
-					end)
-				end,
-				desc = "Harpoon add command",
-			},
-			{
-				"<leader>x1",
-				function()
-					harpoon:list("cmd"):select(1)
-				end,
-				desc = "Harpoon run command 1",
-			},
-			{
-				"<leader>x2",
-				function()
-					harpoon:list("cmd"):select(2)
-				end,
-				desc = "Harpoon run command 2",
-			},
-			{
-				"<leader>x3",
-				function()
-					harpoon:list("cmd"):select(3)
-				end,
-				desc = "Harpoon run command 3",
-			},
-			{
-				"<leader>x4",
-				function()
-					harpoon:list("cmd"):select(4)
-				end,
-				desc = "Harpoon run command 4",
-			},
-		}
-	end,
+	keys = {
+		{
+			"<leader>ha",
+			function()
+				require("harpoon"):list():add()
+			end,
+			desc = "Harpoon add file",
+		},
+		{
+			"<leader>hh",
+			function()
+				local harpoon = require("harpoon")
+				harpoon.ui:toggle_quick_menu(harpoon:list())
+			end,
+			desc = "Harpoon menu",
+		},
+		{
+			"<leader>1",
+			function()
+				require("harpoon"):list():select(1)
+			end,
+			desc = "Harpoon file 1",
+		},
+		{
+			"<leader>2",
+			function()
+				require("harpoon"):list():select(2)
+			end,
+			desc = "Harpoon file 2",
+		},
+		{
+			"<leader>3",
+			function()
+				require("harpoon"):list():select(3)
+			end,
+			desc = "Harpoon file 3",
+		},
+		{
+			"<leader>4",
+			function()
+				require("harpoon"):list():select(4)
+			end,
+			desc = "Harpoon file 4",
+		},
+		{
+			"<leader>hn",
+			function()
+				require("harpoon"):list():next()
+			end,
+			desc = "Harpoon next",
+		},
+		{
+			"<leader>hp",
+			function()
+				require("harpoon"):list():prev()
+			end,
+			desc = "Harpoon prev",
+		},
+		{
+			"<leader>hc",
+			function()
+				local harpoon = require("harpoon")
+				harpoon.ui:toggle_quick_menu(harpoon:list("cmd"))
+			end,
+			desc = "Harpoon command menu",
+		},
+		{
+			"<leader>hC",
+			function()
+				vim.ui.input({ prompt = "Add terminal command: " }, function(input)
+					if input and input ~= "" then
+						require("harpoon"):list("cmd"):add(input)
+						vim.notify("Added command: " .. input, vim.log.levels.INFO, { title = "Harpoon" })
+					end
+				end)
+			end,
+			desc = "Harpoon add command",
+		},
+		{
+			"<leader>x1",
+			function()
+				require("harpoon"):list("cmd"):select(1)
+			end,
+			desc = "Harpoon run command 1",
+		},
+		{
+			"<leader>x2",
+			function()
+				require("harpoon"):list("cmd"):select(2)
+			end,
+			desc = "Harpoon run command 2",
+		},
+		{
+			"<leader>x3",
+			function()
+				require("harpoon"):list("cmd"):select(3)
+			end,
+			desc = "Harpoon run command 3",
+		},
+		{
+			"<leader>x4",
+			function()
+				require("harpoon"):list("cmd"):select(4)
+			end,
+			desc = "Harpoon run command 4",
+		},
+	},
 }

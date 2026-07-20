@@ -1,5 +1,15 @@
--- [[ Terminal ]]
 vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+vim.keymap.set("n", "<leader>uq", function()
+	local file = vim.api.nvim_buf_get_name(0)
+	if file ~= "" then
+		local cmd = string.format(
+			'qlmanage -p %s >/dev/null 2>&1 & sleep 0.05 && osascript -e \'tell application "System Events" to set frontmost of process "qlmanage" to true\'',
+			vim.fn.shellescape(file)
+		)
+		vim.fn.jobstart(cmd)
+	end
+end, { desc = "Quick Look markdown preview" })
 
 -- [[ Editor ]]
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
@@ -35,14 +45,27 @@ vim.keymap.set("n", "<M-.>", "5zl", { desc = "Scroll view right" })
 vim.keymap.set("n", "<M-,>", "5zh", { desc = "Scroll view left" })
 
 -- [[ Navigation ]]
-vim.keymap.set("n", "-", function()
-	vim.cmd("edit " .. vim.fn.expand("%:p:h"))
-end, { desc = "Open parent directory" })
+vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
 
 vim.keymap.set("n", "<leader>cd", function()
-	local path = vim.fn.expand("%:p:h")
-	vim.cmd("cd " .. path)
-	vim.notify(path, vim.log.levels.INFO, { title = "Changed CWD" })
+	local dir
+	if vim.bo.filetype == "oil" then
+		local ok, oil = pcall(require, "oil")
+		if ok then
+			dir = oil.get_current_dir()
+		end
+	end
+	if not dir or dir == "" then
+		local path = vim.fn.expand("%:p")
+		if path ~= "" then
+			dir = (vim.fn.isdirectory(path) == 1) and path or vim.fn.fnamemodify(path, ":h")
+		end
+	end
+	if dir and dir ~= "" then
+		dir = dir:gsub("^oil://", "")
+		vim.cmd("cd " .. vim.fn.fnameescape(dir))
+		vim.notify(dir, vim.log.levels.INFO, { title = "Changed CWD" })
+	end
 end, { desc = "cd to current file's dir" })
 
 -- [[ Clipboard ]]
@@ -91,7 +114,7 @@ vim.keymap.set("n", "<C-w>=", function()
 end, { desc = "Equalize windows" })
 
 -- [[ Terminal ]]
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>")
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- [[ Buffers & Tabs ]]
 -- vim.keymap.set("n", "<C-Space>", "<cmd>bnext<CR>", { desc = "Next buffer" })

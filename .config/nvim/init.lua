@@ -3,6 +3,10 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Disable built-in netrw so oil.nvim handles directories
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Display options
 vim.opt.number = true -- Show line numbers
 vim.opt.relativenumber = true -- Show relative numbers
@@ -27,15 +31,27 @@ vim.opt.splitright = true
 vim.opt.equalalways = true -- always equalize window sizes when splitting/closing
 vim.opt.eadirection = "both" -- equalize both width and height
 
--- netrw
--- -- Use 'time' to sort by last modification date
-vim.g.netrw_sort_by = "time"
+vim.opt.swapfile = false -- Disable swapfiles (undofile is enabled)
 
--- Change the list style to 1 (Long listing format) to show dates, times, and file sizes
-vim.g.netrw_liststyle = 1
+-- Automatically append \v when starting a search
+vim.keymap.set("n", "/", "/\\v", { desc = "Search with Very Magic" })
+vim.keymap.set("n", "?", "?\\v", { desc = "Search backward with Very Magic" })
 
--- Optional: Set the sort direction to 'reverse' so the newest files appear at the top
-vim.g.netrw_sort_direction = "reverse"
+-- Automatically append \v when starting a substitute command without delaying `:` commands
+vim.keymap.set("c", "/", function()
+	if vim.fn.getcmdtype() == ":" then
+		local cmd = vim.fn.getcmdline()
+		local base_pattern = "^[%%'%<%>%d%,%.%$%-%+%;]*"
+		if
+			cmd:match(base_pattern .. "s$")
+			or cmd:match(base_pattern .. "sub$")
+			or cmd:match(base_pattern .. "substitute$")
+		then
+			return "/\\v"
+		end
+	end
+	return "/"
+end, { expr = true, desc = "Substitute with Very Magic" })
 
 -- Disable auto-comment continuation when pressing 'o' or 'O'
 vim.api.nvim_create_autocmd("FileType", {

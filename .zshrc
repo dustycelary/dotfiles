@@ -422,3 +422,22 @@ auto_activate_venv
 # Run whenever we change directory
 autoload -U add-zsh-hook
 add-zsh-hook chpwd auto_activate_venv
+
+
+alias dir-icons='_dir_icons() {
+    if [ -z "$1" ]; then
+        echo "❌ Error: Please provide the path to an icon file."
+        echo "Usage: dir-icons /path/to/icon.png"
+        return 1
+    fi
+
+    local icon_path="$1"
+
+    # Loop through all immediate, non-hidden directories at the current level
+    find . -maxdepth 1 -type d -not -name "." -not -name ".*" -print0 | while IFS= read -r -d "" dir; do
+        echo "Stamping: $dir"
+        /opt/homebrew/bin/fileicon set "$dir" "$icon_path"
+    done
+
+    echo "✅ Done! All current-level directory icons updated."
+}; _dir_icons'

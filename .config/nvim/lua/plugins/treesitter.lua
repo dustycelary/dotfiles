@@ -313,10 +313,10 @@ return {
 				rep.repeat_last_move_opposite,
 				{ desc = "repeat last move opposite" }
 			)
-			vim.keymap.set({ "n", "x", "o" }, "f", rep.builtin_f_expr, { expr = true })
-			vim.keymap.set({ "n", "x", "o" }, "F", rep.builtin_F_expr, { expr = true })
-			vim.keymap.set({ "n", "x", "o" }, "t", rep.builtin_t_expr, { expr = true })
-			vim.keymap.set({ "n", "x", "o" }, "T", rep.builtin_T_expr, { expr = true })
+			vim.keymap.set({ "n", "x", "o" }, "f", rep.builtin_f_expr, { expr = true, desc = "Find character forward" })
+			vim.keymap.set({ "n", "x", "o" }, "F", rep.builtin_F_expr, { expr = true, desc = "Find character backward" })
+			vim.keymap.set({ "n", "x", "o" }, "t", rep.builtin_t_expr, { expr = true, desc = "Till character forward" })
+			vim.keymap.set({ "n", "x", "o" }, "T", rep.builtin_T_expr, { expr = true, desc = "Till character backward" })
 		end,
 	},
 }

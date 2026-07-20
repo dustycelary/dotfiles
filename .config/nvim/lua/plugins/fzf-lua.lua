@@ -25,8 +25,8 @@ return {
 			"--exclude build",
 		}, " ")
 
-		-- Custom Action: Open parent directory in Netrw
-		local open_in_netrw = function(selected, opts)
+		-- Custom Action: Open parent directory in Oil
+		local open_in_oil = function(selected, opts)
 			if not selected or #selected == 0 then
 				return
 			end
@@ -34,7 +34,7 @@ return {
 			local path = entry.path or entry.bufname or entry.uri
 			if path then
 				local dir = vim.fn.isdirectory(path) == 1 and path or vim.fn.fnamemodify(path, ":h")
-				vim.cmd("edit " .. vim.fn.fnameescape(dir))
+				require("oil").open(dir)
 			end
 		end
 
@@ -82,7 +82,7 @@ return {
 					["alt-l"] = fzf.actions.file_sel_to_ll,
 
 					-- Custom integrations
-					["ctrl-e"] = open_in_netrw,
+					["ctrl-e"] = open_in_oil,
 					["ctrl-d"] = delete_file,
 
 					-- Toggles
@@ -105,7 +105,7 @@ return {
 			},
 			files = {
 				-- Kept clean so the toggles work bidirectionally
-				cmd = "fd --type f " .. fd_excludes .. " 2>/dev/null",
+				cmd = "fd --type f " .. fd_excludes .. " --exclude '*.swp' 2>/dev/null",
 				fzf_opts = { ["--scheme"] = "path" },
 				no_ignore = true,
 				hidden = true,
