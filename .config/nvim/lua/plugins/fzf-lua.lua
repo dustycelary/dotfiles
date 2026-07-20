@@ -87,7 +87,7 @@ return {
 
 					-- Toggles
 					["alt-i"] = { fzf.actions.toggle_ignore },
-					["alt-h"] = { fzf.actions.toggle_hidden },
+					["alt-u"] = { fzf.actions.toggle_hidden },
 				},
 				grep = {
 					-- Grep needs its own explicit mapping to use the toggles
