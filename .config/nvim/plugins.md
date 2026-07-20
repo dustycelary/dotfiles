@@ -255,7 +255,6 @@ File explorer that lets you edit the filesystem like a normal Vim buffer. Replac
 | `-` | Go up to parent directory |
 | `<C-p>` | Toggle live floating preview |
 | `<C-v>` | Open file in vertical split |
-| `<C-h>` | Open file in horizontal split |
 | `<C-t>` | Open file in new tab |
 | `g.` | Toggle hidden files (dotfiles) |
 | `_` | Open Neovim's working directory (`cwd`) |
