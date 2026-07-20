@@ -56,8 +56,8 @@ vim.opt.timeoutlen = 1000
 vim.opt.wrap = false
 
 -- Folding
-vim.opt.foldmethod = "manual"
--- vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99 -- start with all folds open
 vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
