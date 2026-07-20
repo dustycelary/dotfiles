@@ -2,7 +2,7 @@
 font-family = Monaspace Argon NF
 # font-family = Hack Nerd Font Mono
 font-size = 13
-# font-thicken = true
+font-thicken = true
 selection-background = #13c2c2
 selection-foreground = #000000
 
@@ -12,7 +12,8 @@ selection-foreground = #000000
 # theme = Github Light High Contrast 
 
 # theme = Catppuccin Latte
-theme = Gruvbox Dark Hard
+# theme = Gruvbox Dark Hard
+theme = Terafox
 # theme = Carbonfox
 # theme = Kanagawa Wave
 # background = #1d2021

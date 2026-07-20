@@ -23,7 +23,6 @@ return {
 				"marksman",
 				"bashls",
 				"basedpyright",
-				-- "clangd",
 				"yamlls",
 				"jsonls",
 			},
@@ -65,8 +64,8 @@ return {
 				return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python3"
 			end
 
-			-- lua_ls: lazydev.nvim handles neovim API type stubs automatically
-			local servers = {
+			-- Only define custom overrides for servers that need specific settings
+			local custom_servers = {
 				basedpyright = {
 					root_markers = {
 						"pyrightconfig.json",
@@ -89,7 +88,7 @@ return {
 							analysis = {
 								typeCheckingMode = "off",
 								autoImportCompletions = true,
-								diagnosticMode = "openFilesOnly", -- "workspace"
+								diagnosticMode = "openFilesOnly",
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
 							},
@@ -97,26 +96,14 @@ return {
 						python = {},
 					},
 				},
-				dockerls = { single_file_support = true },
-				marksman = { single_file_support = true },
 				lua_ls = {
-					single_file_support = true,
 					settings = { Lua = { telemetry = { enable = false } } },
 				},
 				html = {
 					filetypes = { "html", "htmldjango" },
-					root_markers = { "package.json", ".git" },
-					single_file_support = true,
-					init_options = { provideFormatter = false }, -- don't mangle Django template tags
+					init_options = { provideFormatter = false },
 				},
-				bashls = {
-					filetypes = { "sh", "bash", "zsh" },
-					root_markers = { "package.json", ".git" },
-					single_file_support = true,
-				},
-				clangd = {},
 				jsonls = {
-					single_file_support = true,
 					settings = {
 						json = {
 							schemas = require("schemastore").json.schemas(),
@@ -125,7 +112,6 @@ return {
 					},
 				},
 				yamlls = {
-					single_file_support = true,
 					settings = {
 						yaml = {
 							schemaStore = { enable = false, url = "" },
@@ -136,7 +122,10 @@ return {
 				},
 			}
 
-			for name, config in pairs(servers) do
+			-- Automatically enable all installed Mason servers
+			local mason_lspconfig = require("mason-lspconfig")
+			for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
+				local config = custom_servers[name] or {}
 				vim.lsp.config(name, config)
 				vim.lsp.enable(name)
 			end

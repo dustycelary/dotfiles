@@ -49,10 +49,8 @@ Ghost text shows the top suggestion inline as you type.
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
 
-## gruvbox.nvim
-Colorscheme using the Gruvbox Dark Hard variant — retro groove color palette with high-contrast dark background.
-
-Styles applied: italic comments, strings, emphasis, and folds; bold text supported.
+## nightfox.nvim (terafox)
+Colorscheme using the Terafox variant from `EdenEast/nightfox.nvim`. Other available palettes include `nightfox`, `dayfox`, `dawnfox`, `duskfox`, `nordfox`, and `carbonfox`.
 
 ---
 
@@ -291,6 +289,10 @@ Highlights the best `f`/`F`/`t`/`T` jump target on each line when you press thos
 
 ## render-markdown.nvim
 Renders markdown in-buffer: styled headings, concealed syntax markers, code block backgrounds, list bullets, and checkboxes. Only active in markdown buffers.
+
+| Key | Action |
+|-----|--------|
+| `<leader>um` | Toggle render markdown |
 
 ---
 

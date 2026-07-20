@@ -280,7 +280,7 @@ fzf-local-dir-widget() {
   zle reset-prompt
 }
 zle -N fzf-local-dir-widget
-bindkey '\ec' fzf-local-dir-widget
+bindkey '\ed' fzf-local-dir-widget
 
 # Global Directory Finder (Alt+G) - Paste to prompt
 fzf-global-dir-widget() {

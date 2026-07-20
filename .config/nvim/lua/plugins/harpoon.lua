@@ -49,7 +49,13 @@ return {
 		end
 
 		harpoon:setup({
-			settings = { save_on_toggle = true },
+			settings = {
+				save_on_toggle = true,
+				sync_on_ui_close = true,
+				key = function()
+					return vim.fs.root(0, ".git") or vim.loop.cwd()
+				end,
+			},
 			cmd = {
 				create_list_item = function(config, name)
 					if type(name) == "table" and name.value then

@@ -7,6 +7,16 @@ vim.g.maplocalleader = " "
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- Global filetype overrides
+vim.filetype.add({
+	pattern = {
+		[".*%.env.*"] = "sh",
+	},
+	extension = {
+		conf = "sh",
+	},
+})
+
 -- Display options
 vim.opt.number = true -- Show line numbers
 vim.opt.relativenumber = true -- Show relative numbers
