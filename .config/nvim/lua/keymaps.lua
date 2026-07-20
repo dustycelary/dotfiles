@@ -1,5 +1,8 @@
 vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
+vim.keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- increment
+vim.keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
+
 vim.keymap.set("n", "<leader>uq", function()
 	local file = vim.api.nvim_buf_get_name(0)
 	if file ~= "" then
@@ -13,9 +16,6 @@ end, { desc = "Quick Look markdown preview" })
 
 -- [[ Editor ]]
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
-vim.keymap.set("n", "<C-CR>", "o", { desc = "Insert line below" })
-vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert line below" })
-vim.keymap.set("i", "<S-CR>", "<C-o>$", { desc = "Move cursor to last character of line" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 vim.keymap.set("n", "S", function()
 	local row = vim.api.nvim_win_get_cursor(0)[1]

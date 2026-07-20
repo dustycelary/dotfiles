@@ -250,8 +250,11 @@ File explorer that lets you edit the filesystem like a normal Vim buffer. Replac
 
 | Key | Action |
 |-----|--------|
-| `-` / `<leader>e` | Open parent/directory in Oil |
-| `<CR>` | Open file or enter directory |
+| `<leader>e` | Toggle Oil file explorer sidebar (left split, 30 columns) |
+| `q` | Close Oil file explorer sidebar |
+| `-` | Open parent directory in Oil (full window) |
+| `<CR>` | Open file in main window & keep Oil sidebar open |
+| `o` / `<S-CR>` / `l` | Open file in main window & close Oil sidebar |
 | `-` | Go up to parent directory |
 | `<C-p>` | Toggle live floating preview |
 | `<C-v>` | Open file in vertical split |
