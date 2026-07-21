@@ -2,6 +2,7 @@
 
 OLED_ENABLE     = no
 MOUSEKEY_ENABLE = yes
+EXTRAKEY_ENABLE = yes
 AUDIO_ENABLE    = no
 RGBLIGHT_ENABLE = no
 
@@ -17,3 +18,4 @@ CAPS_WORD_ENABLE = yes
 # Link-time optimization — shrinks binary, leaves headroom for the
 # extra layer + combos + Flow Tap
 LTO_ENABLE      = yes
+VIA_ENABLE = no

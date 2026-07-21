@@ -90,13 +90,13 @@ return {
 		{ "<leader>fo", "<cmd>FzfLua oldfiles<cr>", desc = "Fzf Old Files" },
 		{ "<leader>fm", "<cmd>FzfLua marks<cr>", desc = "Fzf Marks" },
 		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Fzf Commands" },
-		-- {
-		-- 	"<leader>fs",
-		-- 	function()
-		-- 		require("fzf-lua").lsp_live_workspace_symbols()
-		-- 	end,
-		-- 	desc = "Fzf Workspace Symbols",
-		-- },
+		{
+			"<leader>fs",
+			function()
+				require("fzf-lua").lsp_live_workspace_symbols()
+			end,
+			desc = "Fzf Workspace Symbols",
+		},
 		{
 			"<leader>fd",
 			function()
