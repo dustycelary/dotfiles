@@ -25,7 +25,7 @@ return {
 		},
 	},
 	keys = {
-		{ "<leader>sy", "<cmd>YankyRingHistory<cr>", desc = "Yank History" },
+		{ "<leader>fy", "<cmd>YankyRingHistory<cr>", desc = "Yank History" },
 		{ "y", "<Plug>(YankyYank)", mode = { "n", "x" }, desc = "Yank text" },
 		{ "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "Put text after cursor" },
 		{ "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "Put text before cursor" },

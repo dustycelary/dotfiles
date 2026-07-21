@@ -8,13 +8,13 @@
 return {
 	"machakann/vim-sandwich",
 	config = function()
-		vim.keymap.set({ "n", "x" }, "<leader>wa", "<Plug>(sandwich-add)", { desc = "Add surrounding" })
-		vim.keymap.set("n", "<leader>wd", "<Plug>(sandwich-delete)", { desc = "Delete surrounding" })
-		vim.keymap.set("n", "<leader>wD", "<Plug>(sandwich-delete-auto)", { desc = "Delete surrounding (auto-detect)" })
-		vim.keymap.set("n", "<leader>wr", "<Plug>(sandwich-replace)", { desc = "Replace surrounding" })
+		vim.keymap.set({ "n", "x" }, "<leader>sa", "<Plug>(sandwich-add)", { desc = "Add surrounding" })
+		vim.keymap.set("n", "<leader>sd", "<Plug>(sandwich-delete)", { desc = "Delete surrounding" })
+		vim.keymap.set("n", "<leader>sD", "<Plug>(sandwich-delete-auto)", { desc = "Delete surrounding (auto-detect)" })
+		vim.keymap.set("n", "<leader>sr", "<Plug>(sandwich-replace)", { desc = "Replace surrounding" })
 		vim.keymap.set(
 			"n",
-			"<leader>wR",
+			"<leader>sR",
 			"<Plug>(sandwich-replace-auto)",
 			{ desc = "Replace surrounding (auto-detect)" }
 		)

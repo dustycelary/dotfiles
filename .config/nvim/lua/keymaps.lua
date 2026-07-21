@@ -71,7 +71,6 @@ end, { desc = "cd to current file's dir" })
 -- [[ Clipboard ]]
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste clipboard" })
-vim.keymap.set("v", "<leader>P", '"_dP', { desc = "Replace selection with clipboard" })
 vim.keymap.set("n", "<leader>Y", function()
 	local path = vim.fn.expand("%:p")
 	if path == "" then

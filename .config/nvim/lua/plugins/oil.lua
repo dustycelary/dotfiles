@@ -125,13 +125,13 @@ return {
 		keymaps = {
 			["g?"] = "actions.show_help",
 			["q"] = "<cmd>quit<CR>",
-			["<CR>"] = {
+			["<S-CR>"] = {
 				callback = function()
 					open_entry_to_side(true)
 				end,
 				desc = "Open file in side window and keep Oil open",
 			},
-			["<S-CR>"] = {
+			["<CR>"] = {
 				callback = function()
 					open_entry_to_side(false)
 				end,

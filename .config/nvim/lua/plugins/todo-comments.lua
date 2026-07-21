@@ -4,6 +4,6 @@ return {
 	opts = {},
 	config = function(_, opts)
 		require("todo-comments").setup(opts)
-		vim.keymap.set("n", "<leader>st", "<cmd>TodoFzfLua<cr>", { desc = "Fzf TODO comments" })
+		vim.keymap.set("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Fzf TODO comments" })
 	end,
 }

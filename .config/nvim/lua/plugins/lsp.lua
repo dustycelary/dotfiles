@@ -133,9 +133,6 @@ return {
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
 					local client = vim.lsp.get_client_by_id(args.data.client_id)
-					if client and client.root_dir then
-						vim.fn.chdir(client.root_dir)
-					end
 
 					if client and client.name == "yamlls" then
 						client.server_capabilities.documentFormattingProvider = false

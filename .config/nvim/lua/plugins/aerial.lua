@@ -13,14 +13,6 @@ return {
 	keys = {
 		-- Press <leader>a to pop the sidebar open or closed
 		{ "<leader>ua", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial Symbol Sidebar" },
-		{
-			"<leader>sa",
-			function()
-				require("aerial").fzf_lua_picker()
-			end,
-			desc = "Fzf Aerial Symbols",
-		},
-		{ "<leader>sn", "<cmd>AerialNavToggle<CR>", desc = "Toggle Aerial Floating Nav" },
 	},
 	-- opts acts as the setup() function in lazy.nvim
 
