@@ -1,5 +1,6 @@
 # font-family = Iosevka Custom
-font-family = Monaspace Argon NF
+# font-family = Monaspace Argon NF
+font-family = SF Mono
 # font-family = Hack Nerd Font Mono
 font-size = 13
 font-thicken = true

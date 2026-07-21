@@ -97,13 +97,13 @@ return {
 		-- 	end,
 		-- 	desc = "Fzf Workspace Symbols",
 		-- },
-		-- {
-		-- 	"<leader>fd",
-		-- 	function()
-		-- 		require("fzf-lua").lsp_document_diagnostics()
-		-- 	end,
-		-- 	desc = "Fzf Document Diagnostics",
-		-- },
+		{
+			"<leader>fd",
+			function()
+				require("fzf-lua").lsp_document_diagnostics()
+			end,
+			desc = "Fzf Document Diagnostics",
+		},
 		-- {
 		-- 	"<leader>fD",
 		-- 	function()
