@@ -27,8 +27,7 @@ FILES=(
   .inputrc
   .config/ghostty/config
   .config/nvim
-  .hammerspoon/init.lua
-  .hammerspoon/hammer-control
+  .hammerspoon
   .config/karabiner
 )
 
