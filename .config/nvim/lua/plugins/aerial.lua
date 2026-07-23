@@ -67,7 +67,7 @@ return {
 			"Type",
 			"Component",
 			"Collapsed",
-			"Variable", -- Added so Python scripts don't appear empty
+			-- "Variable", -- Added so Python scripts don't appear empty
 		},
 	},
 	config = function(_, opts)

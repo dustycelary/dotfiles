@@ -25,16 +25,17 @@ return {
 		},
 	},
 	keys = {
-		{ "<leader>fy", "<cmd>YankyRingHistory<cr>", desc = "Yank History" },
+		-- Normal yank/put operations (kept as standard vim keys for muscle memory)
 		{ "y", "<Plug>(YankyYank)", mode = { "n", "x" }, desc = "Yank text" },
 		{ "p", "<Plug>(YankyPutAfter)", mode = { "n", "x" }, desc = "Put text after cursor" },
 		{ "P", "<Plug>(YankyPutBefore)", mode = { "n", "x" }, desc = "Put text before cursor" },
 		{ "gp", "<Plug>(YankyGPutAfter)", mode = { "n", "x" }, desc = "Put text after selection" },
 		{ "gP", "<Plug>(YankyGPutBefore)", mode = { "n", "x" }, desc = "Put text before selection" },
-		{ "[y", "<Plug>(YankyCycleBackward)", desc = "Cycle backward through yank history" },
-		{ "]y", "<Plug>(YankyCycleForward)", desc = "Cycle forward through yank history" },
-		{ "<c-p>", "<Plug>(YankyPreviousEntry)", desc = "Cycle to previous yank history entry" },
-		{ "<c-n>", "<Plug>(YankyNextEntry)", desc = "Cycle to next yank history entry" },
+		
+		-- Yanky specific operations grouped under <leader>r (Yank Ring)
+		{ "<leader>rh", "<cmd>YankyRingHistory<cr>", desc = "Yank History" },
+		{ "<leader>rn", "<Plug>(YankyCycleForward)", desc = "Cycle forward through yank history" },
+		{ "<leader>rp", "<Plug>(YankyCycleBackward)", desc = "Cycle backward through yank history" },
 		-- Indent put
 		-- { "]p", "<Plug>(YankyPutIndentAfterShiftRight)", desc = "Put and indent right" },
 		-- { "[p", "<Plug>(YankyPutIndentAfterShiftLeft)", desc = "Put and indent left" },

@@ -104,12 +104,12 @@ return {
 			end,
 			desc = "Fzf Document Diagnostics",
 		},
-		-- {
-		-- 	"<leader>fD",
-		-- 	function()
-		-- 		require("fzf-lua").lsp_workspace_diagnostics()
-		-- 	end,
-		-- 	desc = "Fzf Workspace Diagnostics",
-		-- },
+		{
+			"<leader>fD",
+			function()
+				require("fzf-lua").lsp_workspace_diagnostics()
+			end,
+			desc = "Fzf Workspace Diagnostics",
+		},
 	},
 }

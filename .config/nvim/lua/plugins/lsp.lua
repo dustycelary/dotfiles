@@ -34,6 +34,11 @@ return {
 		lazy = false,
 		dependencies = { "b0o/schemastore.nvim" },
 		config = function()
+			-- Add borders to LSP floating windows so they are clearly visible
+			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+			vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+			vim.diagnostic.config({ float = { border = "rounded" } })
+
 			local function lsp_info()
 				local clients = vim.lsp.get_clients({ bufnr = 0 })
 				if #clients == 0 then

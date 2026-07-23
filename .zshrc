@@ -3,6 +3,15 @@
 # =============================================================================
 
 # --- [BOTH] ---
+# 4. Aliases & Functions
+alias rezsh='source ~/.zshrc'
+alias ezsh='nvim ~/.zshrc'
+alias envim='nvim ~/.config/nvim/init.lua'
+alias spotify-db="docker exec -it postgres psql -U dev_user -d spotify_rag"
+alias rag="docker compose run --rm ingest"
+
+
+# --- [BOTH] ---
 # 1. Environment & Paths
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR='nvim'
@@ -56,14 +65,8 @@ export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/
 export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}'"
 
-# --- [BOTH] ---
-# 4. Aliases & Functions
-alias rezsh='source ~/.zshrc'
-alias ezsh='nvim ~/.zshrc'
-alias envim='nvim ~/.config/nvim/init.lua'
-alias spotify-db="docker exec -it postgres psql -U dev_user -d spotify_rag"
 
-command -v eza >/dev/null && alias ls='eza --group-directories-first --icons' \
+command -v eza >/dev/null && alias ls='eza --group-directories-first --icons=always' \
                            && alias ll='eza -la --group-directories-first --icons --git' \
                            && alias lt='eza --tree --level=2 --icons'
 command -v bat >/dev/null && alias cat='bat --paging=never'
