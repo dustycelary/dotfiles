@@ -39,7 +39,7 @@ s = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_everything)", "Screen
 [a]
 label = "[ALFRED]"
 c = ["function:openAlfredClipboard", "clipboard"]
-
+m = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", "Menu Search"]
 # raycast deep links are supported
 [r]
 label = "[raycast]"
