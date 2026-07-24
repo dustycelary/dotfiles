@@ -21,7 +21,7 @@ return {
 			["_"] = { "treesitter", "lsp" },
 			markdown = { "markdown", "lsp" },
 			man = { "man", "lsp" },
-			toml = { "toml", "lsp" },
+			toml = { "treesitter", "lsp" },
 			python = { "treesitter", "lsp" },
 		},
 

@@ -23,6 +23,7 @@ return {
 			"dockerfile",
 			"gitignore",
 			"python",
+			"toml",
 		})
 
 		-- enable highlighting and indenting
@@ -48,5 +49,6 @@ return {
 		vim.treesitter.language.register("bash", "zsh")
 		vim.treesitter.language.register("bash", "conf")
 		vim.treesitter.language.register("bash", "env")
+		vim.treesitter.language.register("bash", "toml")
 	end,
 }

@@ -3,6 +3,21 @@
 hs.window.animationDuration = 0
 
 hs.loadSpoon("Hammerflow")
+
+local helpers = {
+	openAlfredClipboard = function()
+		local openAlfredClipboard = [[
+                        tell application id "com.runningwithcrayons.Alfred" to search "clipboard" ]]
+		hs.osascript.applescript(openAlfredClipboard)
+
+		-- Wait 0.2 seconds (adjust as needed), then press Enter
+		hs.timer.doAfter(0.2, function()
+			hs.eventtap.keyStroke({}, "return")
+		end)
+	end,
+}
+spoon.Hammerflow.registerFunctions(helpers)
+
 spoon.Hammerflow.loadFirstValidTomlFile({
 	"home.toml",
 	"work.toml",

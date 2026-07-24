@@ -3,7 +3,7 @@ local M = {}
 local DAYS = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" }
 M.DAY = ""
 M.TIME = ""
-local SCHEDULE = hs.json.read("./hammer-control/schedule.json")
+local SCHEDULE = hs.json.read(os.getenv("HOME") .. "/.hammerspoon/hammer-control/schedule.json")
 
 local function convertToMinute(time_string)
   local hour, minute = string.match(time_string, "(%d%d):(%d%d)")

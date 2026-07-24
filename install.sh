@@ -40,6 +40,7 @@ for f in "${FILES[@]}"; do
   dst="$HOME/$f"
   [[ -e "$src" ]] || { echo "  skip $f (not in dotfiles)"; continue; }
   mkdir -p "$(dirname "$dst")"
-  ln -sfh "$src" "$dst" && echo "  linked ~/$f"
+# Cross-platform compatible line:
+  ln -sfn "$src" "$dst" && echo "  linked ~/$f"
 done
 
