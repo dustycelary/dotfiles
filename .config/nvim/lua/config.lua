@@ -32,24 +32,6 @@ vim.opt.eadirection = "both" -- equalize both width and height
 
 vim.opt.swapfile = false -- Disable swapfiles (undofile is enabled)
 
-if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
-	local osc52 = require("vim.ui.clipboard.osc52")
-	local function no_clipboard_paste()
-		return {}, "v"
-	end
-
-	local function both_registers(value)
-		return { ["+"] = value, ["*"] = value }
-	end
-
-	vim.g.clipboard = {
-		name = "OSC 52",
-		copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
-		paste = both_registers(no_clipboard_paste),
-		cache_enabled = 0,
-	}
-end
-
 vim.opt.showcmd = true
 vim.opt.updatetime = 250
 vim.opt.timeoutlen = 1000

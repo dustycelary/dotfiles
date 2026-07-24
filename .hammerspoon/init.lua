@@ -2,8 +2,31 @@
 
 hs.window.animationDuration = 0
 
+-- local Hammerflow = hs.loadSpoon("Hammerflow")
 hs.loadSpoon("Hammerflow")
 
+spoon.Hammerflow.registerFormat({
+	atScreenEdge = 2, -- 0 = Top, 1 = Bottom, 2 = Left, (Omit for centered)
+	atScreenEdgeDistance = 30,
+	--
+	strokeWidth = 4,
+
+	-- Visual Styling Options
+	strokeColor = { white = 1, alpha = 0.8 },
+	fillColor = { white = 0.1, alpha = 0.9 },
+	textColor = { white = 1, alpha = 1 },
+	textFont = "SF Mono",
+	-- textSize = 18,
+	textSize = 13,
+	radius = 10,
+	padding = 8,
+	-- padding = 14,
+})
+spoon.Hammerflow.atScreenEdge = 1
+
+-- Hammerflow.loadFirstValidTomlFile({ "hammerflow.toml" })
+
+-- spoon.Hammerflow.atScreenEdge = 2
 local helpers = {
 	openAlfredClipboard = function()
 		local openAlfredClipboard = [[

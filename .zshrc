@@ -71,32 +71,7 @@ command -v eza >/dev/null && alias ls='eza --group-directories-first --icons=alw
                            && alias lt='eza --tree --level=2 --icons'
 command -v bat >/dev/null && alias cat='bat --paging=never'
 
-# Portable pbcopy via OSC 52 (works over SSH)
-if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" || -n "$SSH_TTY" ]] || ! command -v pbcopy >/dev/null; then
-  pbcopy() {
-    local data
-    if [ $# -eq 0 ]; then
-      data=$(cat)
-    else
-      data="$*"
-    fi
-    local b64
-    b64=$(printf "%s" "$data" | base64 | tr -d '\r\n')
-    
-    local osc
-    if [[ -n "$TMUX" ]]; then
-      osc=$(printf "\033Ptmux;\033\033]52;c;%s\a\033\\" "$b64")
-    else
-      osc=$(printf "\033]52;c;%s\a" "$b64")
-    fi
 
-    if [ -c /dev/tty ] && [ -w /dev/tty ]; then
-      printf "%s" "$osc" > /dev/tty
-    else
-      printf "%s" "$osc"
-    fi
-  }
-fi
 
 # Portable open helper
 my_open() {
