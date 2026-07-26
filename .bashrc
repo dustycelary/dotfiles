@@ -56,7 +56,9 @@ export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/
 export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --icons=auto --color=always {} 2>/dev/null || ls {}'"
 
 # Source FZF completions and keybindings
-if [[ -d "/opt/homebrew/opt/fzf" ]]; then
+if command -v fzf >/dev/null && fzf --bash >/dev/null 2>&1; then
+  eval "$(fzf --bash)"
+elif [[ -d "/opt/homebrew/opt/fzf" ]]; then
   source "/opt/homebrew/opt/fzf/shell/key-bindings.bash" 2>/dev/null
   source "/opt/homebrew/opt/fzf/shell/completion.bash" 2>/dev/null
 elif [[ -f "/usr/share/doc/fzf/examples/key-bindings.bash" ]]; then
@@ -105,6 +107,15 @@ f() {
   [[ -n "$result" ]] && dirname "$result" | pbcopy
 }
 vf() { nvim "$(fd --type f | fzf)"; }
+fh() {
+  local selected_command
+  selected_command=$(HISTTIMEFORMAT='' history | sort -nr | sed 's/^[ ]*[0-9]*[ ]*//' | awk '!seen[$0]++' | \
+      fzf --height 60% --layout=reverse --prompt="History> " --query="$*")
+  if [[ -n "$selected_command" ]]; then
+      echo "Executing: $selected_command"
+      eval "$selected_command"
+  fi
+}
 bin() {
   mkdir -p ~/Desktop/rubbish
   mv "$@" ~/Desktop/rubbish/
@@ -196,6 +207,20 @@ bind -x '"\C-y\C-p": copy-pwd' 2>/dev/null || true
 
 # Local Content Search (Ctrl+G)
 bind -x '"\C-g": rga-fzf' 2>/dev/null || true
+
+# Previous Commands History Search (Ctrl+R)
+fzf-history-widget() {
+  local selected_command
+  selected_command=$(HISTTIMEFORMAT='' history | sort -nr | sed 's/^[ ]*[0-9]*[ ]*//' | awk '!seen[$0]++' | \
+      fzf --height 60% --layout=reverse \
+          --prompt="History> " \
+          --query="$READLINE_LINE")
+  if [[ -n "$selected_command" ]]; then
+      READLINE_LINE="$selected_command"
+      READLINE_POINT=${#READLINE_LINE}
+  fi
+}
+bind -x '"\C-r": fzf-history-widget' 2>/dev/null || true
 
 # Global File Search (Alt+S)
 fzf-global-file-widget() {

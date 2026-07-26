@@ -23,18 +23,18 @@ c = ["function:openAlfredClipboard", "0_clipboard"]
 p = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", "0_Menu Search"]
 
 [f] # FINDER 
-label = "[finder]"
+label = "| finder"
 f = "Finder"
-d = ["cmd:open ~/Downloads", "Downloads"]
-k = ["cmd:open ~/Desktop", "Desktop"]
-r = ["cmd:open '/Users/fungus/Library/Saved Searches/Recent.savedSearch'", "Recents"]
+d = ["cmd:open ~/Downloads", "downloads"]
+k = ["cmd:open ~/Desktop", "desktop"]
+r = ["cmd:open '/Users/fungus/Library/Saved Searches/Recent.savedSearch'", "recents"]
 o = ["cmd:open ~/OneDrive", "onedrive"]
-h = ["cmd:open ~/", "fungus/"]
+h = ["cmd:open ~/", "fungus"]
 # ~/.hammerspoon/home.toml
 
 
 [k]
-label = "[maestro]"
+label = "| maestro"
 g = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_ghostty')", "Open ghostty"]
 m = ["hs:hs.urlevent.openURL('kmtrigger://macro=move_reminder')", "Move reminders"]
 k = ["hs:hs.urlevent.openURL('kmtrigger://macro=search_km')", "Search KM"]
@@ -45,7 +45,7 @@ a = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_active_monitor')", "s
 
 # raycast deep links are supported
 [r]
-label = "[raycast]"
+label = "| raycast"
 c = ["raycast://extensions/raycast/raycast/confetti", "confetti"]
 e = ["raycast://extensions/raycast/emoji-symbols/search-emoji-symbols", "emoji"]
 v = ["raycast://extensions/jomifepe/bitwarden/search", "Search vault"]
@@ -53,7 +53,7 @@ s = ["raycast://root-search", "search raycast"]
 n = ["raycast://extensions/raycast/raycast-notes/raycast-notes", "notes"]
 
 [m]
-label = "[media]"
+label = "| media"
 p = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
 s = ["hs:hs.spotify.playpause()", "Spotify Play/Pause"]
 u = ["hs:hs.audiodevice.defaultOutputDevicesh fungus@fungus-pi.local):setVolume(math.min(100, hs.audiodevice.defaultOutputDevice():volume() + 5))", "Volume Up"]
