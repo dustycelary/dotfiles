@@ -266,100 +266,120 @@ local function postfix(s)
 end
 
 local function getActionAndLabel(s)
-	if s:find("^http[s]?://") then
-		return open(s), s:sub(5, 5) == "s" and s:sub(9) or s:sub(8)
-	elseif s == "reload" then
-		return function()
-			hs.reload()
-			hs.console.clearConsole()
-		end, s
-	elseif startswith(s, "alfred://") then
-		return alfred(s), s
-	elseif startswith(s, "raycast://") then
-		return raycast(s), s
-	elseif startswith(s, "things:///") then
-		return things(s), s
-	elseif startswith(s, "hs:") then
-		return hs_run(postfix(s)), s
-	elseif startswith(s, "menu:") then
-		local arg = postfix(s)
-		local appName = nil
-		local pathStr = arg
-		if arg:find("|") then
-			local sp = split(arg, "|")
-			appName = trim(sp[1])
-			pathStr = trim(sp[2] or "")
-		end
-		local menuPath = split(pathStr, ">")
-		for i = 1, #menuPath do
-			menuPath[i] = trim(menuPath[i])
-		end
-		local label = (appName and (appName .. " | ") or "") .. table.concat(menuPath, " > ")
-		return menuAction(appName, menuPath, label), label
-	elseif startswith(s, "cmd:") then
-		local arg = postfix(s)
-		return cmd(arg), arg
-	elseif startswith(s, "input:") then
-		local remaining = postfix(s)
-		local _, label = getActionAndLabel(remaining)
-		return function()
-			-- user input takes focus and doesn't return it
-			local focusedWindow = hs.window.focusedWindow()
-			local button, userInput = hs.dialog.textPrompt("", "", "", "Submit", "Cancel")
-			-- restore focus
-			focusedWindow:focus()
-
-			if button == "Cancel" then
-				return
+	local action, label = (function()
+		if s:find("^http[s]?://") then
+			return open(s), s:sub(5, 5) == "s" and s:sub(9) or s:sub(8)
+		elseif s == "reload" then
+			return function()
+				hs.reload()
+				hs.console.clearConsole()
+			end, s
+		elseif s == "repeat" then
+			return function()
+				if obj._lastAction then
+					obj._lastAction()
+				else
+					hs.alert("No previous action to repeat", 2)
+				end
+			end, "repeat last action"
+		elseif startswith(s, "alfred://") then
+			return alfred(s), s
+		elseif startswith(s, "raycast://") then
+			return raycast(s), s
+		elseif startswith(s, "things:///") then
+			return things(s), s
+		elseif startswith(s, "hs:") then
+			return hs_run(postfix(s)), s
+		elseif startswith(s, "menu:") then
+			local arg = postfix(s)
+			local appName = nil
+			local pathStr = arg
+			if arg:find("|") then
+				local sp = split(arg, "|")
+				appName = trim(sp[1])
+				pathStr = trim(sp[2] or "")
 			end
+			local menuPath = split(pathStr, ">")
+			for i = 1, #menuPath do
+				menuPath[i] = trim(menuPath[i])
+			end
+			local label = (appName and (appName .. " | ") or "") .. table.concat(menuPath, " > ")
+			return menuAction(appName, menuPath, label), label
+		elseif startswith(s, "cmd:") then
+			local arg = postfix(s)
+			return cmd(arg), arg
+		elseif startswith(s, "input:") then
+			local remaining = postfix(s)
+			local _, label = getActionAndLabel(remaining)
+			return function()
+				-- user input takes focus and doesn't return it
+				local focusedWindow = hs.window.focusedWindow()
+				local button, userInput = hs.dialog.textPrompt("", "", "", "Submit", "Cancel")
+				-- restore focus
+				focusedWindow:focus()
 
-			-- replace text and execute remaining action
-			local replaced = string.gsub(remaining, "{input}", userInput)
-			local action, _ = getActionAndLabel(replaced)
-			action()
-		end,
-			label
-	elseif startswith(s, "clipboard:") then
-		local remaining = postfix(s)
-		local _, label = getActionAndLabel(remaining)
-		return function()
-			local clipboardContents = hs.pasteboard.getContents() or ""
-			-- escape % in clipboard contents so gsub doesn't treat them as captures
-			local escaped = clipboardContents:gsub("%%", "%%%%")
-			local replaced = string.gsub(remaining, "{clipboard}", escaped)
-			local action, _ = getActionAndLabel(replaced)
-			action()
-		end,
-			label
-	elseif startswith(s, "shortcut:") then
-		local arg = postfix(s)
-		return keystroke(arg), arg
-	elseif startswith(s, "function:") then
-		local funcKey = postfix(s)
-		return userFunc(funcKey), funcKey .. "()"
-	elseif startswith(s, "code:") then
-		local arg = postfix(s)
-		return code(arg), "code " .. arg
-	elseif startswith(s, "text:") then
-		local arg = postfix(s)
-		return text(arg), arg
-	elseif startswith(s, "window:") then
-		local loc = postfix(s)
-		if windowLocations[loc] then
-			return windowLocations[loc], s
+				if button == "Cancel" then
+					return
+				end
+
+				-- replace text and execute remaining action
+				local replaced = string.gsub(remaining, "{input}", userInput)
+				local action, _ = getActionAndLabel(replaced)
+				action()
+			end,
+				label
+		elseif startswith(s, "clipboard:") then
+			local remaining = postfix(s)
+			local _, label = getActionAndLabel(remaining)
+			return function()
+				local clipboardContents = hs.pasteboard.getContents() or ""
+				-- escape % in clipboard contents so gsub doesn't treat them as captures
+				local escaped = clipboardContents:gsub("%%", "%%%%")
+				local replaced = string.gsub(remaining, "{clipboard}", escaped)
+				local action, _ = getActionAndLabel(replaced)
+				action()
+			end,
+				label
+		elseif startswith(s, "shortcut:") then
+			local arg = postfix(s)
+			return keystroke(arg), arg
+		elseif startswith(s, "function:") then
+			local funcKey = postfix(s)
+			return userFunc(funcKey), funcKey .. "()"
+		elseif startswith(s, "code:") then
+			local arg = postfix(s)
+			return code(arg), "code " .. arg
+		elseif startswith(s, "text:") then
+			local arg = postfix(s)
+			return text(arg), arg
+		elseif startswith(s, "window:") then
+			local loc = postfix(s)
+			if windowLocations[loc] then
+				return windowLocations[loc], s
+			else
+				-- regex to parse e.g. 0,0,.5,1 for left half of screen
+				local x, y, w, h = loc:match("^([%.%d]+),%s*([%.%d]+),%s*([%.%d]+),%s*([%.%d]+)$")
+				if not x then
+					hs.alert('Invalid window location: "' .. loc .. '"', nil, nil, 5)
+					return
+				end
+				return move(rect(tonumber(x), tonumber(y), tonumber(w), tonumber(h))), s
+			end
+			return
 		else
-			-- regex to parse e.g. 0,0,.5,1 for left half of screen
-			local x, y, w, h = loc:match("^([%.%d]+),%s*([%.%d]+),%s*([%.%d]+),%s*([%.%d]+)$")
-			if not x then
-				hs.alert('Invalid window location: "' .. loc .. '"', nil, nil, 5)
-				return
-			end
-			return move(rect(tonumber(x), tonumber(y), tonumber(w), tonumber(h))), s
+			return launch(s), s
 		end
-		return
-	else
-		return launch(s), s
+	end)()
+
+	if s ~= "repeat" and type(action) == "function" then
+		local origAction = action
+		action = function()
+			obj._lastAction = origAction
+			origAction()
+		end
 	end
+
+	return action, label
 end
 
 function obj.loadFirstValidTomlFile(paths)

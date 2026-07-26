@@ -1,4 +1,5 @@
 ---@diagnostic disable: undefined-global
+---
 
 hs.window.animationDuration = 0
 
@@ -16,11 +17,11 @@ spoon.Hammerflow.registerFormat({
 	fillColor = { white = 0.1, alpha = 0.9 },
 	textColor = { white = 1, alpha = 1 },
 	textFont = "SF Mono",
-	-- textSize = 18,
-	textSize = 13,
+	textSize = 18,
+	-- textSize = 13,
 	radius = 10,
-	padding = 8,
-	-- padding = 14,
+	-- padding = 8,
+	padding = 14,
 })
 spoon.Hammerflow.atScreenEdge = 1
 
@@ -44,7 +45,7 @@ spoon.Hammerflow.registerFunctions(helpers)
 spoon.Hammerflow.loadFirstValidTomlFile({
 	"home.toml",
 	"work.toml",
-	"Spoons/Hammerflow.spoon/sample.toml",
+	"Spoons/Hammerflow.spoon/keymap.toml",
 })
 -- optionally respect auto_reload setting in the toml config.
 if spoon.Hammerflow.auto_reload then

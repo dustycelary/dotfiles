@@ -40,10 +40,10 @@ return {
 			end,
 		})
 
-		-- set up incremental selection
-		vim.keymap.set("n", "<C-CR>", require("incselect").init)
-		vim.keymap.set("x", "<C-CR>", require("incselect").parent)
-		vim.keymap.set("x", "<bs>", require("incselect").child)
+		-- set up incremental selection (undo steps back through selection history)
+		vim.keymap.set("n", "<S-CR>", require("incselect").init)
+		vim.keymap.set("x", "<S-CR>", require("incselect").parent)
+		vim.keymap.set("x", "<bs>", require("incselect").undo)
 
 		-- use bash parser for zsh files
 		vim.treesitter.language.register("bash", "zsh")

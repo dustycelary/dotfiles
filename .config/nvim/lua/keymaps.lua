@@ -16,6 +16,8 @@ end, { desc = "Quick Look markdown preview" })
 
 -- [[ Editor ]]
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
+vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert new line below without splitting line" })
+vim.keymap.set("i", "<C-Enter>", "<C-o>o", { desc = "Insert new line below without splitting line" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 vim.keymap.set("n", "S", function()
 	local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -116,8 +118,8 @@ end, { desc = "Equalize windows" })
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- [[ Buffers & Tabs ]]
-vim.keymap.set("n", "<M-n>", "<cmd>bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<M-p>", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<M-=>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+vim.keymap.set("n", "<M-->", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
 
 vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Close buffer" })
 vim.keymap.set("n", "<leader>bn", "<cmd>bnext<CR>", { desc = "Next buffer" })

@@ -44,3 +44,13 @@ vim.opt.foldlevel = 99 -- start with all folds open
 vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
 vim.opt.foldnestmax = 4 -- limit nesting depth
+
+-- own options
+
+-- getting rid of comments when starting new line using 'o'
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "*",
+	callback = function()
+		vim.opt_local.formatoptions:remove("o")
+	end,
+})

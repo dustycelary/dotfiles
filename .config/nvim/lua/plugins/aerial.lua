@@ -11,8 +11,18 @@ return {
 		"nvim-tree/nvim-web-devicons", -- For the little function/class icons
 	},
 	keys = {
-		-- Press <leader>a to pop the sidebar open or closed
+		-- Press <leader>ua to pop the sidebar open or closed
 		{ "<leader>ua", "<cmd>AerialToggle!<CR>", desc = "Toggle Aerial Symbol Sidebar" },
+		{
+			"<leader>uv",
+			function()
+				require("aerial")
+				if _G.toggle_aerial_variables then
+					_G.toggle_aerial_variables()
+				end
+			end,
+			desc = "Toggle Aerial Variables & Constants",
+		},
 	},
 	-- opts acts as the setup() function in lazy.nvim
 
@@ -46,32 +56,134 @@ return {
 		},
 
 		filter_kind = {
-			"File",
-			"Package",
-			"Namespace",
 			"Class",
+			"Component",
 			"Constructor",
 			"Enum",
 			"EnumMember",
-			"Function",
-			"Interface",
-			"Module",
-			"Method",
-			"Property",
-			"Field",
-			"Struct",
-			"TypeParameter",
 			"Event",
-			"Operator",
+			"Field",
+			"File",
+			"Function",
 			"Heading",
+			"Interface",
+			"Method",
+			"Module",
+			"Namespace",
+			"Operator",
+			"Package",
+			"Property",
+			"Struct",
 			"Type",
-			"Component",
-			"Collapsed",
-			-- "Variable", -- Added so Python scripts don't appear empty
+			"TypeParameter",
+			-- Value / Data symbols
+			"Variable",
+			"Constant",
+			"Key",
+			"Array",
+			"Object",
 		},
 	},
 	config = function(_, opts)
 		require("aerial").setup(opts)
+
+		local show_vars = true
+		local full_kinds = {
+			"Class",
+			"Component",
+			"Constructor",
+			"Enum",
+			"EnumMember",
+			"Event",
+			"Field",
+			"File",
+			"Function",
+			"Heading",
+			"Interface",
+			"Method",
+			"Module",
+			"Namespace",
+			"Operator",
+			"Package",
+			"Property",
+			"Struct",
+			"Type",
+			"TypeParameter",
+			"Variable",
+			"Constant",
+			"Key",
+			"Array",
+			"Object",
+		}
+		local base_kinds = {
+			"Class",
+			"Component",
+			"Constructor",
+			"Enum",
+			"EnumMember",
+			"Event",
+			"Field",
+			"File",
+			"Function",
+			"Heading",
+			"Interface",
+			"Method",
+			"Module",
+			"Namespace",
+			"Operator",
+			"Package",
+			"Property",
+			"Struct",
+			"Type",
+			"TypeParameter",
+		}
+
+		function _G.toggle_aerial_variables()
+			show_vars = not show_vars
+			local target_kinds = show_vars and full_kinds or base_kinds
+
+			-- Update aerial.config.filter_kind in place
+			local config = require("aerial.config")
+			if type(config.filter_kind) == "table" then
+				for k in pairs(config.filter_kind) do
+					config.filter_kind[k] = nil
+				end
+				for i, v in ipairs(target_kinds) do
+					config.filter_kind[i] = v
+				end
+			end
+
+			-- Override buffer variable for current buffer
+			local bufnr = vim.api.nvim_get_current_buf()
+			vim.b[bufnr].aerial_filter_kind = target_kinds
+
+			if show_vars then
+				vim.notify("Aerial: Showing variables & constants", vim.log.levels.INFO)
+			else
+				vim.notify("Aerial: Hiding variables & constants", vim.log.levels.INFO)
+			end
+
+			-- Force active backend to re-fetch and render symbols
+			local ok, backends = pcall(require, "aerial.backends")
+			if ok then
+				local backend = backends.get(bufnr)
+				if backend and backend.fetch_symbols then
+					backend.fetch_symbols(bufnr)
+				end
+			end
+		end
+
+		-- Bind 'V' inside Aerial sidebar window with nowait=true
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = "aerial",
+			callback = function(args)
+				vim.keymap.set("n", "V", function()
+					if _G.toggle_aerial_variables then
+						_G.toggle_aerial_variables()
+					end
+				end, { buffer = args.buf, nowait = true, desc = "Toggle Variables in Aerial" })
+			end,
+		})
 
 		-- Global winbar function to display breadcrumbs dynamically
 		function _G.get_winbar()

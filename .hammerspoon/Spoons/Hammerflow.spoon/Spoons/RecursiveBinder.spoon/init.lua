@@ -28,7 +28,7 @@ obj.helperEntryEachLine = 5
 --- RecursiveBinder.helperEntryLengthInChar
 --- Variable
 --- Length of each entry in char. Default to 20.
-obj.helperEntryLengthInChar = 20
+obj.helperEntryLengthInChar = 30
 
 --- RecursiveBinder.helperFormat
 --- Variable

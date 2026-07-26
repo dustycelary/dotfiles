@@ -53,7 +53,7 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclu
 export FZF_CTRL_T_COMMAND='fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules'
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
-export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --color=always {} 2>/dev/null || ls {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --icons=auto --color=always {} 2>/dev/null || ls {}'"
 
 # Source FZF completions and keybindings
 if [[ -d "/opt/homebrew/opt/fzf" ]]; then
@@ -79,9 +79,9 @@ alias rebash='source ~/.bashrc'
 alias ebash='nvim ~/.bashrc'
 
 # Modern CLI replacements
-command -v eza >/dev/null && alias ls='eza --group-directories-first --icons' \
-                           && alias ll='eza -la --group-directories-first --icons --git' \
-                           && alias lt='eza --tree --level=2 --icons'
+command -v eza >/dev/null && alias ls='eza --group-directories-first --icons=auto' \
+                           && alias ll='eza -la --group-directories-first --icons=auto --git' \
+                           && alias lt='eza --tree --level=2 --icons=auto'
 command -v bat >/dev/null && alias cat='bat --paging=never'
 
 # Portable pbcopy via OSC 52 (works over SSH)
@@ -237,7 +237,7 @@ fzf-local-dir-widget() {
   selected_dir=$(fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
       fzf --height 50% --layout=reverse \
           --prompt="Local Dir> " \
-          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
+          --preview 'eza --tree --level=1 --long --time-style=relative --icons=auto --color=always {} 2>/dev/null || ls {}')
   if [[ -n "$selected_dir" ]]; then
       if [[ -n "$READLINE_LINE" && "$READLINE_LINE" != *[[:space:]] ]]; then
           READLINE_LINE="${READLINE_LINE} "
@@ -254,7 +254,7 @@ fzf-global-dir-widget() {
   selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
       fzf --height 50% --layout=reverse \
           --prompt="Global Dir> " \
-          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls {}')
+          --preview 'eza --tree --level=1 --long --time-style=relative --icons=auto --color=always {} 2>/dev/null || ls {}')
   if [[ -n "$selected_dir" ]]; then
       if [[ -n "$READLINE_LINE" && "$READLINE_LINE" != *[[:space:]] ]]; then
           READLINE_LINE="${READLINE_LINE} "
@@ -302,11 +302,24 @@ _fzf_path_completion_handler() {
       # If search_dir had a tilde, convert selection prefix back to tilde
       if [[ "$search_dir" == "~"* ]]; then
         selection="${selection/#$HOME/\~}"
+      elif [[ "$search_dir" == "." && "$cur" != "./"* ]]; then
+        selection="${selection#./}"
       fi
+
+      # If directory, append trailing slash
+      local selection_expanded="${selection/#\~/$HOME}"
+      if [[ -d "$selection_expanded" ]]; then
+        selection="${selection}/"
+        compopt -o nospace 2>/dev/null
+      fi
+
       COMPREPLY=( "$selection" )
       compopt +o default 2>/dev/null
     fi
   fi
+
+  bind '"\e[0n": redraw-current-line' 2>/dev/null
+  builtin printf '\e[5n'
 }
 complete -F _fzf_path_completion_handler cd nvim cat ls cp mv rm
 
