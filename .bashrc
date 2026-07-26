@@ -246,7 +246,7 @@ fzf-local-dir-widget() {
       READLINE_POINT=${#READLINE_LINE}
   fi
 }
-bind -x '"\ec": fzf-local-dir-widget' 2>/dev/null || true
+bind -x '"\ed": fzf-local-dir-widget' 2>/dev/null || true
 
 # Global Directory Finder (Alt+G) - Paste to prompt
 fzf-global-dir-widget() {
