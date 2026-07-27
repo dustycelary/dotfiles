@@ -21,10 +21,10 @@ g = ["Ghostty", " ghostty"]
 '.' = ["repeat", " repeat"]
 c = ["function:openAlfredClipboard", " clipboard"]
 b = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
-s = ["hs:hs.window.focusedWindow():move({x=550,y=220,w=820,h=520})", " shrink window"]
-v = ["function:showResourceViewer", " resource viewer"]
+# s = ["hs:hs.window.focusedWindow():move({x=550,y=220,w=820,h=520})", " shrink window"]
 # p = ["function:launchAppMonitor", " compact terminal monitor (400x400)"]
 p = ["hs:resourceMonitor.toggle()", " resource monitor"]
+t = ["function:openTmuxSpGhostty", " tmux 'sp' launch/focus"]
 
 
 [f] # FINDER 
@@ -49,14 +49,14 @@ a = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_active_monitor')", "s
 # o = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_active_monitor')", "ss active monitor"]
 
 # raycast deep links are supported
-[r]
-label = "|  raycast"
-c = ["raycast://extensions/raycast/raycast/confetti", "confetti"]
-e = ["raycast://extensions/raycast/emoji-symbols/search-emoji-symbols", "emoji"]
-v = ["raycast://extensions/jomifepe/bitwarden/search", "Search vault"]
-r = ["raycast://root-search", "search raycast"]
-n = ["raycast://extensions/raycast/raycast-notes/raycast-notes", "notes"]
-a = ["raycast://extensions/raycast/raycast-ai/ai-chat", "Ai chat"]
+# [r]
+# label = "|  raycast"
+# c = ["raycast://extensions/raycast/raycast/confetti", "confetti"]
+# e = ["raycast://extensions/raycast/emoji-symbols/search-emoji-symbols", "emoji"]
+# v = ["raycast://extensions/jomifepe/bitwarden/search", "Search vault"]
+# r = ["raycast://root-search", "search raycast"]
+# n = ["raycast://extensions/raycast/raycast-notes/raycast-notes", "notes"]
+# a = ["raycast://extensions/raycast/raycast-ai/ai-chat", "Ai chat"]
 
 # [h]
 # label = "|  helpers"
@@ -70,13 +70,16 @@ d = ["hs:hs.audiodevice.defaultOutputDevice():setVolume(math.max(0, hs.audiodevi
 m = ["hs:local dev = hs.audiodevice.defaultOutputDevice(); dev:setMuted(not dev:muted())", "Mute/Unmute"]
 
 [a] 
-label = "|  apps"
+label = "|  app actions"
 [a.s]
 label = "|  safari"
 s = ["menu:Safari|Bookmarks>Show Start Page", "Start page"] # select menu items (specific app)
 [a.o]
 label = "|  ollama"
 q = ["cmd: /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/tech-bible/automation/scripts/stop-ollama.sh", "quit ollama"]
+[a.t]
+label = "|  tailscale"
+t = ["cmd:pgrep -x Tailscale > /dev/null && (osascript -e 'quit app \"Tailscale\"' && osascript -e 'display notification \"Tailscale quit\" with title \"Tailscale\"') || (open -a Tailscale && osascript -e 'display notification \"Tailscale launched\" with title \"Tailscale\"')", " toggle tailscale"]
 
 
 

@@ -4,7 +4,7 @@ local M = {}
 -- CONFIG
 -----------------------------------------------------------------------
 
-local TARGET_APPS = { "Ghostty", "Safari", "Ollama", "Hammerspoon", "Docker" }
+local TARGET_APPS = { "Ghostty", "Antigravity", "Safari", "Ollama", "Hammerspoon", "Docker", "Spotify" }
 
 local WIDTH = 320
 local PAD_X = 10
@@ -12,34 +12,27 @@ local PAD_Y = 6
 local LINE_H = 17
 local FONT_SIZE = 11.5
 local FONT = "SF Mono"
-local UPDATE_INTERVAL = 2
+local UPDATE_INTERVAL = 5
 
 local panel = nil
-local timer = nil
+local panelTimer = nil
 local dragging = false
 local dragOffset = nil
+local menubar = nil
+local dragCallback = nil
 
------------------------------------------------------------------------
--- HELPERS
------------------------------------------------------------------------
-
-local function calcHeight()
-	-- header + separator + app rows + blank + 3 system rows + padding
-	return PAD_Y + (LINE_H * 2) + (#TARGET_APPS * LINE_H) + LINE_H + (LINE_H * 3) + PAD_Y
+local clickThrough = hs.settings.get("resourceMonitorClickThrough")
+if clickThrough == nil then
+	clickThrough = true -- default to click-through as requested by user
 end
 
-local function frame()
-	local screen = hs.screen.mainScreen():frame()
+-----------------------------------------------------------------------
+-- DATA GATHERING
+-----------------------------------------------------------------------
 
-	return {
-		x = screen.x + 6,
-		y = screen.y + 6,
-		w = WIDTH,
-		h = calcHeight(),
-	}
-end
+--- Gather per-app stats and top 3 processes from a single `ps` call.
+local TOP_N = 3
 
---- Gather per-app CPU, RSS, and process count from `ps`.
 local function gatherStats()
 	local output = hs.execute("ps -eo %cpu,rss,comm")
 	local stats = {}
@@ -48,12 +41,16 @@ local function gatherStats()
 		stats[app] = { cpu = 0, mem = 0, count = 0 }
 	end
 
+	-- collect all processes for top-N sorting
+	local allProcs = {}
+
 	for line in output:gmatch("[^\r\n]+") do
 		local cpuStr, rssStr, comm = line:match("%s*([%d%.]+)%s+(%d+)%s+(.+)")
 		local cpu = tonumber(cpuStr)
 		local rss = tonumber(rssStr)
 
 		if cpu and rss and comm then
+			-- tracked apps
 			for _, app in ipairs(TARGET_APPS) do
 				if comm:lower():find(app:lower(), 1, true) then
 					stats[app].cpu = stats[app].cpu + cpu
@@ -61,10 +58,21 @@ local function gatherStats()
 					stats[app].count = stats[app].count + 1
 				end
 			end
+
+			-- top processes (by CPU)
+			local name = comm:match("[^/]+$") or comm
+			table.insert(allProcs, { name = name, cpu = cpu, mem = rss })
 		end
 	end
 
-	return stats
+	-- sort by CPU descending and take top N
+	table.sort(allProcs, function(a, b) return a.cpu > b.cpu end)
+	local topProcs = {}
+	for i = 1, math.min(TOP_N, #allProcs) do
+		table.insert(topProcs, allProcs[i])
+	end
+
+	return stats, topProcs
 end
 
 --- Format memory in KB to a compact human-readable string.
@@ -89,16 +97,28 @@ end
 
 --- System-wide memory: used / total.
 local function sysMem()
-	local ok, vm = pcall(function()
-		return hs.host.vmStat()
-	end)
-	if not ok or not vm then
+	-- parse vm_stat for page counts
+	local out = hs.execute("vm_stat 2>/dev/null")
+	if not out then
 		return "–"
 	end
-	local page = vm.pageSize or 4096
-	local used = ((vm.activeCount or 0) + (vm.inactiveCount or 0) + (vm.wireCount or 0)) * page
-	local total = hs.host.vmStat().memSize
-	if total and total > 0 then
+
+	local function grab(label)
+		local val = out:match(label .. "%s*:%s*(%d+)")
+		return tonumber(val) or 0
+	end
+
+	local pageSize = tonumber(out:match("page size of (%d+)")) or 16384
+	local active = grab("Pages active")
+	local inactive = grab("Pages inactive")
+	local wired = grab("Pages wired down")
+	local used = (active + inactive + wired) * pageSize
+
+	-- total physical RAM from sysctl
+	local totalStr = hs.execute("sysctl -n hw.memsize 2>/dev/null"):gsub("%s+", "")
+	local total = tonumber(totalStr) or 0
+
+	if total > 0 then
 		return string.format("%.1f / %.0f GB", used / 1024 / 1024 / 1024, total / 1024 / 1024 / 1024)
 	end
 	return string.format("%.1f GB", used / 1024 / 1024 / 1024)
@@ -117,14 +137,17 @@ local function netThroughput()
 
 	for line in out:gmatch("[^\r\n]+") do
 		if not headerParsed then
-			-- find column indices from header
 			local cols = {}
 			for word in line:gmatch("%S+") do
 				table.insert(cols, word)
 			end
 			for i, col in ipairs(cols) do
-				if col == "Ibytes" then ibyteIdx = i end
-				if col == "Obytes" then obyteIdx = i end
+				if col == "Ibytes" then
+					ibyteIdx = i
+				end
+				if col == "Obytes" then
+					obyteIdx = i
+				end
 			end
 			headerParsed = true
 		else
@@ -134,7 +157,6 @@ local function netThroughput()
 					table.insert(cols, word)
 				end
 				local iface = cols[1] or ""
-				-- only count en* and lo* interfaces
 				if iface:match("^en%d") then
 					local ib = tonumber(cols[ibyteIdx]) or 0
 					local ob = tonumber(cols[obyteIdx]) or 0
@@ -174,8 +196,12 @@ local function netThroughput()
 	return result
 end
 
+-----------------------------------------------------------------------
+-- TEXT BUILDING
+-----------------------------------------------------------------------
+
 local function buildText()
-	local stats = gatherStats()
+	local stats, topProcs = gatherStats()
 	local lines = {}
 
 	-- header
@@ -198,6 +224,18 @@ local function buildText()
 		end
 	end
 
+	-- top processes
+	table.insert(lines, "")
+	table.insert(lines, "TOP PROCESSES")
+	for _, p in ipairs(topProcs) do
+		local name = p.name
+		if #name > 13 then name = name:sub(1, 12) .. "…" end
+		table.insert(
+			lines,
+			string.format("%-13s %4.1f%%  %10s", name, p.cpu, fmtMem(p.mem))
+		)
+	end
+
 	-- system metrics
 	table.insert(lines, "")
 	table.insert(lines, string.format("CPU  %-10s  MEM  %s", sysCpu(), sysMem()))
@@ -206,36 +244,143 @@ local function buildText()
 	return table.concat(lines, "\n")
 end
 
-local function update()
-	if not panel then
+-----------------------------------------------------------------------
+-- MENUBAR (always-on, click for dropdown)
+-----------------------------------------------------------------------
+
+local function buildMenuItems()
+	local stats = gatherStats()
+	local items = {}
+
+	-- header
+	table.insert(items, {
+		title = string.format("%-14s %5s  %9s  %2s", "APP", "CPU", "MEM", "#"),
+		disabled = true,
+		fn = nil,
+	})
+	table.insert(items, { title = "-" })
+
+	-- app rows
+	for _, app in ipairs(TARGET_APPS) do
+		local s = stats[app]
+		local title
+		if s.count > 0 then
+			title = string.format("%-14s %4.1f%%  %9s  %2d", app, s.cpu, fmtMem(s.mem), s.count)
+		else
+			title = string.format("%-14s %5s  %9s  %2s", app, "–", "offline", "–")
+		end
+		table.insert(items, { title = title, disabled = true })
+	end
+
+	table.insert(items, { title = "-" })
+
+	-- system metrics
+	table.insert(items, {
+		title = string.format("CPU  %s   MEM  %s", sysCpu(), sysMem()),
+		disabled = true,
+	})
+	table.insert(items, {
+		title = string.format("NET  %s", netThroughput()),
+		disabled = true,
+	})
+
+	table.insert(items, { title = "-" })
+	if panel then
+		table.insert(items, {
+			title = "Hide Overlay",
+			fn = function()
+				M.hideOverlay()
+			end,
+		})
+		local lockTitle = clickThrough and "🔓 Make Draggable" or "🔒 Lock Position (Click-Through)"
+		table.insert(items, {
+			title = lockTitle,
+			fn = function()
+				clickThrough = not clickThrough
+				hs.settings.set("resourceMonitorClickThrough", clickThrough)
+				if panel then
+					if clickThrough then
+						panel:mouseCallback(nil)
+					else
+						panel:mouseCallback(dragCallback)
+					end
+				end
+			end,
+		})
+	else
+		table.insert(items, {
+			title = "Show Overlay",
+			fn = function()
+				M.showOverlay()
+			end,
+		})
+	end
+
+	return items
+end
+
+function M.startMenubar()
+	if menubar then
 		return
 	end
 
-	local h = calcHeight()
-	panel[2].text = buildText()
+	menubar = hs.menubar.new()
+	menubar:setTitle("📊")
+	menubar:setMenu(buildMenuItems)
+end
 
-	-- resize canvas if height changed
-	local f = panel:frame()
-	if f.h ~= h then
-		panel:frame({ x = f.x, y = f.y, w = WIDTH, h = h })
-		panel[2].frame = { x = PAD_X, y = PAD_Y, w = WIDTH - (PAD_X * 2), h = h - (PAD_Y * 2) }
+function M.stopMenubar()
+	if menubar then
+		menubar:delete()
+		menubar = nil
 	end
 end
 
 -----------------------------------------------------------------------
--- PUBLIC
+-- OVERLAY (temporary on-screen panel via hotkey)
 -----------------------------------------------------------------------
 
-function M.show()
+local function calcHeight()
+	-- header(2) + apps + blank + "TOP PROCESSES" + top3 + blank + sys(2) + padding
+	return PAD_Y + (LINE_H * 2) + (#TARGET_APPS * LINE_H) + LINE_H + LINE_H + (TOP_N * LINE_H) + LINE_H + (LINE_H * 2) + PAD_Y
+end
+
+local function overlayFrame()
+	local savedPos = hs.settings.get("resourceMonitorPosition")
+	local screen = hs.screen.mainScreen():frame()
+	local h = calcHeight()
+	if savedPos and savedPos.x and savedPos.y then
+		return {
+			x = savedPos.x,
+			y = savedPos.y,
+			w = WIDTH,
+			h = h,
+		}
+	end
+	return {
+		x = screen.x + screen.w - WIDTH - 16,
+		y = screen.y + 6,
+		w = WIDTH,
+		h = h,
+	}
+end
+
+local function updateOverlay()
+	if not panel then
+		return
+	end
+	panel[2].text = buildText()
+end
+
+function M.showOverlay()
 	if panel then
 		return
 	end
 
 	local h = calcHeight()
-	panel = hs.canvas.new(frame())
+	panel = hs.canvas.new(overlayFrame())
 
 	panel:level(hs.canvas.windowLevels.status)
-
 	panel:behavior({
 		hs.canvas.windowBehaviors.canJoinAllSpaces,
 		hs.canvas.windowBehaviors.stationary,
@@ -249,7 +394,7 @@ function M.show()
 			red = 0.08,
 			green = 0.08,
 			blue = 0.08,
-			alpha = 0.65,
+			alpha = 0.78,
 		},
 		strokeColor = {
 			white = 0.25,
@@ -272,13 +417,14 @@ function M.show()
 		textColor = { white = 0.92, alpha = 1 },
 	}
 
-	-- drag support
-	panel:mouseCallback(function(_, msg, x, y)
+	dragCallback = function(_, msg, x, y)
 		if msg == "mouseDown" then
 			dragging = true
 			dragOffset = { x = x, y = y }
 		elseif msg == "mouseUp" then
 			dragging = false
+			local frame = panel:frame()
+			hs.settings.set("resourceMonitorPosition", { x = frame.x, y = frame.y })
 		elseif msg == "mouseMove" and dragging then
 			local pos = hs.mouse.absolutePosition()
 			panel:frame({
@@ -288,31 +434,42 @@ function M.show()
 				h = calcHeight(),
 			})
 		end
-	end)
-
-	panel:show()
-	update()
-	timer = hs.timer.doEvery(UPDATE_INTERVAL, update)
-end
-
-function M.hide()
-	if timer then
-		timer:stop()
-		timer = nil
 	end
 
+	-- drag support
+	if not clickThrough then
+		panel:mouseCallback(dragCallback)
+	end
+
+	panel:show()
+	updateOverlay()
+
+	panelTimer = hs.timer.doEvery(UPDATE_INTERVAL, updateOverlay)
+end
+
+function M.hideOverlay()
+	if panelTimer then
+		panelTimer:stop()
+		panelTimer = nil
+	end
 	if panel then
 		panel:delete()
 		panel = nil
 	end
 end
 
+--- Toggle the overlay. Hotkey-friendly.
 function M.toggle()
 	if panel then
-		M.hide()
+		M.hideOverlay()
 	else
-		M.show()
+		M.showOverlay()
 	end
 end
+
+-----------------------------------------------------------------------
+-- AUTO-START menubar
+-----------------------------------------------------------------------
+M.startMenubar()
 
 return M
