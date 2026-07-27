@@ -17,13 +17,18 @@ toast_on_reload = true    # optional, default false, show a toast when the confi
 show_ui = true            # optional, default true, show the ui with your key maps
 key_maps_per_line = 1     # optional, default 5, number of key maps per line in the ui
 
-g = ["Ghostty", "0_ghostty"]
-'.' = ["repeat", "0_repeat"]
-c = ["function:openAlfredClipboard", "0_clipboard"]
-p = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", "0_Menu Search"]
+g = ["Ghostty", " ghostty"]
+'.' = ["repeat", " repeat"]
+c = ["function:openAlfredClipboard", " clipboard"]
+b = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
+s = ["hs:hs.window.focusedWindow():move({x=550,y=220,w=820,h=520})", " shrink window"]
+v = ["function:showResourceViewer", " resource viewer"]
+# p = ["function:launchAppMonitor", " compact terminal monitor (400x400)"]
+p = ["hs:resourceMonitor.toggle()", " resource monitor"]
+
 
 [f] # FINDER 
-label = "| finder"
+label = "|  finder"
 f = "Finder"
 d = ["cmd:open ~/Downloads", "downloads"]
 k = ["cmd:open ~/Desktop", "desktop"]
@@ -34,7 +39,7 @@ h = ["cmd:open ~/", "fungus"]
 
 
 [k]
-label = "| maestro"
+label = "|  maestro"
 g = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_ghostty')", "Open ghostty"]
 m = ["hs:hs.urlevent.openURL('kmtrigger://macro=move_reminder')", "Move reminders"]
 k = ["hs:hs.urlevent.openURL('kmtrigger://macro=search_km')", "Search KM"]
@@ -45,22 +50,33 @@ a = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_active_monitor')", "s
 
 # raycast deep links are supported
 [r]
-label = "| raycast"
+label = "|  raycast"
 c = ["raycast://extensions/raycast/raycast/confetti", "confetti"]
 e = ["raycast://extensions/raycast/emoji-symbols/search-emoji-symbols", "emoji"]
 v = ["raycast://extensions/jomifepe/bitwarden/search", "Search vault"]
-s = ["raycast://root-search", "search raycast"]
+r = ["raycast://root-search", "search raycast"]
 n = ["raycast://extensions/raycast/raycast-notes/raycast-notes", "notes"]
+a = ["raycast://extensions/raycast/raycast-ai/ai-chat", "Ai chat"]
+
+# [h]
+# label = "|  helpers"
 
 [m]
-label = "| media"
+label = "|  media"
 p = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
 s = ["hs:hs.spotify.playpause()", "Spotify Play/Pause"]
 u = ["hs:hs.audiodevice.defaultOutputDevicesh fungus@fungus-pi.local):setVolume(math.min(100, hs.audiodevice.defaultOutputDevice():volume() + 5))", "Volume Up"]
 d = ["hs:hs.audiodevice.defaultOutputDevice():setVolume(math.max(0, hs.audiodevice.defaultOutputDevice():volume() - 5))", "Volume Down"]
 m = ["hs:local dev = hs.audiodevice.defaultOutputDevice(); dev:setMuted(not dev:muted())", "Mute/Unmute"]
 
-
+[a] 
+label = "|  apps"
+[a.s]
+label = "|  safari"
+s = ["menu:Safari|Bookmarks>Show Start Page", "Start page"] # select menu items (specific app)
+[a.o]
+label = "|  ollama"
+q = ["cmd: /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/tech-bible/automation/scripts/stop-ollama.sh", "quit ollama"]
 
 
 
@@ -86,20 +102,23 @@ m = ["hs:local dev = hs.audiodevice.defaultOutputDevice(); dev:setMuted(not dev:
 # c = "clipboard:text:{clipboard}"                # insert clipboard contents into any other action
 
 
-# we have window management too!
-# [w]
-# label = "[window]"
-# h = "window:left-half"                    # use presets listed in the README
-# c = "window:center-half"                  # use presets listed in the README
-# s = ["window:.4,.3,.2,.4","small center"] # or use 4 percentages for x,y,width,height for custom placement - more details in README
+# window management
+[w]
+label = "|  window"
+h = ["window:left-half", "left half"]
+l = ["window:right-half", "right half"]
+k = ["window:top-half", "top half"]
+j = ["window:bottom-half", "bottom half"]
+c = ["window:center-half", "center half"]
+u = ["window:top-left", "top-left quadrant"]
+i = ["window:top-right", "top-right quadrant"]
+n = ["window:bottom-left", "bottom-left quadrant"]
+m = ["window:bottom-right", "bottom-right quadrant"]
+f = ["window:fullscreen", "fullscreen"]
+x = ["window:maximized", "maximize"]
+t = ["menu:View>Float on Top", "float on top (app menu)"]
+s = ["hs:hs.pasteboard.setContents(hs.inspect(hs.window.focusedWindow():size()))", "Window size"]
 
-
-# or use raycast for window management if you prefer
-# [w.r]
-# label = "[raycast-window]"
-# h = ["raycast://extensions/raycast/window-management/left-half", "left half"]
-# l = ["raycast://extensions/raycast/window-management/right-half", "right half"]
-# c = ["raycast://extensions/raycast/window-management/center-half", "center half"]
 
 
 # for quick access to your config

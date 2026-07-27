@@ -28,19 +28,10 @@ spoon.Hammerflow.atScreenEdge = 1
 -- Hammerflow.loadFirstValidTomlFile({ "hammerflow.toml" })
 
 -- spoon.Hammerflow.atScreenEdge = 2
-local helpers = {
-	openAlfredClipboard = function()
-		local openAlfredClipboard = [[
-                        tell application id "com.runningwithcrayons.Alfred" to search "clipboard" ]]
-		hs.osascript.applescript(openAlfredClipboard)
-
-		-- Wait 0.2 seconds (adjust as needed), then press Enter
-		hs.timer.doAfter(0.2, function()
-			hs.eventtap.keyStroke({}, "return")
-		end)
-	end,
-}
+local helpers = require("helpers")
 spoon.Hammerflow.registerFunctions(helpers)
+
+resourceMonitor = require("resource_monitor")
 
 spoon.Hammerflow.loadFirstValidTomlFile({
 	"home.toml",

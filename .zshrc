@@ -7,9 +7,8 @@
 alias rezsh='source ~/.zshrc'
 alias ezsh='nvim ~/.zshrc'
 alias envim='nvim ~/.config/nvim/init.lua'
-alias spotify-db="docker exec -it postgres psql -U dev_user -d spotify_rag"
 alias rag="docker compose run --rm ingest"
-
+alias sp_rag="docker exec -it postgres psql -U dev_user -d spotify_rag"
 
 # --- [BOTH] ---
 # 1. Environment & Paths
