@@ -169,6 +169,7 @@ copy-pwd-widget() {
 zle -N copy-pwd-widget
 bindkey '^y^p' copy-pwd-widget
 
+
 rga-fzf() {
   local RG_PREFIX="rga --files-with-matches --smart-case --glob '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}' --glob '!**/screenshots/**' --glob '!**Screenshots**'"
   local file
@@ -185,14 +186,10 @@ rga-fzf() {
   )
   if [[ -n "$file" ]]; then
     file=$(echo "$file" | tr -d '\r\n')
-    echo "Opening $file..."
-    local ext="${file##*.}"
-    ext=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
-    if [[ "$ext" == "pdf" || "$ext" == "docx" || "$ext" == "png" || "$ext" == "jpg" || "$ext" == "jpeg" ]]; then
-      my_open "$file"
-    else
-      ${EDITOR:-nvim} "$file"
+    if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+        LBUFFER+=" "
     fi
+    LBUFFER+="${(q)file}"
   fi
 }
 # Local Content Search (Ctrl+G)
@@ -202,11 +199,29 @@ rga-fzf-local-widget() {
 }
 zle -N rga-fzf-local-widget
 bindkey '^g' rga-fzf-local-widget
+
 # --- fzf file/dir picker widgets -------------------------------------------
 # One shared implementation instead of four near-duplicates.
 # Always appends the selection to the END of the current command line.
 
 # Global File Search (Alt+S)
+# fzf-global-file-widget() {
+#   local selected_file
+#   selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
+#       fzf --height 60% --layout=reverse \
+#           --prompt="Global File> " \
+#           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+#   if [[ -n "$selected_file" ]]; then
+#       if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+#           LBUFFER+=" "
+#       fi
+#       LBUFFER+="${(q)selected_file}"
+#   fi
+#   zle reset-prompt
+# }
+# zle -N fzf-global-file-widget
+# bindkey '\es' fzf-global-file-widget
+
 fzf-global-file-widget() {
   local selected_file
   selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
@@ -214,10 +229,17 @@ fzf-global-file-widget() {
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
   if [[ -n "$selected_file" ]]; then
+      local resolved="${selected_file:A}"
+      local insert_val
+      if [[ "$resolved" == "$HOME"/* ]]; then
+          insert_val="~/${(q)${resolved#$HOME/}}"
+      else
+          insert_val="${(q)resolved}"
+      fi
       if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
           LBUFFER+=" "
       fi
-      LBUFFER+="${(q)selected_file}"
+      LBUFFER+="$insert_val"
   fi
   zle reset-prompt
 }
@@ -231,12 +253,21 @@ fzf-local-file-widget() {
       fzf --height 60% --layout=reverse \
           --prompt="Local File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+
   if [[ -n "$selected_file" ]]; then
+      local resolved="${selected_file:A}"
+      local insert_val
+      if [[ "$resolved" == "$HOME"/* ]]; then
+          insert_val="~/${(q)${resolved#$HOME/}}"
+      else
+          insert_val="${(q)resolved}"
+      fi
       if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
           LBUFFER+=" "
       fi
-      LBUFFER+="${(q)selected_file}"
+      LBUFFER+="$insert_val"
   fi
+  
   zle reset-prompt
 }
 zle -N fzf-local-file-widget
@@ -250,10 +281,17 @@ fzf-local-dir-widget() {
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
+      local resolved="${selected_dir:A}"
+      local insert_val
+      if [[ "$resolved" == "$HOME"/* ]]; then
+          insert_val="~/${(q)${resolved#$HOME/}}"
+      else
+          insert_val="${(q)resolved}"
+      fi
       if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
           LBUFFER+=" "
       fi
-      LBUFFER+="${(q)selected_dir}"
+      LBUFFER+="$insert_val"
   fi
   zle reset-prompt
 }
@@ -268,10 +306,17 @@ fzf-global-dir-widget() {
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
+      local resolved="${selected_dir:A}"
+      local insert_val
+      if [[ "$resolved" == "$HOME"/* ]]; then
+          insert_val="~/${(q)${resolved#$HOME/}}"
+      else
+          insert_val="${(q)resolved}"
+      fi
       if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
           LBUFFER+=" "
       fi
-      LBUFFER+="${(q)selected_dir}"
+      LBUFFER+="$insert_val"
   fi
   zle reset-prompt
 }
