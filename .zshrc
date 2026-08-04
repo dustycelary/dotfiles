@@ -71,7 +71,7 @@ command -v lsd >/dev/null && alias ls='lsd' \
                            && alias lt='lsd --tree'
 
 # Keep bat for cat
-command -v bat >/dev/null && alias cat='bat'
+# command -v bat >/dev/null && alias cat='bat'
 
 # Portable open helper
 my_open() {
@@ -200,27 +200,6 @@ rga-fzf-local-widget() {
 zle -N rga-fzf-local-widget
 bindkey '^g' rga-fzf-local-widget
 
-# --- fzf file/dir picker widgets -------------------------------------------
-# One shared implementation instead of four near-duplicates.
-# Always appends the selection to the END of the current command line.
-
-# Global File Search (Alt+S)
-# fzf-global-file-widget() {
-#   local selected_file
-#   selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
-#       fzf --height 60% --layout=reverse \
-#           --prompt="Global File> " \
-#           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
-#   if [[ -n "$selected_file" ]]; then
-#       if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
-#           LBUFFER+=" "
-#       fi
-#       LBUFFER+="${(q)selected_file}"
-#   fi
-#   zle reset-prompt
-# }
-# zle -N fzf-global-file-widget
-# bindkey '\es' fzf-global-file-widget
 
 fzf-global-file-widget() {
   local selected_file
@@ -271,7 +250,7 @@ fzf-local-file-widget() {
   zle reset-prompt
 }
 zle -N fzf-local-file-widget
-bindkey '^T' fzf-local-file-widget
+bindkey '\ef' fzf-local-file-widget
 
 # Local Directory Finder (Alt+D) - Paste to prompt
 fzf-local-dir-widget() {
