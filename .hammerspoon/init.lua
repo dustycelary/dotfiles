@@ -31,8 +31,6 @@ spoon.Hammerflow.atScreenEdge = 1
 local helpers = require("helpers")
 spoon.Hammerflow.registerFunctions(helpers)
 
-resourceMonitor = require("resource_monitor")
-
 spoon.Hammerflow.loadFirstValidTomlFile({
 	"home.toml",
 	"work.toml",

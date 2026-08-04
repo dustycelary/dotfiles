@@ -57,20 +57,21 @@ _comp_options+=(globdots)
 eval "$(zoxide init zsh)"
 
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude venv'
-export FZF_CTRL_T_COMMAND='fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules'
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
-export FZF_CTRL_T_OPTS="--preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}'"
 
-export FZF_ALT_C_COMMAND='{ zoxide query --list 2>/dev/null; fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules } | awk "!seen[\$0]++"'
-export FZF_ALT_C_OPTS="--preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}'"
+# command -v eza >/dev/null && alias ls='eza --icons' \
+#                            && alias ll='eza -l --icons' \
+#                            && alias lt='eza --tree --icons'
+# command -v bat >/dev/null && alias cat='bat'
 
+# lsd aliases for 100% GNU ls flag compatibility with icons
+command -v lsd >/dev/null && alias ls='lsd' \
+                           && alias ll='lsd -l' \
+                           && alias la='lsd -a' \
+                           && alias lt='lsd --tree'
 
-command -v eza >/dev/null && alias ls='eza --group-directories-first --icons=always' \
-                           && alias ll='eza -la --group-directories-first --icons --git' \
-                           && alias lt='eza --tree --level=2 --icons'
-command -v bat >/dev/null && alias cat='bat --paging=never'
-
-
+# Keep bat for cat
+command -v bat >/dev/null && alias cat='bat'
 
 # Portable open helper
 my_open() {
@@ -87,6 +88,7 @@ mkcd() { mkdir -p "$1" && cd "$1"; }
 f() { local res; res=$(fd | fzf); [[ -n "$res" ]] && dirname "$res" | pbcopy; }
 vf() { nvim "$(fd --type f | fzf)"; }
 bin() { mkdir -p ~/Desktop/rubbish; mv "$@" ~/Desktop/rubbish/; echo "Moved to rubbish: $@"; }
+clip() { printf "%s" "$*" | pbcopy; }
 
 cd() {
   if [[ -d "$1" || -z "$1" || "$1" == "-" ]]; then
@@ -137,6 +139,36 @@ cd() {
   fi
 }
 
+
+copy-pwd() {
+  pwd | pbcopy
+  echo "Copied: $(pwd)"
+}
+
+# --- [MAC ONLY] ---
+# 5. macOS ONLY Configurations
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # Homebrew
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+
+  # Pyenv
+  export PYENV_ROOT="$HOME/.pyenv"
+  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init -)"
+
+  alias eghostty='nvim ~/.config/ghostty/config'
+  alias bb='cd "/Users/fungus/Library/Mobile Documents/iCloud~md~obsidian/Documents/beep-boop" && nvim .'
+fi
+
+# --- [BOTH] ---
+# 6. Zsh Keybindings & Widget Registration
+copy-pwd-widget() {
+  copy-pwd
+  zle reset-prompt
+}
+zle -N copy-pwd-widget
+bindkey '^y^p' copy-pwd-widget
+
 rga-fzf() {
   local RG_PREFIX="rga --files-with-matches --smart-case --glob '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}' --glob '!**/screenshots/**' --glob '!**Screenshots**'"
   local file
@@ -163,37 +195,6 @@ rga-fzf() {
     fi
   fi
 }
-
-copy-pwd() {
-  pwd | pbcopy
-  echo "Copied: $(pwd)"
-}
-
-# --- [MAC ONLY] ---
-# 5. macOS ONLY Configurations
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  # Homebrew
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-
-  # Pyenv
-  export PYENV_ROOT="$HOME/.pyenv"
-  [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-  eval "$(pyenv init -)"
-
-  alias eghostty='nvim ~/.config/ghostty/config'
-  alias nf='cat ~/nerdfont.csv | fzf -d "," --with-nth=1,2,3 | awk -F"," "{printf \$3}" | pbcopy'
-  alias bb='cd "/Users/fungus/Library/Mobile Documents/iCloud~md~obsidian/Documents/beep-boop" && nvim .'
-fi
-
-# --- [BOTH] ---
-# 6. Zsh Keybindings & Widget Registration
-copy-pwd-widget() {
-  copy-pwd
-  zle reset-prompt
-}
-zle -N copy-pwd-widget
-bindkey '^y^p' copy-pwd-widget
-
 # Local Content Search (Ctrl+G)
 rga-fzf-local-widget() {
   rga-fzf
@@ -201,6 +202,9 @@ rga-fzf-local-widget() {
 }
 zle -N rga-fzf-local-widget
 bindkey '^g' rga-fzf-local-widget
+# --- fzf file/dir picker widgets -------------------------------------------
+# One shared implementation instead of four near-duplicates.
+# Always appends the selection to the END of the current command line.
 
 # Global File Search (Alt+S)
 fzf-global-file-widget() {
@@ -210,11 +214,10 @@ fzf-global-file-widget() {
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
   if [[ -n "$selected_file" ]]; then
-      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
-          BUFFER+=" "
+      if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+          LBUFFER+=" "
       fi
-      BUFFER+="${(q)selected_file}"
-      CURSOR=${#BUFFER}
+      LBUFFER+="${(q)selected_file}"
   fi
   zle reset-prompt
 }
@@ -229,18 +232,17 @@ fzf-local-file-widget() {
           --prompt="Local File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
   if [[ -n "$selected_file" ]]; then
-      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
-          BUFFER+=" "
+      if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+          LBUFFER+=" "
       fi
-      BUFFER+="${(q)selected_file}"
-      CURSOR=${#BUFFER}
+      LBUFFER+="${(q)selected_file}"
   fi
   zle reset-prompt
 }
 zle -N fzf-local-file-widget
 bindkey '^T' fzf-local-file-widget
 
-# Local Directory Finder (Alt+C) - Paste to prompt
+# Local Directory Finder (Alt+D) - Paste to prompt
 fzf-local-dir-widget() {
   local selected_dir
   selected_dir=$(fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
@@ -248,11 +250,10 @@ fzf-local-dir-widget() {
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
-      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
-          BUFFER+=" "
+      if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+          LBUFFER+=" "
       fi
-      BUFFER+="${(q)selected_dir}"
-      CURSOR=${#BUFFER}
+      LBUFFER+="${(q)selected_dir}"
   fi
   zle reset-prompt
 }
@@ -267,11 +268,10 @@ fzf-global-dir-widget() {
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
-      if [[ -n "$BUFFER" && "$BUFFER" != *[[:space:]] ]]; then
-          BUFFER+=" "
+      if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+          LBUFFER+=" "
       fi
-      BUFFER+="${(q)selected_dir}"
-      CURSOR=${#BUFFER}
+      LBUFFER+="${(q)selected_dir}"
   fi
   zle reset-prompt
 }
@@ -356,7 +356,7 @@ PROMPT='%n@fungus-mac:$(shorten_path)$ '
 # 8. Python Virtual Environment Auto-Activation
 auto_activate_venv() {
   local venv_dirs=(".venv" "venv")
-  local found_venv=""
+
 
   # Check if we are currently in a directory that matches the active venv
   if [[ -n "$VIRTUAL_ENV" ]]; then

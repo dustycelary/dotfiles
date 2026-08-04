@@ -76,10 +76,43 @@ return {
 			["gx"] = "actions.open_external",
 			["g."] = "actions.toggle_hidden",
 			["g\\"] = "actions.toggle_trash",
+			["gy"] = "actions.yank_entry",
+			["gY"] = {
+				desc = "Yank current directory path",
+				callback = function()
+					local dir = require("oil").get_current_dir()
+					if dir then
+						vim.fn.setreg("+", dir)
+						vim.notify("Yanked directory: " .. dir)
+					end
+				end,
+			},
 		},
 	},
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	keys = {
 		{ "-", "<cmd>Oil<cr>", desc = "Open parent directory in Oil" },
 	},
+	config = function(_, opts)
+		require("oil").setup(opts)
+
+		-- Expand %% to the current directory on the command line
+		vim.keymap.set("c", "%%", function()
+			if vim.bo.filetype == "oil" then
+				return require("oil").get_current_dir()
+			else
+				return vim.fn.expand("%:p:h") .. "/"
+			end
+		end, { expr = true, desc = "Expand to current directory path" })
+
+		-- Global keymap to copy current file/directory path to system clipboard
+		vim.keymap.set("n", "<leader>yp", function()
+			local path = vim.api.nvim_buf_get_name(0)
+			if vim.bo.filetype == "oil" then
+				path = require("oil").get_current_dir() or path
+			end
+			vim.fn.setreg("+", path)
+			vim.notify("Yanked path: " .. path)
+		end, { desc = "Yank current file/directory path" })
+	end,
 }

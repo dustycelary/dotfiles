@@ -3,18 +3,6 @@ local activeViewerCanvas = nil
 local activeViewerTimer = nil
 local activeViewerFadeTimer = nil
 
-local function getAllGhosttyWindows()
-	local windows = {}
-	for _, app in ipairs(hs.application.runningApplications()) do
-		if app:name() == "Ghostty" then
-			for _, w in ipairs(app:allWindows()) do
-				windows[w:id()] = w
-			end
-		end
-	end
-	return windows
-end
-
 local helpers = {
 	openAlfredClipboard = function()
 		local openAlfredClipboard = [[
@@ -190,7 +178,6 @@ local helpers = {
 			end)
 		end
 	end,
-
 	openTmuxSpGhostty = function()
 		if isLaunching then
 			return
@@ -198,39 +185,233 @@ local helpers = {
 
 		local storedId = hs.settings.get("tmuxSpGhosttyWindowId")
 		local win = storedId and hs.window.get(storedId)
+
 		if win then
 			win:focus()
+
+			-- Run/attach to the existing tmux session instead of opening Ghostty.
+			hs.execute("/opt/homebrew/bin/tmux new-session -A -s sp")
 		else
-			if storedId then
-				hs.settings.clear("tmuxSpGhosttyWindowId")
-			end
-			isLaunching = true
-			local oldWindows = {}
-			for id, _ in pairs(getAllGhosttyWindows()) do
-				oldWindows[id] = true
-			end
-
+			-- No tracked Ghostty window, just launch Ghostty once into the session.
 			hs.execute("open -na Ghostty --args -e /opt/homebrew/bin/tmux new-session -A -s sp")
-
-			local attempts = 0
-			local function findNewWindow()
-				local currentWindows = getAllGhosttyWindows()
-				for id, w in pairs(currentWindows) do
-					if not oldWindows[id] then
-						hs.settings.set("tmuxSpGhosttyWindowId", id)
-						isLaunching = false
-						return
-					end
-				end
-				attempts = attempts + 1
-				if attempts < 30 then
-					hs.timer.doAfter(0.1, findNewWindow)
-				else
-					isLaunching = false
-				end
-			end
-			hs.timer.doAfter(0.1, findNewWindow)
 		end
+	end,
+
+	spotifyGet = function(key)
+		local cmd = "/opt/homebrew/bin/spotify_player get key " .. key
+		local output, status, type_ret, rc = hs.execute(cmd)
+
+		if not output or output == "" then
+			hs.alert.show("No response from Spotify Player for key: " .. key, 3)
+			return
+		end
+
+		local success, result = pcall(function()
+			local data = hs.json.decode(output)
+			if not data then
+				error("Could not decode JSON response.")
+			end
+
+			local title = key:gsub("-", " "):gsub("^%l", string.upper)
+			local lines = { "🎧  " .. title:upper() .. "\n" }
+
+			if key == "playback" then
+				if not data.item then
+					table.insert(lines, "Nothing is playing.")
+				else
+					local track = data.item.name or "Unknown Track"
+					local artists = {}
+					for _, a in ipairs(data.item.artists or {}) do
+						if a.name then
+							table.insert(artists, a.name)
+						end
+					end
+					local artist = table.concat(artists, ", ")
+					if artist == "" then
+						artist = "Unknown Artist"
+					end
+					local album = data.item.album and data.item.album.name or "Unknown Album"
+					local is_playing = data.is_playing and "▶ Playing" or "⏸ Paused"
+					local progress = math.floor((data.progress_ms or 0) / 1000)
+					local duration = math.floor((data.item.duration_ms or 0) / 1000)
+					local progress_str = string.format(
+						"%d:%02d / %d:%02d",
+						math.floor(progress / 60),
+						progress % 60,
+						math.floor(duration / 60),
+						duration % 60
+					)
+
+					table.insert(
+						lines,
+						string.format(
+							"%s\n🎵 %s\n👤 %s\n💿 %s\n⏱ %s",
+							is_playing,
+							track,
+							artist,
+							album,
+							progress_str
+						)
+					)
+				end
+			elseif key == "devices" then
+				if type(data) ~= "table" then
+					error("Invalid devices data format.")
+				end
+				for _, dev in ipairs(data) do
+					local name = dev.name or "Unknown Device"
+					local dev_type = dev.type or "Unknown Type"
+					local vol = dev.volume_percent or 0
+					local active = dev.is_active and " [Active]" or ""
+					table.insert(lines, string.format("• %s (%s) - Vol: %d%%%s", name, dev_type, vol, active))
+				end
+				if #lines == 1 then
+					table.insert(lines, "No devices found.")
+				end
+			elseif key == "queue" then
+				local tracks = nil
+				if type(data) == "table" then
+					tracks = data.queue or data
+				end
+				if type(tracks) ~= "table" then
+					error("Invalid queue data format.")
+				end
+
+				local count = 0
+				for _, _ in ipairs(tracks) do
+					count = count + 1
+				end
+
+				for i, track in ipairs(tracks) do
+					if i > 10 then
+						table.insert(lines, string.format("... and %d more", count - 10))
+						break
+					end
+					local track_name = track.name or "Unknown Track"
+					local artists = {}
+					for _, a in ipairs(track.artists or {}) do
+						if a.name then
+							table.insert(artists, a.name)
+						end
+					end
+					local artist = table.concat(artists, ", ")
+					if artist == "" then
+						artist = "Unknown Artist"
+					end
+					table.insert(lines, string.format("%d. %s - %s", i, track_name, artist))
+				end
+				if count == 0 then
+					table.insert(lines, "Queue is empty.")
+				end
+			elseif key == "user-playlists" then
+				if type(data) ~= "table" then
+					error("Invalid playlists data format.")
+				end
+				for i, pl in ipairs(data) do
+					if i > 12 then
+						table.insert(lines, string.format("... and %d more", #data - 12))
+						break
+					end
+					local name = pl.name or "Unnamed Playlist"
+					table.insert(lines, string.format("• %s", name))
+				end
+				if #lines == 1 then
+					table.insert(lines, "No playlists found.")
+				end
+			elseif key == "user-liked-tracks" or key == "user-top-tracks" then
+				if type(data) ~= "table" then
+					error("Invalid tracks data format.")
+				end
+				for i, track in ipairs(data) do
+					if i > 12 then
+						table.insert(lines, string.format("... and %d more", #data - 12))
+						break
+					end
+					local track_name = track.name or "Unknown Track"
+					local artists = {}
+					for _, a in ipairs(track.artists or {}) do
+						if a.name then
+							table.insert(artists, a.name)
+						end
+					end
+					local artist = table.concat(artists, ", ")
+					if artist == "" then
+						artist = "Unknown Artist"
+					end
+					table.insert(lines, string.format("%d. %s - %s", i, track_name, artist))
+				end
+				if #lines == 1 then
+					table.insert(lines, "No tracks found.")
+				end
+			elseif key == "user-saved-albums" then
+				if type(data) ~= "table" then
+					error("Invalid albums data format.")
+				end
+				for i, album in ipairs(data) do
+					if i > 12 then
+						table.insert(lines, string.format("... and %d more", #data - 12))
+						break
+					end
+					local name = album.name or "Unknown Album"
+					local artists = {}
+					for _, a in ipairs(album.artists or {}) do
+						if a.name then
+							table.insert(artists, a.name)
+						end
+					end
+					local artist = table.concat(artists, ", ")
+					if artist == "" then
+						artist = "Unknown Artist"
+					end
+					table.insert(lines, string.format("• %s - %s", name, artist))
+				end
+				if #lines == 1 then
+					table.insert(lines, "No albums found.")
+				end
+			elseif key == "user-followed-artists" then
+				if type(data) ~= "table" then
+					error("Invalid artists data format.")
+				end
+				for i, artist in ipairs(data) do
+					if i > 12 then
+						table.insert(lines, string.format("... and %d more", #data - 12))
+						break
+					end
+					local name = artist.name or "Unknown Artist"
+					table.insert(lines, string.format("• %s", name))
+				end
+				if #lines == 1 then
+					table.insert(lines, "No followed artists found.")
+				end
+			else
+				table.insert(lines, tostring(output):sub(1, 500))
+			end
+
+			return table.concat(lines, "\n")
+		end)
+
+		local displayText
+		if success then
+			displayText = result
+		else
+			displayText = "❌ Spotify Player Error for '"
+				.. key
+				.. "':\n"
+				.. tostring(result)
+				.. "\n\nRaw output snippet:\n"
+				.. tostring(output):sub(1, 200)
+		end
+
+		hs.alert.show(displayText, {
+			strokeWidth = 2,
+			strokeColor = { white = 0.5, alpha = 0.8 },
+			fillColor = { white = 0.08, alpha = 0.95 },
+			textColor = { white = 0.95, alpha = 1 },
+			textFont = "SF Mono",
+			textSize = 15,
+			radius = 10,
+			padding = 16,
+		}, hs.screen.mainScreen(), 6)
 	end,
 }
 

@@ -81,10 +81,18 @@ alias rebash='source ~/.bashrc'
 alias ebash='nvim ~/.bashrc'
 
 # Modern CLI replacements
-command -v eza >/dev/null && alias ls='eza --group-directories-first --icons=auto' \
-                           && alias ll='eza -la --group-directories-first --icons=auto --git' \
-                           && alias lt='eza --tree --level=2 --icons=auto'
-command -v bat >/dev/null && alias cat='bat --paging=never'
+# command -v eza >/dev/null && alias ls='eza --group-directories-first --icons=auto' \
+#                            && alias ll='eza -la --group-directories-first --icons=auto --git' \
+#                            && alias lt='eza --tree --level=2 --icons=auto'
+# command -v bat >/dev/null && alias cat='bat --paging=never'
+# lsd aliases for 100% GNU ls flag compatibility with icons
+command -v lsd >/dev/null && alias ls='lsd' \
+                           && alias ll='lsd -l' \
+                           && alias la='lsd -a' \
+                           && alias lt='lsd --tree'
+
+# Keep bat for cat
+command -v bat >/dev/null && alias cat='bat'
 
 # Portable pbcopy via OSC 52 (works over SSH)
 

@@ -20,12 +20,7 @@ key_maps_per_line = 1     # optional, default 5, number of key maps per line in 
 g = ["Ghostty", " ghostty"]
 '.' = ["repeat", " repeat"]
 c = ["function:openAlfredClipboard", " clipboard"]
-b = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
-# s = ["hs:hs.window.focusedWindow():move({x=550,y=220,w=820,h=520})", " shrink window"]
-# p = ["function:launchAppMonitor", " compact terminal monitor (400x400)"]
-p = ["hs:resourceMonitor.toggle()", " resource monitor"]
-t = ["function:openTmuxSpGhostty", " tmux 'sp' launch/focus"]
-
+# b = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
 
 [f] # FINDER 
 label = "|  finder"
@@ -35,6 +30,7 @@ k = ["cmd:open ~/Desktop", "desktop"]
 r = ["cmd:open '/Users/fungus/Library/Saved Searches/Recent.savedSearch'", "recents"]
 o = ["cmd:open ~/OneDrive", "onedrive"]
 h = ["cmd:open ~/", "fungus"]
+D = ["cmd: open /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/admin/dopamine_menu_v1.pdf", "Dopa menu"]
 # ~/.hammerspoon/home.toml
 
 
@@ -48,26 +44,14 @@ s = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_all_monitors')", "ss 
 a = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_active_monitor')", "ss active monitor"]
 # o = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_active_monitor')", "ss active monitor"]
 
-# raycast deep links are supported
-# [r]
-# label = "|  raycast"
-# c = ["raycast://extensions/raycast/raycast/confetti", "confetti"]
-# e = ["raycast://extensions/raycast/emoji-symbols/search-emoji-symbols", "emoji"]
-# v = ["raycast://extensions/jomifepe/bitwarden/search", "Search vault"]
-# r = ["raycast://root-search", "search raycast"]
-# n = ["raycast://extensions/raycast/raycast-notes/raycast-notes", "notes"]
-# a = ["raycast://extensions/raycast/raycast-ai/ai-chat", "Ai chat"]
-
-# [h]
-# label = "|  helpers"
-
 [m]
 label = "|  media"
-p = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
-s = ["hs:hs.spotify.playpause()", "Spotify Play/Pause"]
-u = ["hs:hs.audiodevice.defaultOutputDevicesh fungus@fungus-pi.local):setVolume(math.min(100, hs.audiodevice.defaultOutputDevice():volume() + 5))", "Volume Up"]
-d = ["hs:hs.audiodevice.defaultOutputDevice():setVolume(math.max(0, hs.audiodevice.defaultOutputDevice():volume() - 5))", "Volume Down"]
-m = ["hs:local dev = hs.audiodevice.defaultOutputDevice(); dev:setMuted(not dev:muted())", "Mute/Unmute"]
+'space' = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
+"n" = ["hs:hs.eventtap.event.newSystemKeyEvent('NEXT', true):post(); hs.eventtap.event.newSystemKeyEvent('NEXT', false):post()", "Next Track"]
+"p" = ["hs:hs.eventtap.event.newSystemKeyEvent('PREVIOUS', true):post(); hs.eventtap.event.newSystemKeyEvent('PREVIOUS', false):post()", "Previous Track"]
+
+
+
 
 [a] 
 label = "|  app actions"
@@ -77,6 +61,7 @@ s = ["menu:Safari|Bookmarks>Show Start Page", "Start page"] # select menu items 
 [a.o]
 label = "|  ollama"
 q = ["cmd: /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/tech-bible/automation/scripts/stop-ollama.sh", "quit ollama"]
+s = ["cmd: /opt/homebrew/bin/ollama serve > /dev/null 2>&1", "start ollama"]
 [a.t]
 label = "|  tailscale"
 t = ["cmd:pgrep -x Tailscale > /dev/null && (osascript -e 'quit app \"Tailscale\"' && osascript -e 'display notification \"Tailscale quit\" with title \"Tailscale\"') || (open -a Tailscale && osascript -e 'display notification \"Tailscale launched\" with title \"Tailscale\"')", " toggle tailscale"]

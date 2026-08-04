@@ -1,31 +1,56 @@
+# ==============================================================================
+# GHOSTTY CONFIGURATION
+# ==============================================================================
+# Located at: ~/.config/ghostty/config
+# Press `cmd+s` followed by `r` to reload this configuration after editing.
+
+# ------------------------------------------------------------------------------
+# 1. TYPOGRAPHY & FONTS
+# ------------------------------------------------------------------------------
+# Ghostty supports modern features like programming ligatures.
+# You have excellent fonts installed. Choose one below:
+
+# font-family = SF Mono
+# font-family = Terminess Nerd Font Mono
+# font-family = Iosevka Tree Lig
+# font-family = Iosevka Retro Block
+font-family = Monaspace Argon NF
+# font-family = JetBrainsMono Nerd Font Mono
+# font-family = FiraCode Nerd Font Mono
 # font-family = Iosevka Custom
-# font-family = Monaspace Argon NF
-font-family = SF Mono
-# font-family = Hack Nerd Font Mono
-font-size = 13
+
+font-size = 14
+# font-size = 16
 font-thicken = true
+
+# Enable OpenType features like ligatures (arrows, symbols, etc.)
+font-feature = calt, liga, dlig
+
+# Vertical cell height spacing and baseline adjustments
+# adjust-cell-height = 15%
+adjust-font-baseline = -1
+adjust-cell-height = 1
+
+# ------------------------------------------------------------------------------
+# 2. THEMES & COLOR INTEGRATION
+# ------------------------------------------------------------------------------
+# You can set static themes, or separate light/dark themes to match macOS.
+# To see all options, run `ghostty +list-themes`.
+
+# Static theme choice:
+theme = Terafox
+
+# Auto-switching theme (uncomment to enable):
+# theme = light:Catppuccin Latte,dark:Terafox
+
+# Controls native macOS titlebar/scrollbar styling matching light/dark mode
+window-theme = system
+
+# Selection colors
 selection-background = #13c2c2
 selection-foreground = #000000
 
-# window-decoration = false
-
-# theme = GitHub Dark Colorblind
-# theme = Github Light High Contrast 
-
-# theme = Catppuccin Latte
-# theme = Gruvbox Dark Hard
-theme = Terafox
-# theme = Carbonfox
-# theme = Kanagawa Wave
-# background = #1d2021
-# foreground = #d4be98
-# selection-background = ffffff
-# cursor-color = ffcc00
-# selection-background = 4C566A
-# cursor-color = f1e962
-# cursor-color = ffffff
-
-# Gruvbox Material Hard Dark palette
+# Custom Gruvbox Material Hard Dark Palette Override (commented out)
 # palette = 0=#1d2021
 # palette = 1=#ea6962
 # palette = 2=#a9b665
@@ -43,59 +68,89 @@ theme = Terafox
 # palette = 14=#89b482
 # palette = 15=#d4be98
 
-# background-opacity = 0.95
+# ------------------------------------------------------------------------------
+# 3. WINDOW AESTHETICS & LAYOUT
+# ------------------------------------------------------------------------------
+# Adjusting window appearance for a premium, modern feel.
+
+# Initial window dimensions
+window-width = 100
+window-height = 28
+window-save-state = always
+
+# Spacing & margins (adds a modern, clean breathing room)
+window-padding-x = 12
+window-padding-y = 12
+window-padding-balance = true
+
+# Opacity and blur (Glassmorphism effect)
+background-opacity = 0.90
 background-blur-radius = 20
 window-colorspace = srgb
 
+# macOS Specific Aesthetics:
+# 'tabs' integrates the tab bar into the title bar (like Arc browser).
+# Alternatively, use 'hidden' to hide titlebar completely (drag with opt+click).
+macos-titlebar-style = tabs
+macos-titlebar-proxy-icon = hidden
+macos-icon = holographic
 
-#
-# # Scrollback
+# ------------------------------------------------------------------------------
+# 4. TABS & MULTI-WINDOW BEHAVIOR
+# ------------------------------------------------------------------------------
+window-show-tab-bar = auto
+tab-inherit-working-directory = true
+
+# Fade out unfocused split panes to emphasize your active workspace
+unfocused-split-opacity = 0.75
+
+# ------------------------------------------------------------------------------
+# 5. CURSOR BEHAVIOR
+# ------------------------------------------------------------------------------
+cursor-style = block
+cursor-style-blink = true
+mouse-hide-while-typing = true
+
+# ------------------------------------------------------------------------------
+# 6. SYSTEM & CLIPBOARD
+# ------------------------------------------------------------------------------
 scrollback-limit = 50000
-
 shell-integration = zsh
 shell-integration-features = no-cursor,sudo,no-title
-cursor-style = block
-adjust-cell-height = 15%
-# adjust-cell-height = 35% # ORIGINAL ONE 
-adjust-font-baseline = -1
-#
 
-mouse-hide-while-typing = true
-# mouse-scroll-multiplier = 2
+copy-on-select = clipboard
+clipboard-read = allow
+clipboard-write = allow
+macos-option-as-alt = true
 
-# STYLE 
+# ------------------------------------------------------------------------------
+# 7. QUICK TERMINAL (DROP-DOWN OVERLAY)
+# ------------------------------------------------------------------------------
+# Toggle with cmd+shift+` from anywhere on macOS.
+keybind = global:cmd+shift+`=toggle_quick_terminal
+quick-terminal-position = bottom
+quick-terminal-autohide = true
+quick-terminal-animation-duration = 0.2
 
-window-width = 80
-window-height = 24
-window-padding-x = 10
-window-padding-y = 10
-window-padding-balance = true
-window-save-state = always
-macos-titlebar-style=transparent
-macos-titlebar-proxy-icon=visible
+# ------------------------------------------------------------------------------
+# 8. KEYBINDINGS & WORKFLOW SHORTCUTS
+# ------------------------------------------------------------------------------
+# Custom tmux-like keybindings with leader key: cmd+s
 
-
-macos-icon=holographic 
-# cursor-opacity=0.9
-tab-inherit-working-directory=true
-# window-theme = ghostty
-
-
-# keybindings
-
+# General Control
 keybind = cmd+s>r=reload_config
 keybind = cmd+s>x=close_surface
-
 keybind = cmd+s>n=new_window
+keybind = cmd+s>w=write_scrollback_file:open
 
-# tabs
+# Tab Management
 keybind = cmd+s>c=new_tab
 keybind = cmd+s>shift+l=next_tab
 keybind = cmd+s>shift+h=previous_tab
 keybind = cmd+s>comma=move_tab:-1
 keybind = cmd+s>period=move_tab:1
 
-# quick tab switch
+# Tab Navigation (Quick Switch)
 keybind = cmd+s>1=goto_tab:1
 keybind = cmd+s>2=goto_tab:2
 keybind = cmd+s>3=goto_tab:3
@@ -106,7 +161,7 @@ keybind = cmd+s>7=goto_tab:7
 keybind = cmd+s>8=goto_tab:8
 keybind = cmd+s>9=goto_tab:9
 
-# split
+# Split Panes Layout
 keybind = cmd+s>\=new_split:right
 keybind = cmd+s>-=new_split:down
 
@@ -117,27 +172,18 @@ keybind = cmd+s>l=goto_split:right
 
 keybind = cmd+s>z=toggle_split_zoom
 keybind = cmd+s>f=toggle_window_float_on_top
-
 keybind = cmd+s>e=equalize_splits
 
-# other
-copy-on-select = clipboard
-clipboard-read = allow 
-clipboard-write = allow 
+# Split Panes Resizing (Leader cmd+s followed by ctrl + direction)
+keybind = cmd+s>ctrl+h=resize_split:left,15
+keybind = cmd+s>ctrl+j=resize_split:down,15
+keybind = cmd+s>ctrl+k=resize_split:up,15
+keybind = cmd+s>ctrl+l=resize_split:right,15
 
-
-
-macos-option-as-alt = true
-
-# personal
+# Shell Prompt Jumping (Jump back to previous outputs)
 keybind = cmd+up=unbind
 keybind = cmd+down=unbind
 keybind = cmd+left=unbind
 keybind = cmd+right=unbind
 keybind = cmd+up=jump_to_prompt:-1
 keybind = cmd+down=jump_to_prompt:1
-
-
-keybind = global:cmd+shift+`=toggle_quick_terminal
-quick-terminal-position=bottom
-keybind = cmd+s>w=write_scrollback_file:open

@@ -72,6 +72,15 @@ return {
 				files = common_actions,
 				grep = common_actions,
 			},
+			registers = {
+				multiline = false,
+				winopts = {
+					preview = {
+						layout = "horizontal",
+						horizontal = "right:65%",
+					},
+				},
+			},
 			-- 3. We completely removed the hardcoded 'cmd' overrides and 'fd_excludes'.
 			-- fzf-lua's defaults are already perfectly tuned for fd and ripgrep.
 			-- By not hardcoding exclusions, your alt-i/alt-h toggles will now work correctly!
@@ -89,6 +98,7 @@ return {
 		{ "<leader>fk", "<cmd>FzfLua keymaps<cr>", desc = "Fzf Keymaps" },
 		{ "<leader>fo", "<cmd>FzfLua oldfiles<cr>", desc = "Fzf Old Files" },
 		{ "<leader>fm", "<cmd>FzfLua marks<cr>", desc = "Fzf Marks" },
+		{ '<leader>f"', "<cmd>FzfLua registers<cr>", desc = "Fzf Registers" },
 		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Fzf Commands" },
 		{
 			"<leader>fs",
