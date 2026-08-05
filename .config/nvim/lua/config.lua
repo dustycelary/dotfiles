@@ -2,6 +2,9 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Default .sh files to bash syntax/filetype
+vim.g.is_bash = 1
+
 -- Disable built-in netrw so oil.nvim handles directories
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1

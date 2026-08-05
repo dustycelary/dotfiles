@@ -22,8 +22,7 @@ font-family = Iosevka NFM
 # font-family = FiraCode Nerd Font Mono
 # font-family = Iosevka Custom
 
-font-size = 14
-# font-size = 16
+font-size = 15
 font-thicken = true
 font-thicken-strength = 128
 font-synthetic-style = false

@@ -159,7 +159,19 @@ return {
 						require("fzf-lua").lsp_implementations({ jump1 = true })
 					end, { buffer = args.buf, desc = "LSP implementations" })
 					vim.keymap.set("n", "go", function()
-						require("fzf-lua").lsp_document_symbols()
+						local clients = vim.lsp.get_clients({ bufnr = 0 })
+						local has_symbol_provider = false
+						for _, client in ipairs(clients) do
+							if client.supports_method("textDocument/documentSymbol") then
+								has_symbol_provider = true
+								break
+							end
+						end
+						if has_symbol_provider then
+							require("fzf-lua").lsp_document_symbols()
+						else
+							require("fzf-lua").treesitter()
+						end
 					end, { buffer = args.buf, desc = "Document symbols" })
 
 					vim.keymap.set(

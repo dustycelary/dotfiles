@@ -115,11 +115,23 @@ return {
 			desc = "Fzf Document Diagnostics",
 		},
 		{
-			"<leader>fD",
+			"go",
 			function()
-				require("fzf-lua").lsp_workspace_diagnostics()
+				local clients = vim.lsp.get_clients({ bufnr = 0 })
+				local has_symbol_provider = false
+				for _, client in ipairs(clients) do
+					if client.supports_method("textDocument/documentSymbol") then
+						has_symbol_provider = true
+						break
+					end
+				end
+				if has_symbol_provider then
+					require("fzf-lua").lsp_document_symbols()
+				else
+					require("fzf-lua").treesitter()
+				end
 			end,
-			desc = "Fzf Workspace Diagnostics",
+			desc = "Document symbols (LSP / Treesitter)",
 		},
 	},
 }

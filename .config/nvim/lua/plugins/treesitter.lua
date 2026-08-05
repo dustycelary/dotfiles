@@ -44,7 +44,9 @@ return {
 		vim.keymap.set("x", "<S-CR>", require("incselect").parent)
 		vim.keymap.set("x", "<bs>", require("incselect").undo)
 
-		-- use bash parser for zsh files
+		-- use bash parser for sh, zsh, conf, env, and toml files
+		vim.treesitter.language.register("bash", "sh")
+		vim.treesitter.language.register("bash", "zsh")
 		vim.treesitter.language.register("bash", "conf")
 		vim.treesitter.language.register("bash", "env")
 		vim.treesitter.language.register("bash", "toml")

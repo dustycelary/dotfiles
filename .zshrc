@@ -85,8 +85,8 @@ my_open() {
 }
 
 mkcd() { mkdir -p "$1" && cd "$1"; }
-f() { local res; res=$(fd | fzf); [[ -n "$res" ]] && dirname "$res" | pbcopy; }
-vf() { nvim "$(fd --type f | fzf)"; }
+f() { local res; res=$(FZF_DEFAULT_COMMAND='fd' fzf); [[ -n "$res" ]] && dirname "$res" | pbcopy; }
+vf() { nvim "$(FZF_DEFAULT_COMMAND='fd --type f' fzf)"; }
 bin() { mkdir -p ~/Desktop/rubbish; mv "$@" ~/Desktop/rubbish/; echo "Moved to rubbish: $@"; }
 clip() { printf "%s" "$*" | pbcopy; }
 
@@ -171,7 +171,7 @@ bindkey '^y^p' copy-pwd-widget
 
 
 rga-fzf() {
-  local RG_PREFIX="rga --files-with-matches --smart-case --glob '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}' --glob '!**/screenshots/**' --glob '!**Screenshots**'"
+  local RG_PREFIX="rga --files-with-matches --smart-case --glob '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}' --glob '!**/screenshots/**' --glob '!**Screenshots**' --glob '!.git/**' --glob '!venv/**' --glob '!.venv/**' --glob '!node_modules/**' --glob '!__pycache__/**'"
   local file
   file=$(
     FZF_DEFAULT_COMMAND="$RG_PREFIX ''" \
@@ -203,7 +203,7 @@ bindkey '^g' rga-fzf-local-widget
 
 fzf-global-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
+  selected_file=$(fd --type f --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache --exclude CloudStorage --exclude "Mobile Documents" . "$HOME" | \
       fzf --height 60% --layout=reverse \
           --prompt="Global File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
@@ -228,7 +228,7 @@ bindkey '\es' fzf-global-file-widget
 # Local File Search (Ctrl+T)
 fzf-local-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --hidden --no-ignore --follow --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules . | \
+  selected_file=$(fd --type f --hidden --no-ignore --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules . | \
       fzf --height 60% --layout=reverse \
           --prompt="Local File> " \
           --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
@@ -255,7 +255,7 @@ bindkey '\ef' fzf-local-file-widget
 # Local Directory Finder (Alt+D) - Paste to prompt
 fzf-local-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --hidden --follow --exclude .git --exclude venv --exclude node_modules . | \
+  selected_dir=$(fd --type d --hidden --exclude .git --exclude venv --exclude node_modules . | \
       fzf --height 50% --layout=reverse \
           --prompt="Local Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
@@ -280,7 +280,7 @@ bindkey '\ed' fzf-local-dir-widget
 # Global Directory Finder (Alt+G) - Paste to prompt
 fzf-global-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --follow --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache . "$HOME" | \
+  selected_dir=$(fd --type d --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache --exclude CloudStorage --exclude "Mobile Documents" . "$HOME" | \
       fzf --height 50% --layout=reverse \
           --prompt="Global Dir> " \
           --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
