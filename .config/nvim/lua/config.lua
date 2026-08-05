@@ -14,10 +14,13 @@ vim.opt.signcolumn = "yes" -- Always show sign column (for gitsigns etc)
 vim.opt.termguicolors = true
 vim.opt.background = "dark"
 
-vim.opt.autoindent = true -- Keep identation from previous line
+vim.opt.autoindent = true -- Keep indentation from previous line
 vim.opt.smarttab = true
 -- vim.opt.smartindent = true
 vim.opt.expandtab = true -- Convert tabs to spaces by default
+vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
+vim.opt.shiftwidth = 4 -- Size of an indent
+vim.opt.softtabstop = 4 -- Number of spaces that a <Tab> counts for while performing editing operations
 
 vim.opt.undofile = true
 vim.opt.scrolloff = 8

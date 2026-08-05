@@ -104,15 +104,5 @@ return {
 				return vim.fn.expand("%:p:h") .. "/"
 			end
 		end, { expr = true, desc = "Expand to current directory path" })
-
-		-- Global keymap to copy current file/directory path to system clipboard
-		vim.keymap.set("n", "<leader>yp", function()
-			local path = vim.api.nvim_buf_get_name(0)
-			if vim.bo.filetype == "oil" then
-				path = require("oil").get_current_dir() or path
-			end
-			vim.fn.setreg("+", path)
-			vim.notify("Yanked path: " .. path)
-		end, { desc = "Yank current file/directory path" })
 	end,
 }

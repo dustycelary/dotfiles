@@ -20,13 +20,14 @@ return {
 			"svelte",
 			"graphql",
 			"bash",
+			"zsh",
 			"dockerfile",
 			"gitignore",
 			"python",
 			"toml",
 		})
 
-		-- enable highlighting and indenting
+		-- enable highlighting
 		vim.api.nvim_create_autocmd("FileType", {
 			pattern = "*",
 			callback = function(args)
@@ -34,8 +35,6 @@ return {
 				if lang then
 					-- Enables highlighting
 					pcall(vim.treesitter.start, args.buf, lang)
-					-- Enables indenting
-					vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 				end
 			end,
 		})
@@ -46,7 +45,6 @@ return {
 		vim.keymap.set("x", "<bs>", require("incselect").undo)
 
 		-- use bash parser for zsh files
-		vim.treesitter.language.register("bash", "zsh")
 		vim.treesitter.language.register("bash", "conf")
 		vim.treesitter.language.register("bash", "env")
 		vim.treesitter.language.register("bash", "toml")

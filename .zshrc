@@ -65,7 +65,7 @@ export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 # command -v bat >/dev/null && alias cat='bat'
 
 # lsd aliases for 100% GNU ls flag compatibility with icons
-command -v lsd >/dev/null && alias ls='lsd' \
+command -v lsd >/dev/null && alias ls='lsd -1' \
                            && alias ll='lsd -l' \
                            && alias la='lsd -a' \
                            && alias lt='lsd --tree'

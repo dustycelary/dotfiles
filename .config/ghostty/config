@@ -12,24 +12,34 @@
 
 # font-family = SF Mono
 # font-family = Terminess Nerd Font Mono
+# font-family = Roboto
 # font-family = Iosevka Tree Lig
 # font-family = Iosevka Retro Block
-font-family = Monaspace Argon NF
+# font-family = Monaspace Argon NF
 # font-family = JetBrainsMono Nerd Font Mono
+font-family = Iosevka NFM
+# font-family = Maple Mono NF
 # font-family = FiraCode Nerd Font Mono
 # font-family = Iosevka Custom
 
 font-size = 14
 # font-size = 16
 font-thicken = true
+font-thicken-strength = 128
+font-synthetic-style = false
 
 # Enable OpenType features like ligatures (arrows, symbols, etc.)
-font-feature = calt, liga, dlig
+font-feature = calt
+font-feature = liga
+# font-feature = dlig
 
 # Vertical cell height spacing and baseline adjustments
-# adjust-cell-height = 15%
+adjust-cell-height = 2
 adjust-font-baseline = -1
-adjust-cell-height = 1
+
+# Clean up underlines so they don't clash with descenders
+adjust-underline-position = 2
+adjust-underline-thickness = 1
 
 # ------------------------------------------------------------------------------
 # 2. THEMES & COLOR INTEGRATION
@@ -38,7 +48,9 @@ adjust-cell-height = 1
 # To see all options, run `ghostty +list-themes`.
 
 # Static theme choice:
-theme = Terafox
+# theme = Terafox
+# theme = Amber
+theme = Catppuccin Mocha
 
 # Auto-switching theme (uncomment to enable):
 # theme = light:Catppuccin Latte,dark:Terafox
@@ -46,9 +58,9 @@ theme = Terafox
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system
 
-# Selection colors
-selection-background = #13c2c2
-selection-foreground = #000000
+# Selection colors (Catppuccin Mocha Surface2 & Text)
+selection-background = #585b70
+selection-foreground = #cdd6f4
 
 # Custom Gruvbox Material Hard Dark Palette Override (commented out)
 # palette = 0=#1d2021
@@ -86,7 +98,7 @@ window-padding-balance = true
 # Opacity and blur (Glassmorphism effect)
 background-opacity = 0.90
 background-blur-radius = 20
-window-colorspace = srgb
+window-colorspace = display-p3
 
 # macOS Specific Aesthetics:
 # 'tabs' integrates the tab bar into the title bar (like Arc browser).
