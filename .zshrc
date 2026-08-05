@@ -56,8 +56,8 @@ _comp_options+=(globdots)
 # 3. Tool Integrations & FZF
 eval "$(zoxide init zsh)"
 
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git --exclude venv'
-export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv'
+export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline --scheme=path --tiebreak=end,index'
 
 # command -v eza >/dev/null && alias ls='eza --icons' \
 #                            && alias ll='eza -l --icons' \
@@ -203,10 +203,13 @@ bindkey '^g' rga-fzf-local-widget
 
 fzf-global-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache --exclude CloudStorage --exclude "Mobile Documents" . "$HOME" | \
-      fzf --height 60% --layout=reverse \
+  local cloud_dir=""
+  [[ -d "$HOME/Library/CloudStorage" ]] && cloud_dir="$HOME/Library/CloudStorage"
+  selected_file=$(fd --max-depth 8 --one-file-system --type f --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude site-packages --exclude typeshed --exclude CMakeFiles --exclude out --exclude build --exclude dist --exclude target --exclude .cache --exclude .local --exclude .cargo --exclude .rustup --exclude .npm --exclude .nvm --exclude .pyenv --exclude .gemini --exclude .docker --exclude .ollama --exclude qmk_firmware --exclude Pictures --exclude Movies --exclude Music . "$HOME" $cloud_dir | \
+      fzf --height 60% --layout=reverse --scheme=path --tiebreak=end,index \
           --prompt="Global File> " \
-          --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+          --preview-window="right:35%" \
+          --preview 'bat --style=numbers --color=always --line-range :100 {} 2>/dev/null || head -n 100 {}')
   if [[ -n "$selected_file" ]]; then
       local resolved="${selected_file:A}"
       local insert_val
@@ -228,10 +231,15 @@ bindkey '\es' fzf-global-file-widget
 # Local File Search (Ctrl+T)
 fzf-local-file-widget() {
   local selected_file
-  selected_file=$(fd --type f --hidden --no-ignore --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules . | \
-      fzf --height 60% --layout=reverse \
+  local search_depth=""
+  if [[ "$PWD" == "/" || "$PWD" == "/System"* || "$PWD" == "/Volumes"* ]]; then
+      search_depth="--max-depth 4"
+  fi
+  selected_file=$(fd --type f --hidden --no-ignore $search_depth --one-file-system --exclude .git --exclude venv --exclude .venv --exclude __pycache__ --exclude node_modules --exclude site-packages --exclude typeshed --exclude CMakeFiles --exclude .build --exclude dist --exclude target --exclude .next --exclude Library --exclude .cache --exclude .local --exclude System . | \
+      fzf --height 60% --layout=reverse --scheme=path --tiebreak=end,index \
           --prompt="Local File> " \
-          --preview 'bat --style=numbers --color=always {} 2>/dev/null || cat {}')
+          --preview-window="right:35%" \
+          --preview 'bat --style=numbers --color=always --line-range :100 {} 2>/dev/null || head -n 100 {}')
 
   if [[ -n "$selected_file" ]]; then
       local resolved="${selected_file:A}"
@@ -255,10 +263,15 @@ bindkey '\ef' fzf-local-file-widget
 # Local Directory Finder (Alt+D) - Paste to prompt
 fzf-local-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --hidden --exclude .git --exclude venv --exclude node_modules . | \
-      fzf --height 50% --layout=reverse \
+  local search_depth=""
+  if [[ "$PWD" == "/" || "$PWD" == "/System"* || "$PWD" == "/Volumes"* ]]; then
+      search_depth="--max-depth 4"
+  fi
+  selected_dir=$(fd --type d --hidden $search_depth --one-file-system --exclude .git --exclude venv --exclude node_modules --exclude site-packages --exclude typeshed --exclude CMakeFiles --exclude .build --exclude dist --exclude target --exclude .next --exclude Library --exclude .cache --exclude .local --exclude System . | \
+      fzf --height 50% --layout=reverse --scheme=path --tiebreak=end,index \
           --prompt="Local Dir> " \
-          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
+          --preview-window="right:35%" \
+          --preview 'lsd --tree --depth 1 --color=always {} 2>/dev/null || eza --tree --level=1 --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
       local resolved="${selected_dir:A}"
       local insert_val
@@ -280,10 +293,13 @@ bindkey '\ed' fzf-local-dir-widget
 # Global Directory Finder (Alt+G) - Paste to prompt
 fzf-global-dir-widget() {
   local selected_dir
-  selected_dir=$(fd --type d --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude Library --exclude .cache --exclude CloudStorage --exclude "Mobile Documents" . "$HOME" | \
-      fzf --height 50% --layout=reverse \
+  local cloud_dir=""
+  [[ -d "$HOME/Library/CloudStorage" ]] && cloud_dir="$HOME/Library/CloudStorage"
+  selected_dir=$(fd --max-depth 8 --one-file-system --type d --exclude .git --exclude venv --exclude .venv --exclude node_modules --exclude __pycache__ --exclude site-packages --exclude typeshed --exclude CMakeFiles --exclude out --exclude build --exclude dist --exclude target --exclude .cache --exclude .local --exclude .cargo --exclude .rustup --exclude .npm --exclude .nvm --exclude .pyenv --exclude .gemini --exclude .docker --exclude .ollama --exclude qmk_firmware --exclude Pictures --exclude Movies --exclude Music . "$HOME" $cloud_dir | \
+      fzf --height 50% --layout=reverse --scheme=path --tiebreak=end,index \
           --prompt="Global Dir> " \
-          --preview 'eza --tree --level=1 --long --time-style=relative --color=always {} 2>/dev/null || ls -la {}')
+          --preview-window="right:35%" \
+          --preview 'lsd --tree --depth 1 --color=always {} 2>/dev/null || eza --tree --level=1 --color=always {} 2>/dev/null || ls -la {}')
   if [[ -n "$selected_dir" ]]; then
       local resolved="${selected_dir:A}"
       local insert_val
