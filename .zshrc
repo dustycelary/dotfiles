@@ -227,7 +227,57 @@ fi
 # 7. FZF Search Helpers & Widgets
 # -----------------------------------------------------------------------------
 
-# Local & Cloud Content Search (Ctrl+G)
+# ---- Shared helpers (used by all widgets below) ----
+
+# Populates $_fzf_reply with all existing cloud storage dirs, unconditionally.
+_fzf_cloud_dirs_all() {
+  _fzf_reply=()
+  [[ -d "$HOME/Library/CloudStorage" ]] && _fzf_reply+=("$HOME/Library/CloudStorage")
+  [[ -d "$HOME/Library/Mobile Documents" ]] && _fzf_reply+=("$HOME/Library/Mobile Documents")
+}
+
+# Populates $_fzf_reply with cloud storage dirs, only if they fall within
+# $PWD's scope (i.e. $PWD is $HOME, ~/Library, or an ancestor of the cloud dir).
+_fzf_cloud_dirs_in_scope() {
+  _fzf_reply=()
+  local candidate
+  for candidate in "$HOME/Library/CloudStorage" "$HOME/Library/Mobile Documents"; do
+    [[ -d "$candidate" ]] || continue
+    if [[ "$candidate" == "$PWD"/* || "$candidate" == "$PWD" ]]; then
+      _fzf_reply+=("$candidate")
+    fi
+  done
+}
+
+# Builds --exclude args from a pattern list into $_fzf_reply.
+_fzf_build_excludes() {
+  _fzf_reply=()
+  local ex
+  for ex in "$@"; do
+    _fzf_reply+=(--exclude "$ex")
+  done
+}
+
+# Resolves a path and appends it to LBUFFER, using ~ shorthand under $HOME.
+_fzf_insert_path() {
+  local resolved="${1:A}"
+  local insert_val
+  if [[ "$resolved" == "$HOME"/* ]]; then
+    insert_val="~/${(q)${resolved#$HOME/}}"
+  else
+    insert_val="${(q)resolved}"
+  fi
+  if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
+    LBUFFER+=" "
+  fi
+  LBUFFER+="$insert_val"
+}
+
+_fzf_preview_file_cmd='bat --style=numbers --color=always --line-range :100 {} 2>/dev/null || head -n 100 {}'
+_fzf_preview_dir_cmd='lsd --tree --depth 1 --color=always {} 2>/dev/null || eza --tree --level=1 --color=always {} 2>/dev/null || ls -la {}'
+
+
+# ---- Local & Cloud Content Search (Ctrl+G) ----
 rga-fzf() {
   local globs=(
     '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}'
@@ -245,29 +295,25 @@ rga-fzf() {
     glob_args+="--glob '$g' "
   done
 
-  local cloud_targets=()
-  [[ -d "$HOME/Library/CloudStorage" ]] && cloud_targets+=("$HOME/Library/CloudStorage")
-  [[ -d "$HOME/Library/Mobile Documents" ]] && cloud_targets+=("$HOME/Library/Mobile Documents")
+  _fzf_cloud_dirs_all
+  local cloud_targets=("${_fzf_reply[@]}")
 
   local RG_PREFIX="rga --files-with-matches --smart-case ${glob_args}"
   local file
   file=$(
-    FZF_DEFAULT_COMMAND="$RG_PREFIX '' . ${_cloud_search_paths[*]}" \
+    FZF_DEFAULT_COMMAND="$RG_PREFIX '' . ${cloud_targets[*]}" \
     fzf --ansi \
         --disabled \
         --layout=reverse \
         --height=80% \
         --preview-window="right:60%:wrap:hidden" \
         --prompt="Search Content (Local & Cloud) > " \
-        --bind "change:reload:$RG_PREFIX {q} . ${_cloud_search_paths[*]} || true,ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+        --bind "change:reload:$RG_PREFIX {q} . ${cloud_targets[*]} || true,ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
         --preview "[[ -n {} ]] && rga --pretty --context 3 {q} {}"
   )
   if [[ -n "$file" ]]; then
     file=$(echo "$file" | tr -d '\r\n')
-    if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
-      LBUFFER+=" "
-    fi
-    LBUFFER+="${(q)file}"
+    _fzf_insert_path "$file"
   fi
 }
 
@@ -279,12 +325,12 @@ zle -N rga-fzf-local-widget
 bindkey '^g' rga-fzf-local-widget
 
 
-# Global File Search (Alt+S) - Searches Home, OneDrive & iCloud
+# ---- Global File Search (Alt+S) ----
 fzf-global-file-widget() {
   local selected_file
-  local cloud_dirs=()
-  [[ -d "$HOME/Library/CloudStorage" ]] && cloud_dirs+=("$HOME/Library/CloudStorage")
-  [[ -d "$HOME/Library/Mobile Documents" ]] && cloud_dirs+=("$HOME/Library/Mobile Documents")
+
+  _fzf_cloud_dirs_all
+  local cloud_dirs=("${_fzf_reply[@]}")
 
   local global_excludes=(
     Library .Trash .git venv .venv node_modules __pycache__ site-packages typeshed
@@ -292,13 +338,8 @@ fzf-global-file-widget() {
     .npm .nvm .pyenv .gemini .docker .ollama qmk_firmware
     Pictures Movies Music "*.band" "*.app" "*.framework"
   )
-  local fd_excludes=()
-  local ex
-  for ex in "${global_excludes[@]}"; do
-    fd_excludes+=(--exclude "$ex")
-  done
-
-  local preview_cmd='bat --style=numbers --color=always --line-range :100 {} 2>/dev/null || head -n 100 {}'
+  _fzf_build_excludes "${global_excludes[@]}"
+  local fd_excludes=("${_fzf_reply[@]}")
 
   selected_file=$(
     fd --max-depth 8 --one-file-system --type f "${fd_excludes[@]}" . "$HOME" "${cloud_dirs[@]}" | \
@@ -309,67 +350,32 @@ fzf-global-file-widget() {
           --prompt="Global File> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
-          --preview "$preview_cmd"
+          --preview "$_fzf_preview_file_cmd"
   )
 
-  if [[ -n "$selected_file" ]]; then
-    local resolved="${selected_file:A}"
-    local insert_val
-    if [[ "$resolved" == "$HOME"/* ]]; then
-      insert_val="~/${(q)${resolved#$HOME/}}"
-    else
-      insert_val="${(q)resolved}"
-    fi
-    if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
-      LBUFFER+=" "
-    fi
-    LBUFFER+="$insert_val"
-  fi
+  [[ -n "$selected_file" ]] && _fzf_insert_path "$selected_file"
   zle reset-prompt
 }
 zle -N fzf-global-file-widget
 bindkey '\es' fzf-global-file-widget
 
 
-# Local File Search (Alt+F) - Searches Current Dir & Cloud Storage
+# ---- Local File Search (Alt+F) ----
 fzf-local-file-widget() {
   local selected_file
-  local search_depth=()
 
-  local cloud_dirs=()
-  local candidate
-  for candidate in "$HOME/Library/CloudStorage" "$HOME/Library/Mobile Documents"; do
-    [[ -d "$candidate" ]] || continue
-    if [[ "$candidate" == "$PWD"/* || "$candidate" == "$PWD" ]]; then
-      cloud_dirs+=("$candidate")
-    fi
-  done
+  _fzf_cloud_dirs_in_scope
+  local cloud_dirs=("${_fzf_reply[@]}")
 
   local local_excludes=(
     Library .git venv .venv __pycache__ node_modules site-packages typeshed
     CMakeFiles .build dist target .next .cache .local System .Trash "*.band" "*.app" "*.framework"
   )
-  local fd_excludes=()
-  local ex
-  for ex in "${local_excludes[@]}"; do
-    fd_excludes+=(--exclude "$ex")
-  done
-
-  local cloud_excludes=()
-  for ex in "${local_excludes[@]}"; do
-    [[ "$ex" == "Library" ]] && continue
-    cloud_excludes+=(--exclude "$ex")
-  done
-
-  local preview_cmd='bat --style=numbers --color=always --line-range :100 {} 2>/dev/null || head -n 100 {}'
+  _fzf_build_excludes "${local_excludes[@]}"
+  local fd_excludes=("${_fzf_reply[@]}")
 
   selected_file=$(
-    {
-      fd --type f --hidden --no-ignore "${search_depth[@]}" --one-file-system "${fd_excludes[@]}" . "$PWD"
-      if (( ${#cloud_dirs[@]} )); then
-        fd --type f --hidden --no-ignore --one-file-system "${cloud_excludes[@]}" . "${cloud_dirs[@]}"
-      fi
-    } | sort -u | \
+    fd --type f --hidden --no-ignore --one-file-system "${fd_excludes[@]}" . "$PWD" "${cloud_dirs[@]}" | \
       fzf --height 60% \
           --layout=reverse \
           --scheme=path \
@@ -377,66 +383,31 @@ fzf-local-file-widget() {
           --prompt="Local File> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
-          --preview "$preview_cmd"
+          --preview "$_fzf_preview_file_cmd"
   )
-  if [[ -n "$selected_file" ]]; then
-    local resolved="${selected_file:A}"
-    local insert_val
-    if [[ "$resolved" == "$HOME"/* ]]; then
-      insert_val="~/${(q)${resolved#$HOME/}}"
-    else
-      insert_val="${(q)resolved}"
-    fi
-    if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
-      LBUFFER+=" "
-    fi
-    LBUFFER+="$insert_val"
-  fi
+  [[ -n "$selected_file" ]] && _fzf_insert_path "$selected_file"
   zle reset-prompt
 }
 zle -N fzf-local-file-widget
 bindkey '\ef' fzf-local-file-widget
 
 
-# Local Directory Finder (Alt+D) - Searches Current Dir & Cloud Storage
+# ---- Local Directory Finder (Alt+D) ----
 fzf-local-dir-widget() {
   local selected_dir
-  local search_depth=()
 
-  local cloud_dirs=()
-  local candidate
-  for candidate in "$HOME/Library/CloudStorage" "$HOME/Library/Mobile Documents"; do
-    [[ -d "$candidate" ]] || continue
-    if [[ "$candidate" == "$PWD"/* || "$candidate" == "$PWD" ]]; then
-      cloud_dirs+=("$candidate")
-    fi
-  done
+  _fzf_cloud_dirs_in_scope
+  local cloud_dirs=("${_fzf_reply[@]}")
 
   local local_dir_excludes=(
     Library .Trash .git venv node_modules site-packages typeshed CMakeFiles .build
     dist target .next .cache .local System "*.band" "*.app" "*.framework" .cagent .claude
   )
-  local fd_excludes=()
-  local ex
-  for ex in "${local_dir_excludes[@]}"; do
-    fd_excludes+=(--exclude "$ex")
-  done
-
-  local cloud_excludes=()
-  for ex in "${local_dir_excludes[@]}"; do
-    [[ "$ex" == "Library" ]] && continue
-    cloud_excludes+=(--exclude "$ex")
-  done
-
-  local preview_cmd='lsd --tree --depth 1 --color=always {} 2>/dev/null || eza --tree --level=1 --color=always {} 2>/dev/null || ls -la {}'
+  _fzf_build_excludes "${local_dir_excludes[@]}"
+  local fd_excludes=("${_fzf_reply[@]}")
 
   selected_dir=$(
-    {
-      fd --type d --hidden "${search_depth[@]}" --one-file-system "${fd_excludes[@]}" . "$PWD"
-      if (( ${#cloud_dirs[@]} )); then
-        fd --type d --hidden --one-file-system "${cloud_excludes[@]}" . "${cloud_dirs[@]}"
-      fi
-    } | sort -u | \
+    fd --type d --hidden --one-file-system "${fd_excludes[@]}" . "$PWD" "${cloud_dirs[@]}" | \
       fzf --height 50% \
           --layout=reverse \
           --scheme=path \
@@ -444,33 +415,21 @@ fzf-local-dir-widget() {
           --prompt="Local Dir> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
-          --preview "$preview_cmd"
+          --preview "$_fzf_preview_dir_cmd"
   )
-  if [[ -n "$selected_dir" ]]; then
-    local resolved="${selected_dir:A}"
-    local insert_val
-    if [[ "$resolved" == "$HOME"/* ]]; then
-      insert_val="~/${(q)${resolved#$HOME/}}"
-    else
-      insert_val="${(q)resolved}"
-    fi
-    if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
-      LBUFFER+=" "
-    fi
-    LBUFFER+="$insert_val"
-  fi
+  [[ -n "$selected_dir" ]] && _fzf_insert_path "$selected_dir"
   zle reset-prompt
 }
 zle -N fzf-local-dir-widget
 bindkey '\ed' fzf-local-dir-widget
 
 
-# Global Directory Finder (Alt+G) - Searches Home, OneDrive & iCloud
+# ---- Global Directory Finder (Alt+G) ----
 fzf-global-dir-widget() {
   local selected_dir
-  local cloud_dirs=()
-  [[ -d "$HOME/Library/CloudStorage" ]] && cloud_dirs+=("$HOME/Library/CloudStorage")
-  [[ -d "$HOME/Library/Mobile Documents" ]] && cloud_dirs+=("$HOME/Library/Mobile Documents")
+
+  _fzf_cloud_dirs_all
+  local cloud_dirs=("${_fzf_reply[@]}")
 
   local global_excludes=(
     Library .Trash .git venv .venv node_modules __pycache__ site-packages typeshed
@@ -478,13 +437,8 @@ fzf-global-dir-widget() {
     .npm .nvm .pyenv .gemini .docker .ollama qmk_firmware
     Pictures Movies Music "*.epub" "*.band" "*.app" "*.framework"
   )
-  local fd_excludes=()
-  local ex
-  for ex in "${global_excludes[@]}"; do
-    fd_excludes+=(--exclude "$ex")
-  done
-
-  local preview_cmd='lsd --tree --depth 1 --color=always {} 2>/dev/null || eza --tree --level=1 --color=always {} 2>/dev/null || ls -la {}'
+  _fzf_build_excludes "${global_excludes[@]}"
+  local fd_excludes=("${_fzf_reply[@]}")
 
   selected_dir=$(
     fd --max-depth 8 --one-file-system --type d "${fd_excludes[@]}" . "$HOME" "${cloud_dirs[@]}" | \
@@ -495,26 +449,15 @@ fzf-global-dir-widget() {
           --prompt="Global Dir> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
-          --preview "$preview_cmd"
+          --preview "$_fzf_preview_dir_cmd"
   )
 
-  if [[ -n "$selected_dir" ]]; then
-    local resolved="${selected_dir:A}"
-    local insert_val
-    if [[ "$resolved" == "$HOME"/* ]]; then
-      insert_val="~/${(q)${resolved#$HOME/}}"
-    else
-      insert_val="${(q)resolved}"
-    fi
-    if [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]]; then
-      LBUFFER+=" "
-    fi
-    LBUFFER+="$insert_val"
-  fi
+  [[ -n "$selected_dir" ]] && _fzf_insert_path "$selected_dir"
   zle reset-prompt
 }
 zle -N fzf-global-dir-widget
 bindkey '\eg' fzf-global-dir-widget
+
 
 
 # -----------------------------------------------------------------------------
