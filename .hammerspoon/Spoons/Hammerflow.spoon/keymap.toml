@@ -23,7 +23,7 @@ j = ["https://gemini.google.com", " new gemini tab"]
 b = ["Safari", " safari"]
 # g = ["Ghostty", " ghostty"]
 # h = ["hs:local w = hs.window.focusedWindow(); if w then local t = w:application():name() .. ': ' .. w:title(); hs.pasteboard.setContents(t); hs.alert('Copied: ' .. t) else hs.alert('No focused window') end", " copy app + window"]
-# b = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
+m = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
 
 
 [f] # FINDER 
@@ -52,10 +52,10 @@ s = ["hs:hs.urlevent.openURL('kmtrigger://macro=search_snippets')", "Search snip
 a = ["hs:hs.urlevent.openURL('kmtrigger://macro=add_to_dropover')", "add to dropover"]
 n = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_nvim')", "Open in nvim"]
 p = ['hs:hs.execute("shortcuts run \"Paste files from shelf\"")', "Paste dropover"]
-q = ['cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Documents/QuickNote/scratch.md"', "nvim scratch.md"]
+q = ['cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Documents/Notes/QuickNote/scratch.md"', "nvim scratch.md"]
 
 
-[m]
+[M]
 label = "|  media"
 'space' = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
 "n" = ["hs:hs.eventtap.event.newSystemKeyEvent('NEXT', true):post(); hs.eventtap.event.newSystemKeyEvent('NEXT', false):post()", "Next Track"]
@@ -69,7 +69,6 @@ label = "|  safari"
 s = ["menu:Safari|Bookmarks>Show Start Page", "Start page"] # select menu items (specific app)
 [a.o]
 label = "|  ollama"
-q = ["cmd: /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/tech-bible/automation/scripts/stop-ollama.sh", "quit ollama"]
 s = ["cmd: /opt/homebrew/bin/ollama serve > /dev/null 2>&1", "start ollama"]
 [a.t]
 label = "|  tailscale"
