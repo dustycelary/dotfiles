@@ -564,7 +564,8 @@ shorten_path() {
   echo "$res"
 }
 
-PS1='\u@fungus-mac:$(shorten_path)\$ '
+# PS1='\u@fungus-mac:$(shorten_path)\$ '
+PS1='\u@\h:$(shorten_path)\$ '
 
 
 # -----------------------------------------------------------------------------
