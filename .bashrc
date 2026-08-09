@@ -41,7 +41,6 @@ shopt -s extglob interactive_comments
 
 bind 'set bell-style none' 2>/dev/null
 bind 'set completion-ignore-case on' 2>/dev/null
-bind 'set show-all-if-ambiguous on' 2>/dev/null
 
 _bash_history_sync() { history -a; history -n; }
 
@@ -72,9 +71,8 @@ has pyenv && eval "$(pyenv init -)" 2>/dev/null
 has zoxide && eval "$(zoxide init bash)"
 
 # fd package name differs on Debian/Raspberry Pi (fdfind)
-if ! has fd && has fdfind; then
-  alias fd='fdfind'
-fi
+if ! has fd && has fdfind; then alias fd='fdfind'; fi
+export FZF_COMPLETION_TRIGGER='**'
 
 if has fzf; then
   if fzf --bash >/dev/null 2>&1; then
@@ -87,9 +85,10 @@ if has fzf; then
   fi
 fi
 
-if has fd; then
-  export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv --exclude .venv .'
-fi
+bind 'set show-all-if-ambiguous off' 2>/dev/null
+bind 'set completion-query-items 999999' 2>/dev/null
+
+if has fd; then export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv --exclude .venv .'; fi
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline'
 
 # ---- Clipboard / opener portability -----------------------------------------
@@ -237,7 +236,24 @@ _auto_activate_venv_hook() {
 PROMPT_COMMAND="_bash_history_sync; _auto_activate_venv_hook${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 
 # ---- Keybinds ----------------------------------------------------------------
+__alt_c_fzf_cd() {
+  local dir
+  if declare -f __fzfcmd >/dev/null 2>&1 && declare -f __fzf_defaults >/dev/null 2>&1; then
+    dir=$(
+      FZF_DEFAULT_COMMAND=${FZF_ALT_C_COMMAND:-} \
+      FZF_DEFAULT_OPTS=$(__fzf_defaults "--reverse --walker=dir,follow,hidden --scheme=path" "${FZF_ALT_C_OPTS-} +m") \
+      FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd)
+    ) || return
+  else
+    return
+  fi
+  [[ -n "$dir" ]] && builtin cd -- "$dir"
+}
+
 bind -x '"\C-y\C-p":copy-pwd' 2>/dev/null || true
+if declare -f __fzf_select__ >/dev/null 2>&1; then bind -m emacs-standard '"\C-i": " \C-b\C-k \C-u`__fzf_select__`\e\C-e\C-\e(\C-a\C-y\C-h\e \C-y\ey\C-x\C-x\C-f\C-y\ey\C-_"' 2>/dev/null || true; fi
+bind -r '\ec' 2>/dev/null || true
+bind -x '"\ec":__alt_c_fzf_cd' 2>/dev/null || true
 
 # ---- macOS-only helpers -----------------------------------------------------
 if (( is_macos )); then
