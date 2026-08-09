@@ -67,7 +67,7 @@ _cloud_search_paths=()
 [[ -d "$HOME/Library/CloudStorage" ]] && _cloud_search_paths+=("$HOME/Library/CloudStorage")
 [[ -d "$HOME/Library/Mobile Documents" ]] && _cloud_search_paths+=("$HOME/Library/Mobile Documents")
 
-export FZF_DEFAULT_COMMAND="fd --type f --hidden --exclude .git --exclude venv --exclude Library . ${_cloud_search_paths[*]}"
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --exclude .git --exclude venv --exclude Library . ${(j: :)${(@q)_cloud_search_paths}}"
 export FZF_DEFAULT_OPTS='--height 60% --layout=reverse --border --info=inline --scheme=path --tiebreak=chunk,length,end,index --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview"'
 
 # lsd aliases for GNU ls flag compatibility with icons
@@ -279,7 +279,7 @@ _fzf_preview_dir_cmd='lsd --tree --depth 1 --color=always {} 2>/dev/null || eza 
 
 # ---- Local & Cloud Content Search (Ctrl+G) ----
 rga-fzf() {
-  local globs=(
+  local globs_normal=(
     '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}'
     '!**/screenshots/**'
     '!**Screenshots**'
@@ -289,26 +289,40 @@ rga-fzf() {
     '!node_modules/**'
     '!__pycache__/**'
   )
-  local glob_args=""
+  local globs_hidden=(
+    '!*.{png,jpg,jpeg,gif,webp,zip,tar,gz,mp4,mov}'
+  )
+  local glob_normal_args=""
   local g
-  for g in "${globs[@]}"; do
-    glob_args+="--glob '$g' "
+  for g in "${globs_normal[@]}"; do
+    glob_normal_args+="--glob '$g' "
+  done
+
+  local glob_hidden_args=""
+  for g in "${globs_hidden[@]}"; do
+    glob_hidden_args+="--glob '$g' "
   done
 
   _fzf_cloud_dirs_all
   local cloud_targets=("${_fzf_reply[@]}")
+  local str_cloud_targets="${(j: :)${(@q)cloud_targets}}"
+  local rg_targets=". ${str_cloud_targets}"
 
-  local RG_PREFIX="rga --files-with-matches --smart-case ${glob_args}"
+  local RG_NORMAL="rga --files-with-matches --smart-case ${glob_normal_args}"
+  local RG_HIDDEN="rga --hidden --no-ignore --files-with-matches --smart-case ${glob_hidden_args}"
+
   local file
   file=$(
-    FZF_DEFAULT_COMMAND="$RG_PREFIX '' . ${cloud_targets[*]}" \
+    FZF_DEFAULT_COMMAND="$RG_NORMAL '' $rg_targets" \
     fzf --ansi \
         --disabled \
         --layout=reverse \
         --height=80% \
         --preview-window="right:60%:wrap:hidden" \
-        --prompt="Search Content (Local & Cloud) > " \
-        --bind "change:reload:$RG_PREFIX {q} . ${cloud_targets[*]} || true,ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+        --prompt="Content> " \
+        --bind "change:reload:$RG_NORMAL {q} $rg_targets || true" \
+        --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+        --bind "alt-u:transform:[[ \$FZF_PROMPT =~ 👁 ]] && echo 'change-prompt(Content> )+reload:$RG_NORMAL {q} $rg_targets || true' || echo 'change-prompt(Content 👁> )+reload:$RG_HIDDEN {q} $rg_targets || true'" \
         --preview "[[ -n {} ]] && rga --pretty --context 3 {q} {}"
   )
   if [[ -n "$file" ]]; then
@@ -341,6 +355,10 @@ fzf-global-file-widget() {
   _fzf_build_excludes "${global_excludes[@]}"
   local fd_excludes=("${_fzf_reply[@]}")
 
+  local str_fd_excludes="${(j: :)${(@q)fd_excludes}}"
+  local str_cloud_dirs="${(j: :)${(@q)cloud_dirs}}"
+  local str_home="${(q)HOME}"
+
   selected_file=$(
     fd --max-depth 8 --one-file-system --type f "${fd_excludes[@]}" . "$HOME" "${cloud_dirs[@]}" | \
       fzf --height 60% \
@@ -350,6 +368,7 @@ fzf-global-file-widget() {
           --prompt="Global File> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+          --bind "alt-u:transform:[[ \$FZF_PROMPT =~ 👁 ]] && echo 'change-prompt(Global File> )+reload:fd --max-depth 8 --one-file-system --type f ${str_fd_excludes} . ${str_home} ${str_cloud_dirs}' || echo 'change-prompt(Global File 👁> )+reload:fd --max-depth 8 --one-file-system --type f --hidden --no-ignore . ${str_home} ${str_cloud_dirs}'" \
           --preview "$_fzf_preview_file_cmd"
   )
 
@@ -374,8 +393,12 @@ fzf-local-file-widget() {
   _fzf_build_excludes "${local_excludes[@]}"
   local fd_excludes=("${_fzf_reply[@]}")
 
+  local str_fd_excludes="${(j: :)${(@q)fd_excludes}}"
+  local str_cloud_dirs="${(j: :)${(@q)cloud_dirs}}"
+  local str_pwd="${(q)PWD}"
+
   selected_file=$(
-    fd --type f --hidden --no-ignore --one-file-system "${fd_excludes[@]}" . "$PWD" "${cloud_dirs[@]}" | \
+    fd --type f --one-file-system "${fd_excludes[@]}" . "$PWD" "${cloud_dirs[@]}" | \
       fzf --height 60% \
           --layout=reverse \
           --scheme=path \
@@ -383,6 +406,7 @@ fzf-local-file-widget() {
           --prompt="Local File> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+          --bind "alt-u:transform:[[ \$FZF_PROMPT =~ 👁 ]] && echo 'change-prompt(Local File> )+reload:fd --type f --one-file-system ${str_fd_excludes} . ${str_pwd} ${str_cloud_dirs}' || echo 'change-prompt(Local File 👁> )+reload:fd --type f --hidden --no-ignore --one-file-system . ${str_pwd} ${str_cloud_dirs}'" \
           --preview "$_fzf_preview_file_cmd"
   )
   [[ -n "$selected_file" ]] && _fzf_insert_path "$selected_file"
@@ -406,8 +430,12 @@ fzf-local-dir-widget() {
   _fzf_build_excludes "${local_dir_excludes[@]}"
   local fd_excludes=("${_fzf_reply[@]}")
 
+  local str_fd_excludes="${(j: :)${(@q)fd_excludes}}"
+  local str_cloud_dirs="${(j: :)${(@q)cloud_dirs}}"
+  local str_pwd="${(q)PWD}"
+
   selected_dir=$(
-    fd --type d --hidden --one-file-system "${fd_excludes[@]}" . "$PWD" "${cloud_dirs[@]}" | \
+    fd --type d --one-file-system "${fd_excludes[@]}" . "$PWD" "${cloud_dirs[@]}" | \
       fzf --height 50% \
           --layout=reverse \
           --scheme=path \
@@ -415,6 +443,7 @@ fzf-local-dir-widget() {
           --prompt="Local Dir> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+          --bind "alt-u:transform:[[ \$FZF_PROMPT =~ 👁 ]] && echo 'change-prompt(Local Dir> )+reload:fd --type d --one-file-system ${str_fd_excludes} . ${str_pwd} ${str_cloud_dirs}' || echo 'change-prompt(Local Dir 👁> )+reload:fd --type d --hidden --no-ignore --one-file-system . ${str_pwd} ${str_cloud_dirs}'" \
           --preview "$_fzf_preview_dir_cmd"
   )
   [[ -n "$selected_dir" ]] && _fzf_insert_path "$selected_dir"
@@ -440,6 +469,10 @@ fzf-global-dir-widget() {
   _fzf_build_excludes "${global_excludes[@]}"
   local fd_excludes=("${_fzf_reply[@]}")
 
+  local str_fd_excludes="${(j: :)${(@q)fd_excludes}}"
+  local str_cloud_dirs="${(j: :)${(@q)cloud_dirs}}"
+  local str_home="${(q)HOME}"
+
   selected_dir=$(
     fd --max-depth 8 --one-file-system --type d "${fd_excludes[@]}" . "$HOME" "${cloud_dirs[@]}" | \
       fzf --height 50% \
@@ -449,6 +482,7 @@ fzf-global-dir-widget() {
           --prompt="Global Dir> " \
           --preview-window="right:35%:hidden" \
           --bind "ctrl-p:toggle-preview,ctrl-/:toggle-preview" \
+          --bind "alt-u:transform:[[ \$FZF_PROMPT =~ 👁 ]] && echo 'change-prompt(Global Dir> )+reload:fd --max-depth 8 --one-file-system --type d ${str_fd_excludes} . ${str_home} ${str_cloud_dirs}' || echo 'change-prompt(Global Dir 👁> )+reload:fd --max-depth 8 --one-file-system --type d --hidden --no-ignore . ${str_home} ${str_cloud_dirs}'" \
           --preview "$_fzf_preview_dir_cmd"
   )
 
@@ -519,7 +553,7 @@ shorten_path() {
 }
 
 setopt PROMPT_SUBST
-PROMPT='%n@fungus-mac:$(shorten_path)$ '
+PROMPT='%n@%m:$(shorten_path)$ '
 
 
 # -----------------------------------------------------------------------------
