@@ -9,7 +9,7 @@
   "monday": [
     {
       "start": "00:01",
-      "end": "23:59",
+      "end": "00:02",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
   ],

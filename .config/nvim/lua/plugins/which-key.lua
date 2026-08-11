@@ -19,7 +19,7 @@ return {
 			wo = {
 				winblend = 0,
 			},
-			height = { max = math.huge },
+			height = { max = 25 },
 		},
 		layout = {
 			align = "left",

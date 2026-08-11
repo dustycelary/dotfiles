@@ -25,6 +25,7 @@ return {
 				"basedpyright",
 				"yamlls",
 				"jsonls",
+				"phpactor",
 			},
 		},
 	},
@@ -36,7 +37,8 @@ return {
 		config = function()
 			-- Add borders to LSP floating windows so they are clearly visible
 			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-			vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+			vim.lsp.handlers["textDocument/signatureHelp"] =
+				vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 			vim.diagnostic.config({ float = { border = "rounded" } })
 
 			local function lsp_info()
@@ -92,10 +94,19 @@ return {
 						basedpyright = {
 							analysis = {
 								typeCheckingMode = "basic",
-								autoImportCompletions = true,
+								autoImportCompletions = false,
 								diagnosticMode = "openFilesOnly",
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
+								indexing = false,
+								ignore = {
+									"**/.venv",
+									"**/venv",
+									"**/node_modules",
+									"**/__pycache__",
+									"**/build",
+									"**/dist",
+								},
 							},
 						},
 						python = {},
@@ -130,7 +141,7 @@ return {
 			-- Automatically enable all installed Mason servers
 			local mason_lspconfig = require("mason-lspconfig")
 			for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
-				local config = custom_servers[name] or {}
+				local config = vim.tbl_deep_extend("force", { workspace_required = false }, custom_servers[name] or {})
 				vim.lsp.config(name, config)
 				vim.lsp.enable(name)
 			end

@@ -339,7 +339,7 @@ zle -N rga-fzf-local-widget
 bindkey '^g' rga-fzf-local-widget
 
 
-# ---- Global File Search (Alt+S) ----
+# ---- Global File Search (Alt+O) ----
 fzf-global-file-widget() {
   local selected_file
 
@@ -376,7 +376,7 @@ fzf-global-file-widget() {
   zle reset-prompt
 }
 zle -N fzf-global-file-widget
-bindkey '\es' fzf-global-file-widget
+bindkey '\eo' fzf-global-file-widget
 
 
 # ---- Local File Search (Alt+F) ----
@@ -413,7 +413,7 @@ fzf-local-file-widget() {
   zle reset-prompt
 }
 zle -N fzf-local-file-widget
-bindkey '\ef' fzf-local-file-widget
+bindkey '\et' fzf-local-file-widget
 
 
 # ---- Local Directory Finder (Alt+D) ----
@@ -553,7 +553,10 @@ shorten_path() {
 }
 
 setopt PROMPT_SUBST
+# Left prompt: username@hostname:short_path$
 PROMPT='%n@%m:$(shorten_path)$ '
+# Right prompt: right-aligned timestamp [HH:MM:SS] in dim gray
+RPROMPT='%F{242}[%D{%H:%M:%S}]%f'
 
 
 # -----------------------------------------------------------------------------
