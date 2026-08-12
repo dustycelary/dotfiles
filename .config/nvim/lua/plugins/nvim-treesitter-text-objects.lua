@@ -22,12 +22,12 @@ return {
 			["a="] = { query = "@assignment.outer", desc = "Select outer part of an assignment" },
 			["i="] = { query = "@assignment.inner", desc = "Select inner part of an assignment" },
 			["L="] = { query = "@assignment.lhs", desc = "Select left hand side of an assignment" },
-			["r="] = { query = "@assignment.rhs", desc = "Select right hand side of an assignment" },
+			["R="] = { query = "@assignment.rhs", desc = "Select right hand side of an assignment" },
 
 			["a:"] = { query = "@property.outer", desc = "Select outer part of an object property" },
 			["i:"] = { query = "@property.inner", desc = "Select inner part of an object property" },
 			["L:"] = { query = "@property.lhs", desc = "Select left part of an object property" },
-			["r:"] = { query = "@property.rhs", desc = "Select right part of an object property" },
+			["R:"] = { query = "@property.rhs", desc = "Select right part of an object property" },
 
 			["aa"] = { query = "@parameter.outer", desc = "Select outer part of a parameter/argument" },
 			["ia"] = { query = "@parameter.inner", desc = "Select inner part of a parameter/argument" },
@@ -46,6 +46,11 @@ return {
 
 			["ac"] = { query = "@class.outer", desc = "Select outer part of a class" },
 			["ic"] = { query = "@class.inner", desc = "Select inner part of a class" },
+
+			["ax"] = { query = "@exception.outer", desc = "Select outer part of a try/except block" },
+			["ix"] = { query = "@exception.inner", desc = "Select inner part of a try/except block" },
+			["ae"] = { query = "@exception.outer", desc = "Select outer part of a try/except block" },
+			["ie"] = { query = "@exception.inner", desc = "Select inner part of a try/except block" },
 		}
 
 		for key, map in pairs(select_maps) do
@@ -86,6 +91,8 @@ return {
 			["]c"] = { query = "@class.outer", desc = "Next class start" },
 			["]i"] = { query = "@conditional.outer", desc = "Next conditional start" },
 			["]l"] = { query = "@loop.outer", desc = "Next loop start" },
+			["]x"] = { query = "@exception.outer", desc = "Next try/except block start" },
+			["]e"] = { query = "@exception.outer", desc = "Next try/except block start" },
 			["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
 			["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
 		}
@@ -96,6 +103,8 @@ return {
 			["]C"] = { query = "@class.outer", desc = "Next class end" },
 			["]I"] = { query = "@conditional.outer", desc = "Next conditional end" },
 			["]L"] = { query = "@loop.outer", desc = "Next loop end" },
+			["]X"] = { query = "@exception.outer", desc = "Next try/except block end" },
+			["]E"] = { query = "@exception.outer", desc = "Next try/except block end" },
 		}
 
 		local move_prev_start = {
@@ -104,6 +113,8 @@ return {
 			["[c"] = { query = "@class.outer", desc = "Prev class start" },
 			["[i"] = { query = "@conditional.outer", desc = "Prev conditional start" },
 			["[l"] = { query = "@loop.outer", desc = "Prev loop start" },
+			["[x"] = { query = "@exception.outer", desc = "Prev try/except block start" },
+			["[e"] = { query = "@exception.outer", desc = "Prev try/except block start" },
 		}
 
 		local move_prev_end = {
@@ -112,6 +123,8 @@ return {
 			["[C"] = { query = "@class.outer", desc = "Prev class end" },
 			["[I"] = { query = "@conditional.outer", desc = "Prev conditional end" },
 			["[L"] = { query = "@loop.outer", desc = "Prev loop end" },
+			["[X"] = { query = "@exception.outer", desc = "Prev try/except block end" },
+			["[E"] = { query = "@exception.outer", desc = "Prev try/except block end" },
 		}
 
 		for key, map in pairs(move_next_start) do

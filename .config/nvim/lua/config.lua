@@ -13,6 +13,7 @@ vim.g.loaded_netrwPlugin = 1
 vim.opt.number = true -- Show line numbers
 vim.opt.relativenumber = true -- Show relative numbers
 vim.opt.ignorecase = true -- Case insensitive search
+vim.opt.smartcase = true
 vim.opt.signcolumn = "yes" -- Always show sign column (for gitsigns etc)
 vim.opt.termguicolors = true
 vim.opt.background = "dark"

@@ -354,6 +354,7 @@ Text objects (use with operators like `v`, `d`, `c`, `y`):
 |-----|--------|---------------------|
 | `af` / `if` | Function | around function (def & body) vs inside function body |
 | `ac` / `ic` | Class | around class (def & body) vs inside class body |
+| `ax` / `ix` (`ae` / `ie`) | Try/Except | around try-except block vs inside try/except block body |
 | `aa` / `ia` | Argument / Parameter | around parameter (incl. comma) vs inside parameter |
 | `ab` / `ib` | Block | around block / curly braces `{}` vs inside block contents |
 | `aI` / `iI` | Conditional | around `if`/`else` statement vs inside conditional body |
@@ -378,6 +379,8 @@ Motions:
 |-----|--------|-------------|
 | `]i` / `[i` | Same-Indent Block | Jump to next / previous block at the same indent level (e.g. between `{}` blocks in JSON or code) |
 | `]s` / `[s` | AST Sibling | Jump to next / previous AST sibling node in treesitter |
+| `]x` / `[x` (`]e` / `[e`) | Try/Except Start | Jump to next / previous try-except block start |
+| `]X` / `[X` (`]E` / `[E`) | Try/Except End | Jump to next / previous try-except block end |
 | `]f` / `[f` | Function Start | Jump to next / previous function definition start |
 | `]F` / `[F` | Function End | Jump to next / previous function definition end |
 | `]c` / `[c` | Class Start | Jump to next / previous class definition start |

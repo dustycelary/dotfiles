@@ -64,8 +64,8 @@ return {
 		fzf.setup({
 			-- 2. Global settings for hidden and ignored files
 			defaults = {
-				hidden = false, -- Hide hidden files by default (until alt-h)
-				no_ignore = false, -- Respect .gitignore by default (until alt-i)
+				hidden = false, -- Hide hidden files by default
+				no_ignore = true, -- Do not hide ignored files (.gitignore) by default
 			},
 			actions = {
 				-- Apply the exact same keymaps to both files and grep
