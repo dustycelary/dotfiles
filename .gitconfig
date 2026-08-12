@@ -14,7 +14,9 @@
 [difftool "nvimdiff"]
 	cmd = nvim -d \"$LOCAL\" \"$REMOTE\"
 [difftool]
+	# Note: trustExitCode = true allows `:cq` in nvim to abort git difftool across remaining files
 	prompt = false
+	trustExitCode = true
 [interactive]
 	diffFilter = delta --color-only
 
@@ -29,3 +31,5 @@
 	gpgsign = false
 [pull]
 	rebase = false
+[core]
+	pager = delta

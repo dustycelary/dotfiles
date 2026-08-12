@@ -7,37 +7,32 @@
 # ------------------------------------------------------------------------------
 # 1. TYPOGRAPHY & FONTS
 # ------------------------------------------------------------------------------
-# Ghostty supports modern features like programming ligatures.
-# You have excellent fonts installed. Choose one below:
+# Commit Mono: neutral, precise, and close to Berkeley Mono's technical style.
+# Install Commit Mono first, then confirm its family name with `ghostty +list-fonts`.
 
-# font-family = SF Mono
-# font-family = Terminess Nerd Font Mono
-# font-family = Roboto
-# font-family = Iosevka Tree Lig
-# font-family = Iosevka Retro Block
-# font-family = Monaspace Argon NF
-# font-family = JetBrainsMono Nerd Font Mono
-font-family = Iosevka NFM
-# font-family = Maple Mono NF
-# font-family = FiraCode Nerd Font Mono
-# font-family = Iosevka Custom
-
-font-size = 15
+font-family = CommitMono
+# font-family = JetBrains Mono
+# font-family = Iosevka Term
+font-size = 15.0
 font-thicken = true
-font-thicken-strength = 128
-font-synthetic-style = false
+font-thicken-strength = 80
 
-# Enable OpenType features like ligatures (arrows, symbols, etc.)
+# Commit Mono exposes its ligatures and smart-kerning behavior through `calt`.
 font-feature = calt
 font-feature = liga
-# font-feature = dlig
+font-feature = zero
 
-# Vertical cell height spacing and baseline adjustments
+# Vertical cell height spacing, icon scaling, and baseline adjustments
+# A small amount of extra leading keeps Commit Mono comfortable at 15 pt.
 adjust-cell-height = 2
-adjust-font-baseline = -1
+adjust-font-baseline = 0
+adjust-icon-height = 10%
+
+# Box and line-drawing symbol thickness adjustment
+adjust-box-thickness = 1
 
 # Clean up underlines so they don't clash with descenders
-adjust-underline-position = 2
+adjust-underline-position = 1
 adjust-underline-thickness = 1
 
 # ------------------------------------------------------------------------------
@@ -49,7 +44,8 @@ adjust-underline-thickness = 1
 # Static theme choice:
 # theme = Terafox
 # theme = Amber
-theme = Catppuccin Mocha
+# theme = Catppuccin Mocha
+theme = Carbonfox
 
 # Auto-switching theme (uncomment to enable):
 # theme = light:Catppuccin Latte,dark:Terafox
@@ -57,9 +53,13 @@ theme = Catppuccin Mocha
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system
 
-# Selection colors (Catppuccin Mocha Surface2 & Text)
-selection-background = #585b70
-selection-foreground = #cdd6f4
+# Selection colors (Carbonfox)
+selection-background = #2a2a2a
+selection-foreground = #f2f4f8
+
+# Keep the cursor identical to Carbonfox even if the bundled theme changes.
+cursor-color = #f2f4f8
+cursor-text = #161616
 
 # Custom Gruvbox Material Hard Dark Palette Override (commented out)
 # palette = 0=#1d2021
@@ -160,6 +160,10 @@ keybind = cmd+s>shift+l=next_tab
 keybind = cmd+s>shift+h=previous_tab
 keybind = cmd+s>comma=move_tab:-1
 keybind = cmd+s>period=move_tab:1
+keybind = cmd+s>i=prompt_tab_title
+keybind = cmd+s>shift+i=prompt_surface_title
+keybind = cmd+shift+i=prompt_tab_title
+keybind = cmd+shift+w=prompt_surface_title
 
 # Tab Navigation (Quick Switch)
 keybind = cmd+s>1=goto_tab:1

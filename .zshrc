@@ -151,6 +151,8 @@ copy-pwd() {
   echo "Copied: $(pwd)"
 }
 
+alias cpwd='copy-pwd'
+
 copy-pwd-widget() {
   copy-pwd
   zle reset-prompt

@@ -198,3 +198,24 @@ vim.keymap.set("n", "<leader>cT", function()
 	end
 	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "Treesitter" })
 end, { desc = "Treesitter info" })
+
+vim.api.nvim_create_user_command("SortTasks", function()
+	vim.cmd.write()
+
+	local file = vim.fn.expand("%:p")
+	vim.fn.system({
+		"/Users/fungus/Developer/scripts/list_sort/list_sort.py",
+		file,
+	})
+
+	if vim.v.shell_error ~= 0 then
+		vim.notify("Failed to sort tasks", vim.log.levels.ERROR)
+		return
+	end
+
+	vim.cmd.edit({ bang = true })
+end, {})
+
+vim.keymap.set("n", "<leader>S", "<cmd>SortTasks<CR>", {
+	desc = "Sort Markdown tasks",
+})
