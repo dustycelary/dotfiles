@@ -5,46 +5,6 @@ return {
 		local fzf = require("fzf-lua")
 		local fzf_path = require("fzf-lua.path")
 
-		-- Custom Action: Open parent directory in Oil
-		local open_in_oil = function(selected, opts)
-			if not selected or #selected == 0 then
-				return
-			end
-			local entry = fzf_path.entry_to_file(selected[1], opts)
-			local path = entry.path or entry.bufname or entry.uri
-			if path then
-				local dir = vim.fn.isdirectory(path) == 1 and path or vim.fn.fnamemodify(path, ":h")
-				require("oil").open(dir)
-			end
-		end
-
-		-- Custom Action: Delete the selected file
-		local delete_file = function(selected, opts)
-			if not selected or #selected == 0 then
-				return
-			end
-			local entry = fzf_path.entry_to_file(selected[1], opts)
-			local path = entry.path or entry.bufname or entry.uri
-			if not path then
-				return
-			end
-
-			local confirm = vim.fn.input(string.format("Delete '%s'? [y/N]: ", vim.fn.fnamemodify(path, ":t")))
-			vim.cmd("redraw") -- clear the command line
-
-			if confirm:lower() == "y" then
-				local success, err = os.remove(path)
-				if success then
-					vim.notify("File deleted: " .. path, vim.log.levels.INFO)
-					fzf.actions.resume(selected, opts)
-				else
-					vim.notify("Error deleting file: " .. tostring(err), vim.log.levels.ERROR)
-				end
-			else
-				vim.notify("Deletion cancelled", vim.log.levels.WARN)
-			end
-		end
-
 		-- 1. Unify actions in one table so we don't repeat ourselves
 		local common_actions = {
 			["default"] = fzf.actions.file_edit,
@@ -53,8 +13,6 @@ return {
 			["ctrl-t"] = fzf.actions.file_tabedit,
 			["alt-q"] = fzf.actions.file_sel_to_qf,
 			["alt-l"] = fzf.actions.file_sel_to_ll,
-			["ctrl-e"] = open_in_oil,
-			["ctrl-d"] = delete_file,
 
 			-- Note: Fixed alt-h to match your prompt's comment (was alt-u in your code)
 			["alt-i"] = fzf.actions.toggle_ignore,
@@ -64,7 +22,7 @@ return {
 		fzf.setup({
 			-- 2. Global settings for hidden and ignored files
 			defaults = {
-				hidden = false, -- Hide hidden files by default
+				hidden = true, -- Hide hidden files by default
 				no_ignore = true, -- Do not hide ignored files (.gitignore) by default
 			},
 			actions = {

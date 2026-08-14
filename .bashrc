@@ -1,4 +1,4 @@
-# ~/.bashrc - Interactive Bash configuration for macOS
+# ~/.bashrc - Interactive Bash configuration for macOS & Linux
 
 # Stop here when Bash is not running interactively.
 [[ $- != *i* ]] && return
@@ -62,8 +62,15 @@ esac
 # FZF and tool integrations
 # -----------------------------------------------------------------------------
 
+# Determine fd binary name (fd on macOS/Arch, fdfind on Debian/Ubuntu/Raspberry Pi OS)
+_FD_CMD='fd'
+if ! command -v fd >/dev/null 2>&1 && command -v fdfind >/dev/null 2>&1; then
+  _FD_CMD='fdfind'
+  alias fd='fdfind'
+fi
+
 # Use fd for plain FZF searches, including hidden files but excluding bulky data.
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv'
+export FZF_DEFAULT_COMMAND="$_FD_CMD --type f --hidden --exclude .git --exclude venv --exclude .venv"
 
 # Open FZF in a compact panel with results ordered from top to bottom.
 export FZF_DEFAULT_OPTS='--height=60% --layout=reverse --border'
@@ -123,6 +130,17 @@ alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 # Small helper functions
 # -----------------------------------------------------------------------------
 
+# Fallback pbcopy implementation for Linux / Raspberry Pi OS (using xclip, xsel, or wl-copy)
+if ! command -v pbcopy >/dev/null 2>&1; then
+  if command -v xclip >/dev/null 2>&1; then
+    pbcopy() { xclip -selection clipboard "$@"; }
+  elif command -v xsel >/dev/null 2>&1; then
+    pbcopy() { xsel --clipboard --input "$@"; }
+  elif command -v wl-copy >/dev/null 2>&1; then
+    pbcopy() { wl-copy "$@"; }
+  fi
+fi
+
 # Create a directory, including missing parents, and enter it.
 mkcd() {
   mkdir -p "$1" && cd "$1"
@@ -159,7 +177,7 @@ bind -x '"\C-y\C-p":copy-pwd' 2>/dev/null
 
 # Search file contents locally with FZF and rga, returning the selected path.
 _content_search_select() {
-  FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv --exclude .venv' \
+  FZF_DEFAULT_COMMAND="$_FD_CMD --type f --hidden --exclude .git --exclude venv --exclude .venv" \
     fzf --disabled \
         --prompt='Content> ' \
         --header='Type to search contents; Enter inserts the selected path' \
