@@ -8,7 +8,13 @@ return {
 	event = "VeryLazy",
 	priority = 1000,
 	keys = {
-		{ "<leader>ut", function() require("tiny-inline-diagnostic").toggle() end, desc = "Toggle inline diagnostics" },
+		{
+			"<leader>ud",
+			function()
+				require("tiny-inline-diagnostic").toggle()
+			end,
+			desc = "Toggle inline diagnostics",
+		},
 	},
 	opts = {
 		-- Presets: "modern" | "powerline" (needs nerd/powerline font) |
@@ -17,12 +23,12 @@ return {
 
 		-- Custom signs per severity (Nerd Font icons)
 		signs = {
-			left        = "",
-			right       = "",
-			diag        = "●",
-			arrow       = "    ",
-			up_arrow    = "    ",
-			vertical    = " │",
+			left = "",
+			right = "",
+			diag = "●",
+			arrow = "    ",
+			up_arrow = "    ",
+			vertical = " │",
 			vertical_end = " └",
 		},
 

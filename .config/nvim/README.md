@@ -242,5 +242,6 @@ lazy.nvim installs all plugins on first launch. Mason then installs LSP servers.
 | `<leader>cn` | Rename symbol |
 | `<leader>cf` | Format file |
 | `<leader>ub` | Toggle git blame |
+| `<leader>uc` | Toggle colorscheme (carbonfox <-> catppuccin-latte light) |
 | `]d` / `[d` | Next / prev diagnostic |
 | `<Tab>` / `<S-Tab>` | Next / prev buffer |

@@ -17,13 +17,13 @@ toast_on_reload = true    # optional, default false, show a toast when the confi
 show_ui = true            # optional, default true, show the ui with your key maps
 key_maps_per_line = 1     # optional, default 5, number of key maps per line in the ui
 
-'.' = ["repeat", " repeat"]
-c = ["function:openAlfredClipboard", " clipboard"]
-j = ["https://gemini.google.com", " new gemini tab"]
-b = ["Safari", " safari"]
-g = ["Ghostty", " ghostty"]
+'.' = ["repeat", "   repeat"]
+c = ["function:openAlfredClipboard", "   clipboard"]
+j = ["https://gemini.google.com", "   new gemini tab"]
+b = ["Safari", "   safari"]
+g = ["Ghostty", "   ghostty"]
 # h = ["hs:local w = hs.window.focusedWindow(); if w then local t = w:application():name() .. ': ' .. w:title(); hs.pasteboard.setContents(t); hs.alert('Copied: ' .. t) else hs.alert('No focused window') end", " copy app + window"]
-m = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
+'space' = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
 
 
 [f] # FINDER 
@@ -53,9 +53,10 @@ a = ["hs:hs.urlevent.openURL('kmtrigger://macro=add_to_dropover')", "add to drop
 n = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_nvim')", "Open in nvim"]
 p = ['hs:hs.execute("shortcuts run \"Paste files from shelf\"")', "Paste dropover"]
 q = ['cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Documents/Notes/QuickNote/scratch.md"', "nvim scratch.md"]
+c = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"cs \"'", " cs"]
 
 
-['space']
+[m]
 label = "|  media"
 'space' = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
 "n" = ["hs:hs.eventtap.event.newSystemKeyEvent('NEXT', true):post(); hs.eventtap.event.newSystemKeyEvent('NEXT', false):post()", "Next Track"]

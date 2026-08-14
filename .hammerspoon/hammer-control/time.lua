@@ -32,19 +32,10 @@ local function compareTime(time1, time2)
 end
 
 function M.getTime()
-  local url = "http://worldtimeapi.org/api/ip"
-  local status, body = hs.http.get(url)
-
-  if status == 200 then
-    local json = hs.json.decode(body)
-
-    M.DAY = DAYS[json.day_of_week + 1]
-    local hour, minute = json.datetime:match("T(%d%d):(%d%d):")
-    M.TIME = hour .. ":" .. minute
-  else
-    M.DAY = string.lower(os.date("%A"))
-    M.TIME = os.date("%H:%M")
-  end
+  -- Schedules are local, so use the Mac's clock directly. A synchronous web
+  -- request here delayed startup and made scheduling depend on network access.
+  M.DAY = string.lower(os.date("%A"))
+  M.TIME = os.date("%H:%M")
 end
 
 function M.incrementTime()
@@ -74,6 +65,10 @@ function M.incrementTime()
 end
 
 function M.getSchedule()
+  -- Always resynchronise instead of advancing a synthetic clock. Hammerspoon
+  -- timers pause during sleep and can otherwise fall minutes or hours behind.
+  M.getTime()
+
   if not SCHEDULE then
     error(
       "No schedule file found. Schedule should be in ~/.hammerspoon/hammer-control/schedule.json"
@@ -82,7 +77,7 @@ function M.getSchedule()
   end
 
   local block
-  for _, timeblock in pairs(SCHEDULE[M.DAY]) do
+  for _, timeblock in ipairs(SCHEDULE[M.DAY] or {}) do
     local start_time = timeblock["start"]
     local end_time = timeblock["end"]
 

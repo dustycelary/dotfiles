@@ -49,13 +49,20 @@ Ghost text shows the top suggestion inline as you type.
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
 
-## nightfox.nvim (terafox)
-Colorscheme using the Terafox variant from `EdenEast/nightfox.nvim`. Other available palettes include `nightfox`, `dayfox`, `dawnfox`, `duskfox`, `nordfox`, and `carbonfox`.
+## colorscheme (nightfox.nvim & catppuccin/nvim)
+Default colorscheme is `carbonfox` (dark). Toggles to `catppuccin-latte` (light) via `catppuccin/nvim`.
+
+| Key | Action |
+|-----|--------|
+| `<leader>uc` | Toggle colorscheme (`carbonfox` dark <-> `catppuccin-latte` light) |
 
 ---
 
 ## conform.nvim
-Format on save with a 2 second timeout. Manual format with `<leader>cf`.
+Format on save with a 500ms timeout.
+- Manual format: `<leader>cf`
+- Toggle format-on-save for active buffer: `<leader>tf`
+- Commands: `:FormatDisable[!]`, `:FormatEnable[!]`, `:FormatToggle[!]` (use `!` for global toggle)
 
 | Filetype | Formatter |
 |----------|-----------|

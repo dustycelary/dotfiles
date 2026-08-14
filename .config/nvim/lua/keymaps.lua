@@ -142,6 +142,35 @@ vim.keymap.set("n", "<leader>ui", function()
 	vim.notify("Indent size set to " .. new_size, vim.log.levels.INFO, { title = "Indentation" })
 end, { desc = "Toggle indent size (2 <-> 4)" })
 
+-- Repeat the latest Ex (:) command, including commands run from Harpoon via vim.cmd().
+vim.keymap.set("n", "<leader>.", function()
+	local command = vim.fn.histget("cmd", -1)
+	if command == "" then
+		vim.notify("No Ex command to repeat", vim.log.levels.WARN)
+		return
+	end
+
+	local view = vim.fn.winsaveview()
+	local ok, err = pcall(vim.cmd, command)
+	vim.fn.winrestview(view)
+	if not ok then
+		error(err)
+	end
+end, { desc = "Repeat last Ex command" })
+
+vim.keymap.set("n", "<leader>uc", function()
+	if vim.g.colors_name == "catppuccin-latte" or vim.g.colors_name == "catppuccin" then
+		vim.o.background = "dark"
+		vim.cmd.colorscheme("carbonfox")
+		vim.api.nvim_set_hl(0, "Visual", { bg = "#4c4f69", fg = "#eff1f5", bold = true })
+		vim.notify("Colorscheme: carbonfox (dark)", vim.log.levels.INFO, { title = "Colorscheme" })
+	else
+		vim.o.background = "light"
+		vim.cmd.colorscheme("catppuccin-latte")
+		vim.notify("Colorscheme: catppuccin-latte (light)", vim.log.levels.INFO, { title = "Colorscheme" })
+	end
+end, { desc = "Toggle colorscheme (catppuccin-latte light <-> carbonfox dark)" })
+
 -- [[ Code / LSP ]]
 -- Replace: buffer-local word under cursor
 vim.keymap.set("n", "<leader>cr", function()
@@ -216,6 +245,6 @@ vim.api.nvim_create_user_command("SortTasks", function()
 	vim.cmd.edit({ bang = true })
 end, {})
 
-vim.keymap.set("n", "<leader>S", "<cmd>SortTasks<CR>", {
+vim.keymap.set("n", "<leader>us", "<cmd>SortTasks<CR>", {
 	desc = "Sort Markdown tasks",
 })

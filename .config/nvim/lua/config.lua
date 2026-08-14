@@ -2,6 +2,15 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Ensure Homebrew and standard binary paths are in PATH so Node/LSP executables are found
+local extra_paths = { "/opt/homebrew/bin", "/opt/homebrew/sbin", "/usr/local/bin" }
+for _, path in ipairs(extra_paths) do
+	if vim.fn.isdirectory(path) == 1 and not vim.env.PATH:find(path, 1, true) then
+		vim.env.PATH = path .. ":" .. vim.env.PATH
+	end
+end
+
+
 -- Default .sh files to bash syntax/filetype
 vim.g.is_bash = 1
 

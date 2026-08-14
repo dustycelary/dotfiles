@@ -1,21 +1,20 @@
 hs.application.enableSpotlightForNameSearches(true)
 local selfcontrol = require("hammer-control/selfcontrol")
-local time = require("hammer-control/time")
+
+-- Check frequently enough that a scheduled block starts promptly. Each check
+-- reads the real local clock, so sleeping or timer drift cannot skew the time.
+SELFCONTROL_TIMER = hs.timer.new(15, selfcontrol.run, true)
+SELFCONTROL_TIMER:start()
 
 -- system event tracker
 SYSTEM_WATCHER = hs.caffeinate.watcher.new(function(event_type)
-  if event_type == hs.caffeinate.watcher.screensDidUnlock then
-    time.getTime()
+  if event_type == hs.caffeinate.watcher.systemDidWake
+    or event_type == hs.caffeinate.watcher.screensDidWake
+    or event_type == hs.caffeinate.watcher.screensDidUnlock
+    or event_type == hs.caffeinate.watcher.sessionDidBecomeActive then
     selfcontrol.start()
-    SELFCONTROL_TIMER:start()
-  end
-
-  if event_type == hs.caffeinate.watcher.screensDidLock then
-    SELFCONTROL_TIMER:stop()
   end
 end)
 SYSTEM_WATCHER:start()
 
 selfcontrol.start()
-SELFCONTROL_TIMER = hs.timer.new(60, selfcontrol.run)
-SELFCONTROL_TIMER:start()

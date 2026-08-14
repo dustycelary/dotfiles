@@ -10,15 +10,14 @@
 # Commit Mono: neutral, precise, and close to Berkeley Mono's technical style.
 # Install Commit Mono first, then confirm its family name with `ghostty +list-fonts`.
 
-# font-family = Monofoki Nerd Font
-# font-family = CommitMono Nerd Font
+font-family = CommitMono Nerd Font
 
 # font-family = BlexMono Nerd Font
 # font-family = JetBrains Mono
-font-family = Iosevka NF
-font-size = 15
-font-thicken = true
-font-thicken-strength = 80
+# font-family = Iosevka Term
+font-size = 14.5
+font-thicken = false
+# font-thicken-strength = 80
 
 # Commit Mono exposes its ligatures and smart-kerning behavior through `calt`.
 font-feature = calt
@@ -44,8 +43,8 @@ adjust-underline-thickness = 1
 # You can set static themes, or separate light/dark themes to match macOS.
 # To see all options, run `ghostty +list-themes`.
 
-# Theme choice:
-theme = Catppuccin Latte
+# Theme choice (toggle with ~/.config/ghostty/toggle_theme.sh):
+theme = Carbonfox
 
 # Auto-switching theme (uncomment to enable auto-switch matching macOS Light/Dark mode):
 # theme = light:Gruvbox Light,dark:Carbonfox
@@ -53,9 +52,9 @@ theme = Catppuccin Latte
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system
 
-# Selection colors: Catppuccin Latte blue with the theme's default base color.
-selection-background = #4c4f69
-selection-foreground = #eff1f5
+# Selection & cursor colors (commented out to allow dynamic theme-native colors for Carbonfox & Gruvbox Light):
+# selection-background = #2a2a2a
+# selection-foreground = #f2f4f8
 # cursor-color = #f2f4f8
 # cursor-text = #161616
 
@@ -93,8 +92,8 @@ window-padding-y = 12
 window-padding-balance = true
 
 # Opacity and blur (Glassmorphism effect)
-# background-opacity = 0.90
-# background-blur-radius = 20
+background-opacity = 0.90
+background-blur-radius = 20
 window-colorspace = display-p3
 
 # macOS Specific Aesthetics:
