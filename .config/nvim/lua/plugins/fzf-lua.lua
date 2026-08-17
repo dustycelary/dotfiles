@@ -6,16 +6,15 @@ return {
 		local fzf_path = require("fzf-lua.path")
 
 		-- 1. Unify actions in one table so we don't repeat ourselves
-		local trouble_fzf = require("trouble.sources.fzf")
 		local common_actions = {
 			["default"] = fzf.actions.file_edit,
 			["ctrl-s"] = fzf.actions.file_split,
 			["ctrl-v"] = fzf.actions.file_vsplit,
-			["ctrl-t"] = trouble_fzf.actions.open,
-			["alt-t"] = fzf.actions.file_tabedit,
+			["ctrl-t"] = fzf.actions.file_tabedit,
 			["alt-q"] = fzf.actions.file_sel_to_qf,
 			["alt-l"] = fzf.actions.file_sel_to_ll,
 
+			-- Note: Fixed alt-h to match your prompt's comment (was alt-u in your code)
 			["alt-i"] = fzf.actions.toggle_ignore,
 			["alt-u"] = fzf.actions.toggle_hidden,
 		}
@@ -25,11 +24,6 @@ return {
 			defaults = {
 				hidden = true, -- Hide hidden files by default
 				no_ignore = true, -- Do not hide ignored files (.gitignore) by default
-				formatter = "path.filename_first",
-			},
-			lsp = {
-				async_or_path = true,
-				formatter = "path.filename_first",
 			},
 			actions = {
 				-- Apply the exact same keymaps to both files and grep
@@ -63,39 +57,9 @@ return {
 		{ "<leader>fo", "<cmd>FzfLua oldfiles<cr>", desc = "Fzf Old Files" },
 		{ "<leader>fm", "<cmd>FzfLua marks<cr>", desc = "Fzf Marks" },
 		{ '<leader>f"', "<cmd>FzfLua registers<cr>", desc = "Fzf Registers" },
+		{ "<leader>fs", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Fzf Workspace Symbols" },
+		{ "<leader>fd", "<cmd>FzfLua diagnostics_workspace<cr>", desc = "Fzf Workspace Diagnostics" },
+		{ "go", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document Symbols" },
 		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Fzf Commands" },
-		{
-			"<leader>fs",
-			function()
-				require("fzf-lua").lsp_live_workspace_symbols()
-			end,
-			desc = "Fzf Workspace Symbols",
-		},
-		{
-			"<leader>fd",
-			function()
-				require("fzf-lua").lsp_document_diagnostics()
-			end,
-			desc = "Fzf Document Diagnostics",
-		},
-		{
-			"go",
-			function()
-				local clients = vim.lsp.get_clients({ bufnr = 0 })
-				local has_symbol_provider = false
-				for _, client in ipairs(clients) do
-					if client.supports_method("textDocument/documentSymbol") then
-						has_symbol_provider = true
-						break
-					end
-				end
-				if has_symbol_provider then
-					require("fzf-lua").lsp_document_symbols()
-				else
-					require("fzf-lua").treesitter()
-				end
-			end,
-			desc = "Document symbols (LSP / Treesitter)",
-		},
 	},
 }

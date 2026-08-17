@@ -1,5 +1,10 @@
 -- LSP setup — mason + mason-lspconfig + nvim-lspconfig.
--- Servers: basedpyright, lua_ls, clangd, html, bashls, marksman, dockerls, yamlls, jsonls, phpactor.
+-- Servers: basedpyright, lua_ls, clangd, html (+ htmldjango), bashls, marksman, dockerls, yamlls, jsonls.
+-- Non-obvious: yamlls uses schemastore for JSON schema validation; its formatter is disabled
+--   (conform handles formatting). html registers for htmldjango filetype too.
+-- basedpyright runs with typeCheckingMode=off and openFilesOnly to avoid noise.
+-- Diagnostics virtual text/lines are OFF globally (init.lua) — tiny-inline-diagnostic handles display.
+-- :LspInfo shows attached clients for the current buffer.
 return {
 	{
 		"williamboman/mason.nvim",
@@ -24,18 +29,18 @@ return {
 			},
 		},
 	},
+
 	{
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		dependencies = { "b0o/schemastore.nvim" },
 		config = function()
-			-- Add borders to LSP floating windows
+			-- Add borders to LSP floating windows so they are clearly visible
 			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
 			vim.lsp.handlers["textDocument/signatureHelp"] =
 				vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 			vim.diagnostic.config({ float = { border = "rounded" } })
 
-			-- Command for checking attached clients
 			local function lsp_info()
 				local clients = vim.lsp.get_clients({ bufnr = 0 })
 				if #clients == 0 then
@@ -57,19 +62,32 @@ return {
 					upward = true,
 					type = "directory",
 				})[1]
-				if match and vim.fn.executable(match .. "/bin/python") == 1 then
-					return match .. "/bin/python"
+				if match then
+					local python_path = match .. "/bin/python"
+					if vim.fn.executable(python_path) == 1 then
+						return python_path
+					end
 				end
 				return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python3"
 			end
 
+			-- Only define custom overrides for servers that need specific settings
 			local custom_servers = {
 				basedpyright = {
-					root_markers = { "pyrightconfig.json", "pyproject.toml", "setup.py", "setup.cfg", ".git", "requirements.txt" },
+					root_markers = {
+						"pyrightconfig.json",
+						"pyproject.toml",
+						"setup.py",
+						"setup.cfg",
+						".git",
+						"requirements.txt",
+					},
 					before_init = function(_, config)
 						local root = config.root_dir or vim.fn.getcwd()
 						config.settings = vim.tbl_deep_extend("force", config.settings or {}, {
-							python = { pythonPath = get_python_path(root) },
+							python = {
+								pythonPath = get_python_path(root),
+							},
 						})
 					end,
 					settings = {
@@ -81,14 +99,78 @@ return {
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
 								indexing = false,
-								ignore = { "**/.venv", "**/venv", "**/node_modules", "**/__pycache__", "**/build", "**/dist" },
+								ignore = {
+									"**/.venv",
+									"**/venv",
+									"**/node_modules",
+									"**/__pycache__",
+									"**/build",
+									"**/dist",
+								},
 							},
 						},
+						python = {},
 					},
 				},
 				lua_ls = {
 					settings = { Lua = { telemetry = { enable = false } } },
 				},
+				tailwindcss = {
+					filetypes = {
+						"aspnetcorerazor",
+						"astro",
+						"blade",
+						"clojure",
+						"django-html",
+						"htmldjango",
+						"edge",
+						"eelixir",
+						"elixir",
+						"ejs",
+						"erb",
+						"eruby",
+						"gohtml",
+						"gohtmltmpl",
+						"haml",
+						"handlebars",
+						"hbs",
+						"html",
+						"htmlangular",
+						"html-eex",
+						"heex",
+						"jade",
+						"leaf",
+						"liquid",
+						"mustache",
+						"njk",
+						"nunjucks",
+						"php",
+						"razor",
+						"slim",
+						"twig",
+						"css",
+						"less",
+						"postcss",
+						"sas",
+						"sass",
+						"scss",
+						"stylus",
+						"sugarss",
+						"javascript",
+						"javascriptreact",
+						"reason",
+						"rescript",
+						"typescript",
+						"typescriptreact",
+						"vue",
+						"svelte",
+						"templ",
+					},
+				},
+				-- html = {
+				-- 	filetypes = { "html", "htmldjango" },
+				-- 	init_options = { provideFormatter = false },
+				-- },
 				jsonls = {
 					settings = {
 						json = {
@@ -108,7 +190,7 @@ return {
 				},
 			}
 
-			-- Setup installed Mason servers automatically
+			-- Automatically enable all installed Mason servers
 			local mason_lspconfig = require("mason-lspconfig")
 			for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
 				local config = vim.tbl_deep_extend("force", { workspace_required = false }, custom_servers[name] or {})
@@ -116,34 +198,99 @@ return {
 				vim.lsp.enable(name)
 			end
 
-			-- Keymaps on LSP attach
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
-					local buf = args.buf
 					local client = vim.lsp.get_client_by_id(args.data.client_id)
+
 					if client and client.name == "yamlls" then
 						client.server_capabilities.documentFormattingProvider = false
 					end
 
-					local fzf = require("fzf-lua")
-					vim.keymap.set("n", "grd", function() fzf.lsp_definitions({ jump1 = true }) end, { buffer = buf, desc = "Go to definition" })
-					vim.keymap.set("n", "grD", vim.lsp.buf.declaration, { buffer = buf, desc = "Go to declaration" })
-					vim.keymap.set("n", "grr", fzf.lsp_references, { buffer = buf, desc = "LSP references" })
-					vim.keymap.set("n", "gri", function() fzf.lsp_implementations({ jump1 = true }) end, { buffer = buf, desc = "LSP implementations" })
+					vim.keymap.set("n", "grd", function()
+						require("fzf-lua").lsp_definitions({ jump1 = true })
+					end, { buffer = args.buf, desc = "Go to definition" })
+					vim.keymap.set(
+						"n",
+						"grD",
+						vim.lsp.buf.declaration,
+						{ buffer = args.buf, desc = "Go to declaration" }
+					)
+					vim.keymap.set("n", "grr", function()
+						require("fzf-lua").lsp_references()
+					end, { buffer = args.buf, desc = "LSP references" })
+					vim.keymap.set("n", "gri", function()
+						require("fzf-lua").lsp_implementations({ jump1 = true })
+					end, { buffer = args.buf, desc = "LSP implementations" })
+					vim.keymap.set("n", "go", function()
+						local clients = vim.lsp.get_clients({ bufnr = 0 })
+						local has_symbol_provider = false
+						for _, client in ipairs(clients) do
+							if client.supports_method("textDocument/documentSymbol") then
+								has_symbol_provider = true
+								break
+							end
+						end
+						if has_symbol_provider then
+							require("fzf-lua").lsp_document_symbols()
+						else
+							require("fzf-lua").treesitter()
+						end
+					end, { buffer = args.buf, desc = "Document symbols" })
 
-					vim.keymap.set("n", "<leader>cs", vim.lsp.buf.signature_help, { buffer = buf, desc = "Signature help" })
-					vim.keymap.set("n", "<leader>cn", vim.lsp.buf.rename, { buffer = buf, desc = "Rename symbol" })
-					vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { buffer = buf, desc = "Code actions" })
+					vim.keymap.set(
+						{ "i", "n" },
+						"<C-k>",
+						vim.lsp.buf.signature_help,
+						{ buffer = args.buf, desc = "Toggle signature help" }
+					)
+					vim.keymap.set(
+						"n",
+						"<leader>cs",
+						vim.lsp.buf.signature_help,
+						{ buffer = args.buf, desc = "Signature help" }
+					)
 
-					vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { buffer = buf, desc = "Previous diagnostic" })
-					vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { buffer = buf, desc = "Next diagnostic" })
+					vim.keymap.set("n", "<leader>cn", vim.lsp.buf.rename, { buffer = args.buf, desc = "Rename symbol" })
+					vim.keymap.set(
+						"n",
+						"<leader>ca",
+						vim.lsp.buf.code_action,
+						{ buffer = args.buf, desc = "Code actions" }
+					)
+					vim.keymap.set(
+						"v",
+						"<leader>ca",
+						vim.lsp.buf.code_action,
+						{ buffer = args.buf, desc = "Code actions (range)" }
+					)
 
-					local err_opts = { severity = vim.diagnostic.severity.ERROR }
-					vim.keymap.set("n", "[e", function() vim.diagnostic.goto_prev(err_opts) end, { buffer = buf, desc = "Previous error" })
-					vim.keymap.set("n", "]e", function() vim.diagnostic.goto_next(err_opts) end, { buffer = buf, desc = "Next error" })
+					vim.keymap.set("n", "[d", function()
+						vim.diagnostic.goto_prev()
+					end, { buffer = args.buf, desc = "Previous diagnostic" })
+					vim.keymap.set("n", "]d", function()
+						vim.diagnostic.goto_next()
+					end, { buffer = args.buf, desc = "Next diagnostic" })
 
-					vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { buffer = buf, desc = "Show diagnostic float" })
-					vim.keymap.set("n", "<leader>cl", vim.diagnostic.setloclist, { buffer = buf, desc = "Diagnostics → loclist" })
+					local diag_opts = { severity = vim.diagnostic.severity.ERROR }
+					vim.keymap.set("n", "[e", function()
+						vim.diagnostic.goto_prev(diag_opts)
+					end, { buffer = args.buf, desc = "Previous error" })
+					vim.keymap.set("n", "]e", function()
+						vim.diagnostic.goto_next(diag_opts)
+					end, { buffer = args.buf, desc = "Next error" })
+
+					vim.keymap.set(
+						"n",
+						"<leader>ce",
+						vim.diagnostic.open_float,
+						{ buffer = args.buf, desc = "Show diagnostic float" }
+					)
+					vim.keymap.set(
+						"n",
+						"<leader>cl",
+						vim.diagnostic.setloclist,
+						{ buffer = args.buf, desc = "Diagnostics → loclist" }
+					)
 				end,
 			})
 		end,

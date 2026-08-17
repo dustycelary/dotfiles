@@ -1,7 +1,7 @@
 return {
 	"nvim-treesitter/nvim-treesitter-textobjects",
 	branch = "main",
-	event = { "BufReadPre", "BufNewFile" },
+	lazy = false,
 	dependencies = { "nvim-treesitter/nvim-treesitter" },
 	config = function()
 		require("nvim-treesitter-textobjects").setup({
@@ -16,6 +16,24 @@ return {
 		local select = require("nvim-treesitter-textobjects.select")
 		local move = require("nvim-treesitter-textobjects.move")
 		local swap = require("nvim-treesitter-textobjects.swap")
+		local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
+
+		-- Repeatable move wrappers
+		local repeatable_start = ts_repeat_move.make_repeatable_move(function(opts, query, group)
+			if opts.forward then
+				move.goto_next_start(query, group)
+			else
+				move.goto_previous_start(query, group)
+			end
+		end)
+
+		local repeatable_end = ts_repeat_move.make_repeatable_move(function(opts, query, group)
+			if opts.forward then
+				move.goto_next_end(query, group)
+			else
+				move.goto_previous_end(query, group)
+			end
+		end)
 
 		-- Select keymaps
 		local select_maps = {
@@ -127,33 +145,50 @@ return {
 			["[E"] = { query = "@exception.outer", desc = "Prev try/except block end" },
 		}
 
-		for key, map in pairs(move_next_start) do
-			vim.keymap.set({ "n", "x", "o" }, key, function()
-				move.goto_next_start(map.query, map.query_group or "textobjects")
-			end, { desc = map.desc })
+		local function set_move_keymaps(bufnr)
+			local opts_extra = bufnr and { buffer = bufnr } or {}
+
+			for key, map in pairs(move_next_start) do
+				local opts = vim.tbl_extend("force", { desc = map.desc }, opts_extra)
+				vim.keymap.set({ "n", "x", "o" }, key, function()
+					repeatable_start({ forward = true }, map.query, map.query_group or "textobjects")
+				end, opts)
+			end
+
+			for key, map in pairs(move_next_end) do
+				local opts = vim.tbl_extend("force", { desc = map.desc }, opts_extra)
+				vim.keymap.set({ "n", "x", "o" }, key, function()
+					repeatable_end({ forward = true }, map.query, map.query_group or "textobjects")
+				end, opts)
+			end
+
+			for key, map in pairs(move_prev_start) do
+				local opts = vim.tbl_extend("force", { desc = map.desc }, opts_extra)
+				vim.keymap.set({ "n", "x", "o" }, key, function()
+					repeatable_start({ forward = false }, map.query, map.query_group or "textobjects")
+				end, opts)
+			end
+
+			for key, map in pairs(move_prev_end) do
+				local opts = vim.tbl_extend("force", { desc = map.desc }, opts_extra)
+				vim.keymap.set({ "n", "x", "o" }, key, function()
+					repeatable_end({ forward = false }, map.query, map.query_group or "textobjects")
+				end, opts)
+			end
 		end
 
-		for key, map in pairs(move_next_end) do
-			vim.keymap.set({ "n", "x", "o" }, key, function()
-				move.goto_next_end(map.query, map.query_group or "textobjects")
-			end, { desc = map.desc })
-		end
+		-- Set global keymaps initially
+		set_move_keymaps()
 
-		for key, map in pairs(move_prev_start) do
-			vim.keymap.set({ "n", "x", "o" }, key, function()
-				move.goto_previous_start(map.query, map.query_group or "textobjects")
-			end, { desc = map.desc })
-		end
-
-		for key, map in pairs(move_prev_end) do
-			vim.keymap.set({ "n", "x", "o" }, key, function()
-				move.goto_previous_end(map.query, map.query_group or "textobjects")
-			end, { desc = map.desc })
-		end
+		-- Override buffer-local ftplugin keymaps (e.g. Python ftplugin Python_jump) on FileType
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = "*",
+			callback = function(args)
+				set_move_keymaps(args.buf)
+			end,
+		})
 
 		-- Repeatable moves
-		local ts_repeat_move = require("nvim-treesitter-textobjects.repeatable_move")
-
 		vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
 		vim.keymap.set({ "n", "x", "o" }, ",", ts_repeat_move.repeat_last_move_opposite)
 

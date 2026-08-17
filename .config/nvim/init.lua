@@ -18,3 +18,4 @@ require("lazy").setup("plugins")
 
 -- Diagnostics
 vim.diagnostic.config({ virtual_text = false, virtual_lines = false })
+
