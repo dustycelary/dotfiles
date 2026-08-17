@@ -249,6 +249,7 @@ local windowLocations = {
 	["fullscreen"] = function()
 		hs.window.focusedWindow():toggleFullScreen()
 	end,
+	["mini-top-left"] = move(rect(0, 0, 0.3, 0.25)),
 }
 
 -- helper functions
@@ -281,7 +282,8 @@ local function getActionAndLabel(s)
 				else
 					hs.alert("No previous action to repeat", 2)
 				end
-			end, "repeat last action"
+			end,
+				"repeat last action"
 		elseif startswith(s, "alfred://") then
 			return alfred(s), s
 		elseif startswith(s, "raycast://") then

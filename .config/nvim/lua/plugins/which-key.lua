@@ -31,5 +31,18 @@ return {
 			colors = true,
 			mappings = true,
 		},
+		spec = {
+			{ "<leader>b", group = "Buffers" },
+			{ "<leader>c", group = "Code & LSP" },
+			{ "<leader>h", group = "Harpoon Bookmarks" },
+			{ "<leader>s", group = "Search & Find" },
+			{ "<leader>t", group = "Terminal & Tabs" },
+			{ "<leader>u", group = "UI Toggles" },
+			{ "<leader>w", group = "Windows & Surrounds" },
+			{ "<leader>x", group = "Diagnostics & Trouble" },
+			{ "gr", group = "LSP Definitions / References" },
+			{ "]", group = "Next Motion" },
+			{ "[", group = "Previous Motion" },
+		},
 	},
 }

@@ -1,0 +1,16 @@
+{
+  "Require module": {
+    "prefix": "req",
+    "body": [
+      "local ${1:mod} = require(\"${1:mod}\")"
+    ],
+    "description": "Require a Lua module"
+  },
+  "Pprint": {
+    "prefix": "pp",
+    "body": [
+      "print(vim.inspect(${1:var}))"
+    ],
+    "description": "Pretty print variable with vim.inspect"
+  }
+}

@@ -15,6 +15,13 @@ return {
 			end,
 			desc = "Toggle inline diagnostics",
 		},
+		{
+			"<leader>xt",
+			function()
+				require("tiny-inline-diagnostic").toggle()
+			end,
+			desc = "Toggle inline diagnostics",
+		},
 	},
 	opts = {
 		-- Presets: "modern" | "powerline" (needs nerd/powerline font) |

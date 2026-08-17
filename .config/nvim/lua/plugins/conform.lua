@@ -40,45 +40,5 @@ return {
 		vim.keymap.set("n", "<leader>cf", function()
 			require("conform").format({ async = true })
 		end, { desc = "Format file" })
-
-		-- Keymap: Toggle format-on-save for the active buffer
-		vim.keymap.set("n", "<leader>ut", function()
-			vim.b.disable_autoformat = not vim.b.disable_autoformat
-			local status = vim.b.disable_autoformat and "Disabled" or "Enabled"
-			vim.notify(status .. " format-on-save for active buffer", vim.log.levels.INFO, { title = "Conform" })
-		end, { desc = "Toggle format-on-save (buffer)" })
-
-		-- User commands to disable / enable / toggle format-on-save
-		vim.api.nvim_create_user_command("FormatDisable", function(args)
-			if args.bang then
-				vim.g.disable_autoformat = true
-				vim.notify("Disabled format-on-save globally", vim.log.levels.INFO, { title = "Conform" })
-			else
-				vim.b.disable_autoformat = true
-				vim.notify("Disabled format-on-save for active buffer", vim.log.levels.INFO, { title = "Conform" })
-			end
-		end, { desc = "Disable format-on-save (add ! for global)", bang = true })
-
-		vim.api.nvim_create_user_command("FormatEnable", function(args)
-			if args.bang then
-				vim.g.disable_autoformat = false
-				vim.notify("Enabled format-on-save globally", vim.log.levels.INFO, { title = "Conform" })
-			else
-				vim.b.disable_autoformat = false
-				vim.notify("Enabled format-on-save for active buffer", vim.log.levels.INFO, { title = "Conform" })
-			end
-		end, { desc = "Enable format-on-save (add ! for global)", bang = true })
-
-		vim.api.nvim_create_user_command("FormatToggle", function(args)
-			if args.bang then
-				vim.g.disable_autoformat = not vim.g.disable_autoformat
-				local status = vim.g.disable_autoformat and "Disabled" or "Enabled"
-				vim.notify(status .. " format-on-save globally", vim.log.levels.INFO, { title = "Conform" })
-			else
-				vim.b.disable_autoformat = not vim.b.disable_autoformat
-				local status = vim.b.disable_autoformat and "Disabled" or "Enabled"
-				vim.notify(status .. " format-on-save for active buffer", vim.log.levels.INFO, { title = "Conform" })
-			end
-		end, { desc = "Toggle format-on-save (add ! for global)", bang = true })
 	end,
 }

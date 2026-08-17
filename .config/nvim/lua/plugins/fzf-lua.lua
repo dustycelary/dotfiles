@@ -6,15 +6,16 @@ return {
 		local fzf_path = require("fzf-lua.path")
 
 		-- 1. Unify actions in one table so we don't repeat ourselves
+		local trouble_fzf = require("trouble.sources.fzf")
 		local common_actions = {
 			["default"] = fzf.actions.file_edit,
 			["ctrl-s"] = fzf.actions.file_split,
 			["ctrl-v"] = fzf.actions.file_vsplit,
-			["ctrl-t"] = fzf.actions.file_tabedit,
+			["ctrl-t"] = trouble_fzf.actions.open,
+			["alt-t"] = fzf.actions.file_tabedit,
 			["alt-q"] = fzf.actions.file_sel_to_qf,
 			["alt-l"] = fzf.actions.file_sel_to_ll,
 
-			-- Note: Fixed alt-h to match your prompt's comment (was alt-u in your code)
 			["alt-i"] = fzf.actions.toggle_ignore,
 			["alt-u"] = fzf.actions.toggle_hidden,
 		}
@@ -24,6 +25,11 @@ return {
 			defaults = {
 				hidden = true, -- Hide hidden files by default
 				no_ignore = true, -- Do not hide ignored files (.gitignore) by default
+				formatter = "path.filename_first",
+			},
+			lsp = {
+				async_or_path = true,
+				formatter = "path.filename_first",
 			},
 			actions = {
 				-- Apply the exact same keymaps to both files and grep

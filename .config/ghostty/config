@@ -15,8 +15,9 @@
 
 # font-family = BlexMono Nerd Font
 # font-family = JetBrains Mono
-font-family = Iosevka NF
-font-size = 15
+# font-family = Iosevka NF
+font-family = Iosevka Custom
+# font-size = 15
 font-thicken = true
 font-thicken-strength = 80
 
@@ -45,7 +46,8 @@ adjust-underline-thickness = 1
 # To see all options, run `ghostty +list-themes`.
 
 # Theme choice:
-theme = Catppuccin Latte
+# theme = Catppuccin Latte
+theme = Carbonfox
 
 # Auto-switching theme (uncomment to enable auto-switch matching macOS Light/Dark mode):
 # theme = light:Gruvbox Light,dark:Carbonfox
@@ -93,15 +95,15 @@ window-padding-y = 12
 window-padding-balance = true
 
 # Opacity and blur (Glassmorphism effect)
-# background-opacity = 0.90
-# background-blur-radius = 20
+background-opacity = 0.85
+background-blur-radius = 20
 window-colorspace = display-p3
 
 # macOS Specific Aesthetics:
 # 'tabs' integrates the tab bar into the title bar (like Arc browser).
 # Alternatively, use 'hidden' to hide titlebar completely (drag with opt+click).
-macos-titlebar-style = tabs
-macos-titlebar-proxy-icon = hidden
+# macos-titlebar-style = hidden
+# macos-titlebar-proxy-icon = hidden
 macos-icon = holographic
 
 # ------------------------------------------------------------------------------
@@ -151,6 +153,8 @@ keybind = cmd+s>r=reload_config
 keybind = cmd+s>x=close_surface
 keybind = cmd+s>n=new_window
 keybind = cmd+s>w=write_scrollback_file:open
+# Note: toggle_window_decorations is for Linux/GTK; macOS titlebar styles require opening a new window or restarting Ghostty.
+# keybind = cmd+s>d=toggle_window_decorations
 
 # Tab Management
 keybind = cmd+s>c=new_tab

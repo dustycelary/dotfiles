@@ -10,7 +10,6 @@ for _, path in ipairs(extra_paths) do
 	end
 end
 
-
 -- Default .sh files to bash syntax/filetype
 vim.g.is_bash = 1
 
@@ -29,7 +28,7 @@ vim.opt.background = "dark"
 
 vim.opt.autoindent = true -- Keep indentation from previous line
 vim.opt.smarttab = true
--- vim.opt.smartindent = true
+vim.opt.smartindent = true -- React to syntax indenting (e.g. after '{', 'then', etc.)
 vim.opt.expandtab = true -- Convert tabs to spaces by default
 vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
 vim.opt.shiftwidth = 4 -- Size of an indent
@@ -61,12 +60,15 @@ vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
 vim.opt.foldnestmax = 4 -- limit nesting depth
 
--- own options
+-- Safety & Auto-Save
+vim.opt.confirm = true -- Confirm to save changes before exiting modified buffer
 
--- getting rid of comments when starting new line using 'o'
-vim.api.nvim_create_autocmd("FileType", {
+-- Auto-save modified files when focus is lost or before quitting/closing pane
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave", "VimLeavePre" }, {
 	pattern = "*",
 	callback = function()
-		vim.opt_local.formatoptions:remove("o")
+		if vim.bo.modified and vim.bo.buftype == "" and vim.fn.expand("%") ~= "" then
+			vim.cmd("silent! update")
+		end
 	end,
 })

@@ -22,6 +22,9 @@ return {
 		local luasnip = require("luasnip")
 
 		cmp.setup({
+			completion = {
+				completeopt = "menu,menuone,noinsert,noselect",
+			},
 			snippet = {
 				expand = function(args)
 					luasnip.lsp_expand(args.body)
@@ -39,7 +42,7 @@ return {
 				}),
 			},
 			experimental = {
-				ghost_text = true,
+				ghost_text = false, -- Disabled so cmp ghost text doesn't overlap with Supermaven AI inline suggestions
 			},
 			sorting = {
 				comparators = {
@@ -91,10 +94,10 @@ return {
 			sources = cmp.config.sources({
 				{ name = "lazydev", group_index = 0 }, -- takes priority over lsp for lua files
 				{ name = "nvim_lsp" },
-				{ name = "luasnip" },
+				{ name = "luasnip", keyword_length = 2, max_item_count = 5 },
 				{ name = "path" },
 			}, {
-				{ name = "buffer", keyword_length = 3 },
+				{ name = "buffer", keyword_length = 3, max_item_count = 5 },
 			}),
 			formatting = {
 				fields = { "kind", "abbr", "menu" },

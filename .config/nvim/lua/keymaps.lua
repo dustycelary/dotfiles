@@ -17,30 +17,8 @@ end, { desc = "Quick Look markdown preview" })
 -- [[ Editor ]]
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
 vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert new line below without splitting line" })
-vim.keymap.set("i", "<C-Enter>", "<C-o>o", { desc = "Insert new line below without splitting line" })
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
-vim.keymap.set("n", "S", function()
-	local row = vim.api.nvim_win_get_cursor(0)[1]
-	local prev_indent = ""
-	if row > 1 then
-		local prev_line = vim.api.nvim_buf_get_lines(0, row - 2, row - 1, false)[1]
-		prev_indent = prev_line:match("^(%s*)") or ""
-	end
-	vim.api.nvim_buf_set_lines(0, row - 1, row, false, { prev_indent })
-	vim.api.nvim_win_set_cursor(0, { row, #prev_indent })
-	vim.cmd("startinsert!")
-end, { desc = "Re-indent to match line above and insert" })
 
-vim.keymap.set("n", "zF", function()
-	local row = vim.api.nvim_win_get_cursor(0)[1]
-	local prev_row
-	repeat
-		prev_row = row
-		vim.cmd("normal! [z")
-		row = vim.api.nvim_win_get_cursor(0)[1]
-	until row == prev_row
-	vim.cmd("normal! zC")
-end, { desc = "Close outermost enclosing fold" })
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 
 -- [[ Horizontal scrolling ]]
 vim.keymap.set("n", "<M-.>", "5zl", { desc = "Scroll view right" })
@@ -48,27 +26,6 @@ vim.keymap.set("n", "<M-,>", "5zh", { desc = "Scroll view left" })
 
 -- [[ Navigation ]]
 vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
-
-vim.keymap.set("n", "<leader>cd", function()
-	local dir
-	if vim.bo.filetype == "oil" then
-		local ok, oil = pcall(require, "oil")
-		if ok then
-			dir = oil.get_current_dir()
-		end
-	end
-	if not dir or dir == "" then
-		local path = vim.fn.expand("%:p")
-		if path ~= "" then
-			dir = (vim.fn.isdirectory(path) == 1) and path or vim.fn.fnamemodify(path, ":h")
-		end
-	end
-	if dir and dir ~= "" then
-		dir = dir:gsub("^oil://", "")
-		vim.cmd("cd " .. vim.fn.fnameescape(dir))
-		vim.notify(dir, vim.log.levels.INFO, { title = "Changed CWD" })
-	end
-end, { desc = "cd to current file's dir" })
 
 -- [[ Clipboard ]]
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank clipboard" })
@@ -92,6 +49,22 @@ vim.keymap.set("n", "<M-H>", "2<C-w><", { desc = "Decrease window width" })
 vim.keymap.set("n", "<M-L>", "2<C-w>>", { desc = "Increase window width" })
 vim.keymap.set("n", "<M-K>", "2<C-w>+", { desc = "Increase window height" })
 vim.keymap.set("n", "<M-J>", "2<C-w>-", { desc = "Decrease window height" })
+vim.keymap.set("n", "<C-Left>", "2<C-w><", { desc = "Decrease window width" })
+vim.keymap.set("n", "<C-Right>", "2<C-w>>", { desc = "Increase window width" })
+vim.keymap.set("n", "<C-Up>", "2<C-w>+", { desc = "Increase window height" })
+vim.keymap.set("n", "<C-Down>", "2<C-w>-", { desc = "Decrease window height" })
+vim.keymap.set("n", "<leader><space>", "<cmd>b#<cr>", { desc = "Toggle last active buffer" })
+
+vim.keymap.set("n", "<leader>w-", "<cmd>split<CR>", { desc = "Split window horizontally" })
+vim.keymap.set("n", "<leader>wh", "<cmd>split<CR>", { desc = "Split window horizontally" })
+vim.keymap.set("n", "<leader>w|", "<cmd>vsplit<CR>", { desc = "Split window vertically" })
+vim.keymap.set("n", "<leader>wv", "<cmd>vsplit<CR>", { desc = "Split window vertically" })
+vim.keymap.set("n", "<leader>wd", "<cmd>close<CR>", { desc = "Close split window" })
+vim.keymap.set("n", "<C-q>", "<cmd>close<CR>", { desc = "Close window" })
+
+-- [[ Tab Pages ]]
+vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "New tab page" })
+vim.keymap.set("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close tab page" })
 
 -- Equalize windows while preserving the aerial sidebar width
 vim.keymap.set("n", "<C-w>=", function()
@@ -116,23 +89,17 @@ end, { desc = "Equalize windows" })
 -- [[ Terminal ]]
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
--- [[ Buffers & Tabs ]]
-vim.keymap.set("n", "<M-=>", "<cmd>bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<M-->", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
-
-vim.keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Close buffer" })
-vim.keymap.set("n", "<leader>bn", "<cmd>bnext<CR>", { desc = "Next buffer" })
-vim.keymap.set("n", "<leader>bp", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
-vim.keymap.set("n", "<leader>ba", "<cmd>%bdelete|edit#|bdelete#<CR>", { desc = "Close all other buffers" })
-
-vim.keymap.set("n", "<leader>bt", "<cmd>tabnew<CR>", { desc = "New tab" })
-vim.keymap.set("n", "<leader>bq", "<cmd>tabclose<CR>", { desc = "Close tab" })
-vim.keymap.set("n", "<leader>b]", "<cmd>tabnext<CR>", { desc = "Next tab" })
-vim.keymap.set("n", "<leader>b[", "<cmd>tabprevious<CR>", { desc = "Previous tab" })
-vim.keymap.set("n", "<leader>bo", "<cmd>tabonly<CR>", { desc = "Close all other tabs" })
-vim.keymap.set("n", "<leader>bm", ":tabmove ", { desc = "Move tab" })
-
 -- [[ UI toggles ]]
+vim.keymap.set("n", "<leader>ua", "<cmd>AerialToggle!<CR>", { desc = "Toggle symbol sidebar (aerial)" })
+vim.keymap.set("n", "<leader>uz", function()
+	if vim.t.is_zoomed then
+		vim.cmd("tabclose")
+	else
+		vim.cmd("tab split")
+		vim.t.is_zoomed = true
+	end
+end, { desc = "Toggle window zoom (maximize split)" })
+
 vim.keymap.set("n", "<leader>ui", function()
 	local current = vim.bo.shiftwidth
 	local new_size = (current == 2) and 4 or 2
@@ -214,37 +181,3 @@ vim.keymap.set("n", "<leader>cR", function()
 		end)
 	end)
 end, { desc = "Replace word (project)" })
-
-vim.keymap.set("n", "<leader>cT", function()
-	local ok, parser = pcall(vim.treesitter.get_parser, 0)
-	if not ok or not parser then
-		vim.notify("No treesitter parser active", vim.log.levels.WARN, { title = "Treesitter" })
-		return
-	end
-	local lines = { parser:lang() }
-	for lang, _ in pairs(parser:children()) do
-		table.insert(lines, "  " .. lang .. " (injected)")
-	end
-	vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "Treesitter" })
-end, { desc = "Treesitter info" })
-
-vim.api.nvim_create_user_command("SortTasks", function()
-	vim.cmd.write()
-
-	local file = vim.fn.expand("%:p")
-	vim.fn.system({
-		"/Users/fungus/Developer/scripts/list_sort/list_sort.py",
-		file,
-	})
-
-	if vim.v.shell_error ~= 0 then
-		vim.notify("Failed to sort tasks", vim.log.levels.ERROR)
-		return
-	end
-
-	vim.cmd.edit({ bang = true })
-end, {})
-
-vim.keymap.set("n", "<leader>us", "<cmd>SortTasks<CR>", {
-	desc = "Sort Markdown tasks",
-})

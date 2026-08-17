@@ -1,6 +1,3 @@
--- csvview.nvim — renders CSV/TSV files as an aligned table with borders.
--- Auto-enables on *.csv and *.tsv. Sticky header stays visible while scrolling.
--- Delimiter auto-detected (tries ; , \t | in order). Toggle with :CsvViewToggle.
 return {
 	"hat0uma/csvview.nvim",
 	cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle", "CsvViewInfo" },

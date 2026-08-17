@@ -9,7 +9,7 @@
   "monday": [
     {
       "start": "00:01",
-      "end": "00:02",
+      "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
   ],
@@ -23,7 +23,7 @@
   "wednesday": [
     {
       "start": "00:01",
-      "end": "00:02",
+      "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
   ],
@@ -44,7 +44,7 @@
   "saturday": [
     {
       "start": "00:01",
-      "end": "00:02",
+      "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
   ]

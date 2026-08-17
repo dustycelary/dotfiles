@@ -44,11 +44,20 @@ source "$ZSH/oh-my-zsh.sh"
 # -----------------------------------------------------------------------------
 
 # Keep up to 100,000 commands in memory and in the history file.
+HISTFILE="$HOME/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=100000
 
 # Share new commands between open terminals and remove older duplicates.
 setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS
+
+# Reload history from disk before opening FZF history search (Ctrl+R).
+fzf-history-widget-sync() {
+  fc -R 2>/dev/null
+  zle fzf-history-widget
+}
+zle -N fzf-history-widget-sync
+bindkey '^r' fzf-history-widget-sync
 
 # Normalize excess spaces and review history expansions before executing them.
 setopt HIST_REDUCE_BLANKS HIST_VERIFY
@@ -142,10 +151,40 @@ bin() {
   echo "Moved to rubbish: $*"
 }
 
-# Copy the supplied text to the macOS clipboard.
+# Copy text, piped input, or file contents to the macOS clipboard.
 clip() {
-  printf '%s' "$*" | pbcopy
+  if [[ $# -eq 1 && -f "$1" ]]; then
+    pbcopy < "$1"
+    echo "Copied contents of '$1' to clipboard."
+  elif [[ ! -t 0 ]]; then
+    pbcopy
+  else
+    printf '%s' "$*" | pbcopy
+  fi
 }
+
+# Copy actual file(s) to the macOS clipboard (for pasting in Finder, Slack, etc.).
+copyfile() {
+  if [[ $# -eq 0 ]]; then
+    echo "Usage: copyfile <file1> [file2 ...]" >&2
+    return 1
+  fi
+  local files=()
+  for file in "$@"; do
+    if [[ ! -e "$file" ]]; then
+      echo "Error: file '$file' does not exist." >&2
+      return 1
+    fi
+    local abs_path
+    abs_path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
+    files+=("POSIX file \"$abs_path\"")
+  done
+  local list
+  list=$(IFS=,; echo "${files[*]}")
+  osascript -e "set the clipboard to {$list}"
+  echo "Copied $# file(s) to clipboard."
+}
+alias cpf='copyfile'
 
 # Copy the current directory to the macOS clipboard.
 copy-pwd() {

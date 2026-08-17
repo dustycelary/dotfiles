@@ -1,15 +1,24 @@
 # Neovim Plugins
 
-## aerial.nvim
-Symbol sidebar and breadcrumb winbar. Shows a tree of functions, classes, headings and other symbols in a right-hand split. Also drives the breadcrumb path shown in the winbar at the top of each buffer.
+## aerial.nvim & edgy.nvim
+Symbol sidebar and outline display managed alongside `NvimTree` via `edgy.nvim` on the left sidebar. Shares the left sidebar height split 50/50 with NvimTree.
 
 | Key | Action |
 |-----|--------|
-| `<leader>ua` | Toggle sidebar |
-| `<leader>sa` | Search symbols (fzf) |
-| `<leader>sn` | Toggle floating nav (with preview) |
+| `<leader>ua` | Toggle Aerial code outline sidebar |
+| `<leader>ue` | Toggle file sidebar (NvimTree) |
 
-The winbar is suppressed automatically on nofile, terminal, aerial, fzf, lazy, and mason buffers. The sidebar width is preserved when you equalize windows with `<C-w>=`.
+---
+
+## flash.nvim
+Blazing-fast 2-character motion navigation and Treesitter node selection.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `s` | Normal, Visual, Operator | Flash jump to any 2-character target |
+| `S` | Normal, Visual, Operator | Flash Treesitter node selection |
+| `r` | Operator-pending | Remote Flash motion |
+| `R` | Operator, Visual | Treesitter search |
 
 ---
 
@@ -23,8 +32,9 @@ Tab bar across the top showing all open buffers with LSP diagnostic counts per b
 
 | Key | Action |
 |-----|--------|
-| `<Tab>` | Next buffer |
-| `<S-Tab>` | Previous buffer |
+| `<S-l>` / `<leader>bn` | Next buffer |
+| `<S-h>` / `<leader>bp` | Previous buffer |
+| `<leader>bb` / `<leader><space>` | Switch to last active buffer (`<C-^>`) |
 | `<leader>bd` | Close buffer |
 | `<leader>ba` | Close all other buffers |
 
@@ -48,6 +58,24 @@ Ghost text shows the top suggestion inline as you type.
 | `<C-Space>` | Force open completion |
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
+
+---
+
+## LuaSnip & friendly-snippets
+Snippet engine with community snippet collection (`friendly-snippets`) and custom snippet loading support. Integrated directly into `nvim-cmp`.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<Tab>` | Insert / Select | Expand snippet or jump to next placeholder stop |
+| `<S-Tab>` | Insert / Select | Jump back to previous placeholder stop |
+| `<C-l>` | Insert / Select | Jump to next snippet stop or next choice (if choice node is active) |
+| `<C-h>` | Insert / Select | Jump to previous snippet stop or previous choice (if choice node is active) |
+
+### Custom Snippets
+Custom snippets are loaded from `~/.config/nvim/snippets/`.
+- **VSCode format**: Add `<filetype>.json` (e.g. `lua.json`, `python.json`) registered in `package.json`.
+- **Lua format**: Add `<filetype>.lua` using `luasnip.snippet` definitions.
+
 
 ## colorscheme (nightfox.nvim & catppuccin/nvim)
 Default colorscheme is `carbonfox` (dark). Toggles to `catppuccin-latte` (light) via `catppuccin/nvim`.
@@ -162,20 +190,15 @@ Prevents bad habits by blocking the spamming of movement keys (like `h`, `j`, `k
 ---
 
 ## harpoon2
-Quick-access bookmarks for up to 4 files per project. List is saved automatically on toggle (`save_on_toggle = true`).
-
-Also includes a custom Terminal Command Runner. If inside Tmux, commands are automatically sent to the other pane (splitting the window if only Neovim is open) without changing editor focus. If run outside Tmux, it falls back to a Neovim split terminal.
+Quick-access file bookmarks per project. Saved automatically on toggle (`save_on_toggle = true`).
 
 | Key | Action |
 |-----|--------|
 | `<leader>ha` | Add current file to list |
-| `<leader>hh` | Open file menu |
+| `<leader>hh` | Open Harpoon quick menu |
 | `<leader>1` – `<leader>4` | Jump to file slot 1–4 |
 | `<leader>hn` | Next file in list |
 | `<leader>hp` | Previous file in list |
-| `<leader>hc` | Open command menu |
-| `<leader>hC` | Prompt to add a new command |
-| `<leader>x1` – `<leader>x4` | Run command slot 1–4 (Tmux or Vim terminal) |
 
 ---
 
@@ -306,7 +329,7 @@ Renders markdown in-buffer: styled headings, concealed syntax markers, code bloc
 ---
 
 ## nvim-scrollview
-Scrollbar on the right edge of windows. Semi-transparent (`winblend 50`). Hides automatically when it would overlap text content. Shown on all windows simultaneously, not just the focused one.
+Scrollbar on the right edge of windows. Light, high-contrast styling (`winblend 0`). Hides automatically when it would overlap text content. Shown only on the current window to save performance.
 
 ---
 
@@ -321,24 +344,19 @@ All diagnostics under the cursor are shown simultaneously. Long messages wrap at
 
 ---
 
-## todo-comments.nvim
-Highlights `TODO`, `FIXME`, `HACK`, `NOTE`, `WARN`, `PERF`, `TEST` comments with colored icons. The jump motions are repeatable (using treesitter-textobjects repeat system).
 
-| Key | Action |
-|-----|--------|
-| `]t` | Next TODO comment (repeatable) |
-| `[t` | Previous TODO comment (repeatable) |
-| `<leader>st` | Search Markdown and .env TODOs (fzf) |
-
----
 
 ## trouble.nvim
 Pretty split panel list for showing diagnostics, LSP references, definitions, quickfix, and location lists.
 
 | Key | Action |
 |-----|--------|
-| `<leader>xx` | Toggle workspace diagnostics panel |
-| `<leader>xX` | Toggle buffer diagnostics panel |
+| `<leader>xx` | Toggle workspace diagnostics panel (Trouble) |
+| `<leader>xX` | Toggle buffer diagnostics panel (Trouble) |
+| `<leader>xe` | Show floating diagnostic popup under cursor |
+| `<leader>xt` | Toggle inline powerline diagnostics overlay |
+| `<leader>xd` | Search document diagnostics (Fzf) |
+| `<leader>xD` | Search workspace diagnostics (Fzf) |
 | `<leader>xs` | Toggle symbols outline panel |
 | `<leader>xl` | Toggle LSP definitions/references split |
 | `<leader>xq` | Toggle quickfix panel |
@@ -440,19 +458,16 @@ Key group prefixes:
 
 ---
 
-## yanky.nvim
-Enhanced yank and paste experience. Maintains a history of yanks, highlights put/yank actions, preserves cursor position on yank, and allows cycling through history after pasting. Integrates with fzf-lua for a searchable yank history.
+
+
+## toggleterm.nvim
+Dynamic floating, horizontal, and vertical terminal management inside Neovim.
 
 | Key | Action |
 |-----|--------|
-| `<leader>sy` | Open yank history (fzf) |
-| `y` | Yank text (preserves cursor position) |
-| `p` / `P` | Put text after/before cursor |
-| `gp` / `gP` | Put text after/before selection |
-| `[y` / `]y` | Cycle backward/forward through yank history |
-| `<C-p>` / `<C-n>` | Cycle backward/forward through history (only after put) |
-| `[p` / `]p` | Put and indent left/right |
-| `[P` / `]P` | Put before and indent left/right |
-| `>p` / `<p` | Put and indent right/left |
-| `>P` / `<P` | Put before and indent right/left |
-| `=p` / `=P` | Put after/before applying filter |
+| `<C-\>` | Toggle terminal (float) |
+| `<leader>tt` | Toggle terminal (float) |
+| `<leader>tf` | Toggle floating terminal |
+| `<leader>th` | Toggle horizontal terminal |
+| `<leader>tv` | Toggle vertical terminal |
+
