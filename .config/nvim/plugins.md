@@ -117,7 +117,9 @@ Files use `fd` (includes gitignored files by default, includes hidden files, exc
 | `grd` | Go to definition |
 | `grr` | References |
 | `gri` | Implementations |
-| `go` | Document symbols |
+| `go` / `<leader>fS` | Fuzzy-search document symbols |
+
+All FZF pickers default to fuzzy matching. `<leader>fg` fuzzy-filters all ripgrep results, while `<leader>fG` deliberately starts with live ripgrep/regex search; in either grep picker, press `<C-g>` to switch modes. `<leader>fs` starts with static, fuzzy workspace symbols. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` to populate quickfix or `<C-l>` to populate the current window's location list. When no attached LSP provides document symbols, `go` falls back to Treesitter symbols.
 
 Project-wide rename: `<leader>cR` prompts for search and replacement strings, opens fzf grep, and on confirm sends matches to quickfix then runs `cfdo %s/.../.../ | update` across all matched files.
 
