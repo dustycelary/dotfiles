@@ -10,7 +10,6 @@ for _, path in ipairs(extra_paths) do
 	end
 end
 
-
 -- Default .sh files to bash syntax/filetype
 vim.g.is_bash = 1
 

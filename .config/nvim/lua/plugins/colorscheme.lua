@@ -57,6 +57,11 @@ return {
 		"EdenEast/nightfox.nvim",
 		priority = 1000,
 		config = function()
+			require("nightfox").setup({
+				options = {
+					transparent = true,
+				},
+			})
 			vim.o.background = "dark"
 			vim.cmd.colorscheme("carbonfox")
 		end,

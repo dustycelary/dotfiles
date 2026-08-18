@@ -108,9 +108,8 @@ return {
 			["]m"] = { query = "@function.outer", desc = "Next method/function def start" },
 			["]c"] = { query = "@class.outer", desc = "Next class start" },
 			["]i"] = { query = "@conditional.outer", desc = "Next conditional start" },
-			["]l"] = { query = "@loop.outer", desc = "Next loop start" },
+			["]o"] = { query = "@loop.outer", desc = "Next loop start" },
 			["]x"] = { query = "@exception.outer", desc = "Next try/except block start" },
-			["]e"] = { query = "@exception.outer", desc = "Next try/except block start" },
 			["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
 			["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
 		}
@@ -120,9 +119,8 @@ return {
 			["]M"] = { query = "@function.outer", desc = "Next method/function def end" },
 			["]C"] = { query = "@class.outer", desc = "Next class end" },
 			["]I"] = { query = "@conditional.outer", desc = "Next conditional end" },
-			["]L"] = { query = "@loop.outer", desc = "Next loop end" },
+			["]O"] = { query = "@loop.outer", desc = "Next loop end" },
 			["]X"] = { query = "@exception.outer", desc = "Next try/except block end" },
-			["]E"] = { query = "@exception.outer", desc = "Next try/except block end" },
 		}
 
 		local move_prev_start = {
@@ -130,9 +128,8 @@ return {
 			["[m"] = { query = "@function.outer", desc = "Prev method/function def start" },
 			["[c"] = { query = "@class.outer", desc = "Prev class start" },
 			["[i"] = { query = "@conditional.outer", desc = "Prev conditional start" },
-			["[l"] = { query = "@loop.outer", desc = "Prev loop start" },
+			["[o"] = { query = "@loop.outer", desc = "Prev loop start" },
 			["[x"] = { query = "@exception.outer", desc = "Prev try/except block start" },
-			["[e"] = { query = "@exception.outer", desc = "Prev try/except block start" },
 		}
 
 		local move_prev_end = {
@@ -140,9 +137,8 @@ return {
 			["[M"] = { query = "@function.outer", desc = "Prev method/function def end" },
 			["[C"] = { query = "@class.outer", desc = "Prev class end" },
 			["[I"] = { query = "@conditional.outer", desc = "Prev conditional end" },
-			["[L"] = { query = "@loop.outer", desc = "Prev loop end" },
+			["[O"] = { query = "@loop.outer", desc = "Prev loop end" },
 			["[X"] = { query = "@exception.outer", desc = "Prev try/except block end" },
-			["[E"] = { query = "@exception.outer", desc = "Prev try/except block end" },
 		}
 
 		local function set_move_keymaps(bufnr)
@@ -187,6 +183,40 @@ return {
 				set_move_keymaps(args.buf)
 			end,
 		})
+
+		-- Quickfix & Location List repeatable moves (; and ,)
+		local make_repeatable = ts_repeat_move.make_repeatable_move
+
+		local move_qf = make_repeatable(function(opts)
+			local cmd = opts.forward and "cnext" or "cprev"
+			local fallback = opts.forward and "cfirst" or "clast"
+			local ok, _ = pcall(vim.cmd, cmd)
+			if not ok then
+				pcall(vim.cmd, fallback)
+			end
+		end)
+
+		local move_loc = make_repeatable(function(opts)
+			local cmd = opts.forward and "lnext" or "lprev"
+			local fallback = opts.forward and "lfirst" or "llast"
+			local ok, _ = pcall(vim.cmd, cmd)
+			if not ok then
+				pcall(vim.cmd, fallback)
+			end
+		end)
+
+		vim.keymap.set({ "n", "x", "o" }, "]q", function()
+			move_qf({ forward = true })
+		end, { desc = "Next quickfix item" })
+		vim.keymap.set({ "n", "x", "o" }, "[q", function()
+			move_qf({ forward = false })
+		end, { desc = "Previous quickfix item" })
+		vim.keymap.set({ "n", "x", "o" }, "]l", function()
+			move_loc({ forward = true })
+		end, { desc = "Next location list item" })
+		vim.keymap.set({ "n", "x", "o" }, "[l", function()
+			move_loc({ forward = false })
+		end, { desc = "Previous location list item" })
 
 		-- Repeatable moves
 		vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)

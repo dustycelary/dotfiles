@@ -32,11 +32,32 @@ vim.keymap.set("n", "<S-Up>", "2<C-w>+", { desc = "Increase window height" })
 vim.keymap.set("n", "<S-Down>", "2<C-w>-", { desc = "Decrease window height" })
 vim.keymap.set("n", "<leader><space>", "<cmd>b#<cr>", { desc = "Toggle last active buffer" })
 
-vim.keymap.set("n", "<C-q>", "<cmd>close<CR>", { desc = "Close window" })
+vim.keymap.set("n", "<leader>wc", "<cmd>close<CR>", { desc = "Close window" })
 
 -- [[ Tab Pages ]]
 vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "New tab page" })
 vim.keymap.set("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close tab page" })
+
+-- [[ Quickfix & Location List ]]
+vim.keymap.set("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix panel" })
+vim.keymap.set("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix panel" })
+vim.keymap.set("n", "<leader>fq", function()
+	require("fzf-lua").quickfix()
+end, { desc = "Fuzzy search quickfix list" })
+
+-- Close quickfix/loclist window with 'q' when focused inside it
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "qf",
+	callback = function(event)
+		vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = event.buf, silent = true, desc = "Close quickfix" })
+	end,
+})
+
+vim.keymap.set("n", "<leader>lo", "<cmd>lopen<CR>", { desc = "Open location list panel" })
+vim.keymap.set("n", "<leader>lc", "<cmd>lclose<CR>", { desc = "Close location list panel" })
+vim.keymap.set("n", "<leader>fl", function()
+	require("fzf-lua").loclist()
+end, { desc = "Fuzzy search location list" })
 
 -- Equalize windows while preserving the aerial sidebar width
 

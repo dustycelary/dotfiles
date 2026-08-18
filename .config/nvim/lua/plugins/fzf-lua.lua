@@ -11,8 +11,8 @@ return {
 			["ctrl-s"] = fzf.actions.file_split,
 			["ctrl-v"] = fzf.actions.file_vsplit,
 			["ctrl-t"] = fzf.actions.file_tabedit,
-			["alt-q"] = fzf.actions.file_sel_to_qf,
-			["alt-l"] = fzf.actions.file_sel_to_ll,
+			["ctrl-q"] = fzf.actions.file_sel_to_qf,
+			["ctrl-l"] = fzf.actions.file_sel_to_ll,
 
 			-- Note: Fixed alt-h to match your prompt's comment (was alt-u in your code)
 			["alt-i"] = fzf.actions.toggle_ignore,
@@ -24,11 +24,16 @@ return {
 			defaults = {
 				hidden = true, -- Hide hidden files by default
 				no_ignore = true, -- Do not hide ignored files (.gitignore) by default
+				formatter = "path.filename_first",
+			},
+			lsp = {
+				formatter = "path.filename_first",
 			},
 			actions = {
-				-- Apply the exact same keymaps to both files and grep
+				-- Apply the exact same keymaps to files, grep, and LSP pickers
 				files = common_actions,
 				grep = common_actions,
+				lsp = common_actions,
 			},
 			registers = {
 				multiline = false,
@@ -59,6 +64,7 @@ return {
 		{ '<leader>f"', "<cmd>FzfLua registers<cr>", desc = "Fzf Registers" },
 		{ "<leader>fs", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Fzf Workspace Symbols" },
 		{ "<leader>fd", "<cmd>FzfLua diagnostics_workspace<cr>", desc = "Fzf Workspace Diagnostics" },
+		{ "<leader>fD", "<cmd>FzfLua diagnostics_document<cr>", desc = "Fzf Document Diagnostics" },
 		{ "go", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document Symbols" },
 		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Fzf Commands" },
 	},

@@ -81,33 +81,6 @@ return {
 			end
 		end, { desc = "Prev try-except block end" })
 
-		vim.keymap.set({ "n", "x", "o" }, "]e", function()
-			local ok, move = pcall(require, "nvim-treesitter-textobjects.move")
-			if ok then
-				move.goto_next_start("@exception.outer", "textobjects")
-			end
-		end, { desc = "Next try-except block start" })
-
-		vim.keymap.set({ "n", "x", "o" }, "[e", function()
-			local ok, move = pcall(require, "nvim-treesitter-textobjects.move")
-			if ok then
-				move.goto_previous_start("@exception.outer", "textobjects")
-			end
-		end, { desc = "Prev try-except block start" })
-
-		vim.keymap.set({ "n", "x", "o" }, "]E", function()
-			local ok, move = pcall(require, "nvim-treesitter-textobjects.move")
-			if ok then
-				move.goto_next_end("@exception.outer", "textobjects")
-			end
-		end, { desc = "Next try-except block end" })
-
-		vim.keymap.set({ "n", "x", "o" }, "[E", function()
-			local ok, move = pcall(require, "nvim-treesitter-textobjects.move")
-			if ok then
-				move.goto_previous_end("@exception.outer", "textobjects")
-			end
-		end, { desc = "Prev try-except block end" })
 
 		-- Select try-except block textobjects
 		vim.keymap.set({ "x", "o" }, "ax", function()

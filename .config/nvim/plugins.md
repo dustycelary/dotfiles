@@ -194,7 +194,7 @@ Floating signature help while typing function arguments. Appears automatically o
 
 | Key | Action |
 |-----|--------|
-| `<C-s>` | Toggle floating window |
+| `<C-k>` | Toggle floating window |
 
 Virtual text hints are disabled (too noisy). The window closes automatically after 4 seconds of inactivity.
 
@@ -227,9 +227,9 @@ LSP client setup. Mason installs and manages language server binaries.
 | `<leader>ci` | Show attached LSP clients |
 | `]d` / `[d` | Next/prev diagnostic (repeatable) |
 | `]e` / `[e` | Next/prev error (repeatable) |
-| `<leader>de` | Open diagnostic float |
-| `<leader>dq` | Diagnostics → quickfix |
-| `<leader>dl` | Diagnostics → loclist |
+| `<leader>ce` | Open diagnostic float |
+| `<leader>cq` | Diagnostics → quickfix |
+| `<leader>cl` | Diagnostics → loclist |
 
 Diagnostic virtual text and virtual lines are disabled globally in `init.lua` — `tiny-inline-diagnostic` handles all display.
 
@@ -386,8 +386,10 @@ Motions:
 |-----|--------|-------------|
 | `]i` / `[i` | Same-Indent Block | Jump to next / previous block at the same indent level (e.g. between `{}` blocks in JSON or code) |
 | `]s` / `[s` | AST Sibling | Jump to next / previous AST sibling node in treesitter |
-| `]x` / `[x` (`]e` / `[e`) | Try/Except Start | Jump to next / previous try-except block start |
-| `]X` / `[X` (`]E` / `[E`) | Try/Except End | Jump to next / previous try-except block end |
+| `]x` / `[x` | Try/Except Start | Jump to next / previous try-except block start |
+| `]X` / `[X` | Try/Except End | Jump to next / previous try-except block end |
+| `]o` / `[o` | Loop Start | Jump to next / previous loop start |
+| `]O` / `[O` | Loop End | Jump to next / previous loop end |
 | `]f` / `[f` | Function Start | Jump to next / previous function definition start |
 | `]F` / `[F` | Function End | Jump to next / previous function definition end |
 | `]c` / `[c` | Class Start | Jump to next / previous class definition start |
