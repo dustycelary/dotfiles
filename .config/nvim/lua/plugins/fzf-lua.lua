@@ -22,8 +22,8 @@ return {
 		fzf.setup({
 			-- 2. Global settings for hidden and ignored files
 			defaults = {
-				hidden = true, -- Hide hidden files by default
-				no_ignore = true, -- Do not hide ignored files (.gitignore) by default
+				hidden = false, -- Hide dotfiles by default; alt-u toggles them
+				no_ignore = true, -- Include files ignored by .gitignore
 				formatter = "path.filename_first",
 			},
 			lsp = {

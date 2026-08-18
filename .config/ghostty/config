@@ -15,9 +15,9 @@
 
 # font-family = BlexMono Nerd Font
 # font-family = JetBrains Mono
-# font-family = Iosevka NF
-font-family = Iosevka Custom
-# font-size = 15
+font-family = Iosevka NF
+# font-family = Iosevka Custom
+font-size = 13
 font-thicken = true
 font-thicken-strength = 80
 
@@ -55,9 +55,9 @@ theme = Carbonfox
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system
 
-# Selection colors: Catppuccin Latte blue with the theme's default base color.
-selection-background = #4c4f69
-selection-foreground = #eff1f5
+# High-contrast selection colors for Carbonfox.
+selection-background = #3b5f8a
+selection-foreground = #f2f4f8
 # cursor-color = #f2f4f8
 # cursor-text = #161616
 
@@ -95,7 +95,8 @@ window-padding-y = 12
 window-padding-balance = true
 
 # Opacity and blur (Glassmorphism effect)
-background-opacity = 0.85
+# background-opacity = 0.85
+background-opacity = 0.80
 background-blur-radius = 20
 window-colorspace = display-p3
 

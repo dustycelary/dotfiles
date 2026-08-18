@@ -61,6 +61,12 @@ return {
 				options = {
 					transparent = true,
 				},
+				groups = {
+					carbonfox = {
+						Visual = { bg = "#3b5f8a", fg = "#f2f4f8", style = "bold" },
+						VisualNOS = { bg = "#3b5f8a", fg = "#f2f4f8", style = "bold" },
+					},
+				},
 			})
 			vim.o.background = "dark"
 			vim.cmd.colorscheme("carbonfox")

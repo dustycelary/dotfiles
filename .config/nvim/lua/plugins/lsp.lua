@@ -66,7 +66,12 @@ return {
 				if match and vim.fn.executable(match .. "/bin/python") == 1 then
 					return match .. "/bin/python"
 				end
-				return vim.fn.exepath("python3") or vim.fn.exepath("python") or "python3"
+				local python3 = vim.fn.exepath("python3")
+				if python3 ~= "" then
+					return python3
+				end
+				local python = vim.fn.exepath("python")
+				return python ~= "" and python or "python3"
 			end
 
 			-- Custom server overrides

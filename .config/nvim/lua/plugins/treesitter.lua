@@ -50,7 +50,6 @@ return {
 		vim.treesitter.language.register("bash", "zsh")
 		vim.treesitter.language.register("bash", "conf")
 		vim.treesitter.language.register("bash", "env")
-		vim.treesitter.language.register("bash", "toml")
 
 		-- Try-except block movement options
 		vim.keymap.set({ "n", "x", "o" }, "]x", function()
@@ -80,7 +79,6 @@ return {
 				move.goto_previous_end("@exception.outer", "textobjects")
 			end
 		end, { desc = "Prev try-except block end" })
-
 
 		-- Select try-except block textobjects
 		vim.keymap.set({ "x", "o" }, "ax", function()

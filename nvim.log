@@ -6,3 +6,4 @@ WRN 2026-08-13T16:56:23.407 ?.78491    server_start:197: Failed to start server:
 WRN 2026-08-13T17:02:09.632 ?.82448    server_start:197: Failed to start server: operation not permitted: /var/folders/44/qsxwm8wx7dj1f_pgndygm24w0000gn/T/nvim.fungus/Zsqljo/nvim.82448.0
 WRN 2026-08-13T17:02:24.067 ?.82528    server_start:197: Failed to start server: operation not permitted: /var/folders/44/qsxwm8wx7dj1f_pgndygm24w0000gn/T/nvim.fungus/03TBSR/nvim.82528.0
 WRN 2026-08-13T17:05:58.173 ?.83931    server_start:197: Failed to start server: operation not permitted: /var/folders/44/qsxwm8wx7dj1f_pgndygm24w0000gn/T/nvim.fungus/F4y7jQ/nvim.83931.0
+WRN 2026-08-18T11:58:00.568 ?.78766    server_start:197: Failed to start server: operation not permitted: /var/folders/44/qsxwm8wx7dj1f_pgndygm24w0000gn/T/nvim.fungus/4TlR9d/nvim.78766.0
