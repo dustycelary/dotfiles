@@ -58,7 +58,7 @@ vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99 -- start with all folds open
 vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""
-vim.opt.foldnestmax = 4 -- limit nesting depth
+vim.opt.foldnestmax = 8 -- limit nesting depth
 
 -- own options
 

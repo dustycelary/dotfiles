@@ -36,6 +36,7 @@ return {
 			{ "<leader>c", group = "Code & LSP" },
 			{ "<leader>f", group = "Fzf Search & Find" },
 			{ "<leader>h", group = "Harpoon Bookmarks" },
+			{ "<leader>m", group = "Marks & Quickfix" },
 			{ "<leader>t", group = "Terminal & Tabs" },
 			{ "<leader>u", group = "UI Toggles" },
 			{ "<leader>w", group = "Windows & Splits" },

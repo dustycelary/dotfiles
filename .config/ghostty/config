@@ -138,8 +138,8 @@ macos-option-as-alt = true
 # ------------------------------------------------------------------------------
 # 7. QUICK TERMINAL (DROP-DOWN OVERLAY)
 # ------------------------------------------------------------------------------
-# Toggle with cmd+shift+` from anywhere on macOS.
-keybind = global:cmd+shift+`=toggle_quick_terminal
+# Toggle with cmd+alt+` from anywhere on macOS.
+keybind = global:cmd+alt+`=toggle_quick_terminal
 quick-terminal-position = bottom
 quick-terminal-autohide = true
 quick-terminal-animation-duration = 0.2

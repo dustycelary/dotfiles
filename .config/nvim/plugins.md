@@ -142,8 +142,19 @@ Blame shows author, date, and commit summary at end of line with a 400ms delay.
 
 ---
 
-## guttermarks.nvim
-Shows vim marks (`a-z`, `A-Z`) as indicators in the sign column. No configuration needed — marks appear automatically as you set them with `m{letter}`.
+## marks.nvim
+Shows vim marks (`a-z`, `A-Z`) as indicators in the sign column. Provides keymaps for toggling marks (`mx`), deleting marks (`dmx`), and populating Quickfix/Loclist with marks.
+
+| Key | Action |
+|-----|--------|
+| `mx` | Toggle mark `x` |
+| `dmx` | Delete mark `x` |
+| `dm-` | Delete all marks in buffer |
+| `]m` / `[m` | Jump to next / previous mark |
+| `<leader>mq` | Send active file marks → Quickfix |
+| `<leader>ml` | Send active file marks → Location list |
+| `<leader>mQ` | Send workspace global marks → Quickfix |
+| `<leader>fm` | Fuzzy search marks (fzf-lua) |
 
 ---
 
@@ -170,14 +181,14 @@ Also includes a custom Terminal Command Runner. If inside Tmux, commands are aut
 
 | Key | Action |
 |-----|--------|
-| `<leader>ha` | Add current file to list |
-| `<leader>hh` | Open file menu |
+| `<leader>ha` | Add current file to Harpoon |
+| `<leader>hh` | Open file quick menu |
 | `<leader>1` – `<leader>4` | Jump to file slot 1–4 |
 | `<leader>hn` | Next file in list |
 | `<leader>hp` | Previous file in list |
-| `<leader>hc` | Open command menu |
-| `<leader>hC` | Prompt to add a new command |
-| `<leader>x1` – `<leader>x4` | Run command slot 1–4 (Tmux or Vim terminal) |
+| `<leader>hc` | Prompt to add a new command |
+| `<leader>hm` | Open command quick menu |
+| `<leader>h1` – `<leader>h4` | Run command slot 1–4 |
 
 ---
 
