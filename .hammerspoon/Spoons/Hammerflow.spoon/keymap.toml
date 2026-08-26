@@ -18,16 +18,19 @@ show_ui = true            # optional, default true, show the ui with your key ma
 key_maps_per_line = 1     # optional, default 5, number of key maps per line in the ui
 
 '.' = ["repeat", "   repeat"]
-c = ["function:openAlfredClipboard", "   clipboard"]
-j = ["https://gemini.google.com", "   new gemini tab"]
 b = ["Safari", "   safari"]
 g = ["Ghostty", "   ghostty"]
-# h = ["hs:local w = hs.window.focusedWindow(); if w then local t = w:application():name() .. ': ' .. w:title(); hs.pasteboard.setContents(t); hs.alert('Copied: ' .. t) else hs.alert('No focused window') end", " copy app + window"]
+j = ["Jellyfin Media Player", "   jellyfin"]
+c = ["ChatGPT", "   chatgpt"]
+r = ["Reminders", "   reminders"]
 'space' = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
+# h = ["hs:local w = hs.window.focusedWindow(); if w then local t = w:application():name() .. ': ' .. w:title(); hs.pasteboard.setContents(t); hs.alert('Copied: ' .. t) else hs.alert('No focused window') end", " copy app + window"]
+# c = ["function:openAlfredClipboard", "   clipboard"]
+# j = ["https://gemini.google.com", "   new gemini tab"]
 
 
 [f] # FINDER 
-label = "|  finder"
+label = "|  files"
 f = "Finder"
 d = ["cmd:open ~/Downloads", "downloads"]
 k = ["cmd:open ~/Desktop", "desktop"]
@@ -37,11 +40,12 @@ h = ["cmd:open ~/", "fungus"]
 D = ["cmd:open /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/admin/dopamine_menu_v1.pdf", "Dopa menu"]
 c = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"cs \"'", "Cheatsheets"]
 m = ["cmd:open ~/Documents", "main (docs)"]
+p = ["cmd:open ~/Developer", "developer"]
 # ~/.hammerspoon/home.toml
 
 
-[s]
-label =  "|  shortcuts"
+[m]
+label =  "|  macros"
 g = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_ghostty')", "Open ghostty"]
 m = ["hs:hs.urlevent.openURL('kmtrigger://macro=move_reminder')", "Move reminders"]
 k = ["hs:hs.urlevent.openURL('kmtrigger://macro=search_km')", "Search KM"]
@@ -50,12 +54,11 @@ o = ["hs:hs.urlevent.openURL('kmtrigger://macro=ocr_clipboard')", "Ocr clipboard
 A = ["hs:hs.urlevent.openURL('kmtrigger://macro=screenshot_all_monitors')", "ss all monitors"]
 a = ["hs:hs.urlevent.openURL('kmtrigger://macro=add_to_dropover')", "add to dropover"]
 n = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_nvim')", "Open in nvim"]
-# p = ['hs:hs.execute("shortcuts run \"Paste files from shelf\"")', "Paste dropover"]
 q = ['cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Documents/Notes/QuickNote/scratch.md"', "nvim scratch.md"]
 
 
-[m]
-label = "|  media"
+[p]
+label = "|  playback"
 'space' = ["hs:hs.eventtap.event.newSystemKeyEvent('PLAY', true):post(); hs.eventtap.event.newSystemKeyEvent('PLAY', false):post()", "Play/Pause"]
 "n" = ["hs:hs.eventtap.event.newSystemKeyEvent('NEXT', true):post(); hs.eventtap.event.newSystemKeyEvent('NEXT', false):post()", "Next Track"]
 "p" = ["hs:hs.eventtap.event.newSystemKeyEvent('PREVIOUS', true):post(); hs.eventtap.event.newSystemKeyEvent('PREVIOUS', false):post()", "Previous Track"]
@@ -68,10 +71,6 @@ label = "|  app actions"
 s = ["menu:Safari|Bookmarks>Show Start Page", "Start page"] # select menu items (specific app)
 n = "menu:Window>Move Tab to New Window"    # select menu items (frontmost app)
 m = "menu:Window>Merge All Windows"    # select menu items (frontmost app)
-
-# [a.t]
-# label = "|  tailscale"
-t = ["cmd:pgrep -x Tailscale > /dev/null && (osascript -e 'quit app \"Tailscale\"' && osascript -e 'display notification \"Tailscale quit\" with title \"Tailscale\"') || (open -a Tailscale && osascript -e 'display notification \"Tailscale launched\" with title \"Tailscale\"')", " toggle tailscale"]
 
 
 # window management
@@ -90,6 +89,9 @@ r = ["window:.1,.1,.8,.8", "centered (80%)"]
 d = ["hs:local w = hs.window.focusedWindow(); if w then w:moveToScreen(w:screen():next()) end", "move to next display"]
 o = ["menu:View>Float on Top", "float on top (app menu)"]
 s = ["hs:local w = hs.window.focusedWindow(); if w then hs.pasteboard.setContents(hs.inspect(w:size())) end", "copy window size"]
+1 = ["hs:hs.urlevent.openURL('kmtrigger://macro=window_to_screen_1')", "screen to window 1"]
+2 = ["hs:hs.urlevent.openURL('kmtrigger://macro=window_to_screen_2')", "screen to window 2"]
+3 = ["hs:hs.urlevent.openURL('kmtrigger://macro=window_to_screen_3')", "screen to window 3"]
 
 # Thirds, plus the useful two-thirds layouts for a main/side window split.
 [w.t]

@@ -3,6 +3,25 @@
 
 hs.window.animationDuration = 0
 
+-- Caps Lock is remapped by Karabiner-Elements to Hyper
+-- (Control + Option + Command + Shift).
+-- Focus the nearest window in the pressed physical direction, including on
+-- adjacent displays.
+local hyper = { "ctrl", "alt", "cmd", "shift" }
+local currentSpaceWindows = hs.window.filter.defaultCurrentSpace
+hs.hotkey.bind(hyper, "y", function()
+	currentSpaceWindows:focusWindowWest(nil, nil, true)
+end)
+hs.hotkey.bind(hyper, "u", function()
+	currentSpaceWindows:focusWindowSouth(nil, nil, true)
+end)
+hs.hotkey.bind(hyper, "i", function()
+	currentSpaceWindows:focusWindowNorth(nil, nil, true)
+end)
+hs.hotkey.bind(hyper, "o", function()
+	currentSpaceWindows:focusWindowEast(nil, nil, true)
+end)
+
 -- local Hammerflow = hs.loadSpoon("Hammerflow")
 hs.loadSpoon("Hammerflow")
 
