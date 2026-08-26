@@ -144,14 +144,17 @@ gaps.outer.right =      10
     alt-4 = 'workspace 4-media'
     alt-5 = 'workspace 5-temp'
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    alt-shift-1 = 'move-node-to-workspace 1-web'
-    alt-shift-2 = 'move-node-to-workspace 2-term'
-    alt-shift-3 = 'move-node-to-workspace 3-comms'
-    alt-shift-4 = 'move-node-to-workspace 4-media'
-    alt-shift-5 = 'move-node-to-workspace 5-temp'
+    alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1-web'
+    alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2-term'
+    alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3-comms'
+    alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4-media'
+    alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5-temp'
 
     alt-ctrl-shift-h = 'move-node-to-monitor --focus-follows-window left'
     alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window right'
+
+    alt-leftSquareBracket = 'workspace --wrap-around prev'
+    alt-rightSquareBracket = 'workspace --wrap-around next'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     alt-f = "fullscreen"
