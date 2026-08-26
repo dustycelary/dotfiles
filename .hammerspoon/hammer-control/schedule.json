@@ -1,51 +1,93 @@
 {
   "sunday": [
     {
-      "start": "00:01",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ],
   "monday": [
     {
-      "start": "00:01",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ],
   "tuesday": [
     {
-      "start": "00:01",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ],
   "wednesday": [
     {
-      "start": "00:01",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ],
   "thursday": [
     {
-      "start": "00:01",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ],
   "friday": [
     {
-      "start": "00:00",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ],
   "saturday": [
     {
-      "start": "00:01",
+      "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
+
   ]
 }
