@@ -29,6 +29,7 @@ FILES=(
   .config/nvim
   .hammerspoon
   .config/karabiner
+  .config/aerospace
 )
 
 # =============================================================================
