@@ -55,10 +55,10 @@ automatically-unhide-macos-hidden-apps = false
 #                          "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 
 persistent-workspaces = [
-      "1-web",
-      "2-term",
-      "3-comms",
-      "4-media",
+      "1-look",
+      "2-build",
+      "3-org",
+      "4-med",
       "5-temp",
   ]
 
@@ -138,17 +138,17 @@ gaps.outer.right =      10
     alt-equal = 'resize smart +50'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-    alt-1 = 'workspace 1-web'
-    alt-2 = 'workspace 2-term'
-    alt-3 = 'workspace 3-comms'
-    alt-4 = 'workspace 4-media'
+    alt-1 = 'workspace 1-look'
+    alt-2 = 'workspace 2-build'
+    alt-3 = 'workspace 3-org'
+    alt-4 = 'workspace 4-med'
     alt-5 = 'workspace 5-temp'
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    alt-shift-1 = 'move-node-to-workspace --focus-follows-window 1-web'
-    alt-shift-2 = 'move-node-to-workspace --focus-follows-window 2-term'
-    alt-shift-3 = 'move-node-to-workspace --focus-follows-window 3-comms'
-    alt-shift-4 = 'move-node-to-workspace --focus-follows-window 4-media'
-    alt-shift-5 = 'move-node-to-workspace --focus-follows-window 5-temp'
+    alt-shift-1 = 'move-node-to-workspace 1-look'
+    alt-shift-2 = 'move-node-to-workspace 2-build'
+    alt-shift-3 = 'move-node-to-workspace 3-org'
+    alt-shift-4 = 'move-node-to-workspace 4-med'
+    alt-shift-5 = 'move-node-to-workspace 5-temp'
 
     alt-ctrl-shift-h = 'move-node-to-monitor --focus-follows-window left'
     alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window right'
@@ -158,8 +158,9 @@ gaps.outer.right =      10
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     alt-f = "fullscreen"
-    alt-tab = 'workspace-back-and-forth'
+    alt-tab = 'focus-back-and-forth || workspace-back-and-forth'
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
+    alt-m = 'move-workspace-to-monitor --wrap-around next'
     alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
 
     alt-shift-space = 'layout floating tiling'
@@ -183,8 +184,7 @@ gaps.outer.right =      10
     # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
     #s = ['layout sticky tiling', 'mode main']
 
-    alt-shift-h = ['join-with left', 'mode main']
-    alt-shift-j = ['join-with down', 'mode main']
-    alt-shift-k = ['join-with up', 'mode main']
-    alt-shift-l = ['join-with right', 'mode main']
-
+    h = ['join-with left', 'mode main']
+    j = ['join-with down', 'mode main']
+    k = ['join-with up', 'mode main']
+    l = ['join-with right', 'mode main']
