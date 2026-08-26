@@ -56,13 +56,7 @@
       "start": "23:00",
       "end": "23:59",
       "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
-    },
-    {
-      "start": "00:01",
-      "end": "11:00",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
     }
-
   ],
   "friday": [
     {
