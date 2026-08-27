@@ -15,7 +15,7 @@ export PYTHONDONTWRITEBYTECODE=1
 # Tell Oh My Zsh where it is installed.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Do not load an Oh My Zsh theme because the prompt is defined below.
+# Do not load an Oh My Zsh theme because Pure prompt is initialized below.
 ZSH_THEME=""
 
 # Use fd for FZF file searches, including hidden files but excluding bulky data.
@@ -102,11 +102,10 @@ fi
 # Prompt
 # -----------------------------------------------------------------------------
 
-# Show user, host, and at most four directory components on the left.
-PROMPT='%n@%m:%4~$ '
-
-# Show a dim, right-aligned clock.
-RPROMPT='%F{242}[%D{%H:%M:%S}]%f'
+# Initialize Pure prompt (https://github.com/sindresorhus/pure).
+fpath+=("/opt/homebrew/share/zsh/site-functions")
+autoload -U promptinit; promptinit
+prompt pure
 
 
 # -----------------------------------------------------------------------------
