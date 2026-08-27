@@ -24,6 +24,9 @@ j = ["Jellyfin Media Player", "   jellyfin"]
 c = ["ChatGPT", "   chatgpt"]
 r = ["Reminders", "   reminders"]
 n = ["Notes", "   notes"]
+e = ["Marta", "   marta"]
+
+
 'space' = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
 # h = ["hs:local w = hs.window.focusedWindow(); if w then local t = w:application():name() .. ': ' .. w:title(); hs.pasteboard.setContents(t); hs.alert('Copied: ' .. t) else hs.alert('No focused window') end", " copy app + window"]
 # c = ["function:openAlfredClipboard", "   clipboard"]

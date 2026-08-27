@@ -138,17 +138,17 @@ gaps.outer.right =      10
     alt-equal = 'resize smart +50'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace
-    alt-1 = 'workspace 1-look'
-    alt-2 = 'workspace 2-build'
-    alt-3 = 'workspace 3-org'
-    alt-4 = 'workspace 4-med'
-    alt-5 = 'workspace 5-temp'
+    cmd-alt-ctrl-shift-1 = 'workspace 1-look'
+    cmd-alt-ctrl-shift-2 = 'workspace 2-build'
+    cmd-alt-ctrl-shift-3 = 'workspace 3-org'
+    cmd-alt-ctrl-shift-4 = 'workspace 4-med'
+    cmd-alt-ctrl-shift-5 = 'workspace 5-temp'
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-node-to-workspace
-    alt-shift-1 = 'move-node-to-workspace 1-look'
-    alt-shift-2 = 'move-node-to-workspace 2-build'
-    alt-shift-3 = 'move-node-to-workspace 3-org'
-    alt-shift-4 = 'move-node-to-workspace 4-med'
-    alt-shift-5 = 'move-node-to-workspace 5-temp'
+    cmd-alt-ctrl-shift-f1 = 'move-node-to-workspace 1-look'
+    cmd-alt-ctrl-shift-f2 = 'move-node-to-workspace 2-build'
+    cmd-alt-ctrl-shift-f3 = 'move-node-to-workspace 3-org'
+    cmd-alt-ctrl-shift-f4 = 'move-node-to-workspace 4-med'
+    cmd-alt-ctrl-shift-f5 = 'move-node-to-workspace 5-temp'
 
     alt-ctrl-shift-h = 'move-node-to-monitor --focus-follows-window left'
     alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window right'
