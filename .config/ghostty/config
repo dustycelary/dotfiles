@@ -7,30 +7,27 @@
 # ------------------------------------------------------------------------------
 # 1. TYPOGRAPHY & FONTS
 # ------------------------------------------------------------------------------
-# Commit Mono: neutral, precise, and close to Berkeley Mono's technical style.
-# Install Commit Mono first, then confirm its family name with `ghostty +list-fonts`.
+# JetBrains Mono NF provides clear punctuation and bundled Nerd Font symbols.
 
 # font-family = Monofoki Nerd Font
 # font-family = CommitMono Nerd Font
 
 # font-family = BlexMono Nerd Font
-# font-family = JetBrains Mono
-font-family = Iosevka NF
+font-family = JetBrains Mono NF
+# font-family = Iosevka NF
 # font-family = Iosevka Custom
-font-size = 13
-font-thicken = true
-font-thicken-strength = 80
+font-size = 14
+font-thicken = false
+# font-thicken-strength = 80
 
-# Commit Mono exposes its ligatures and smart-kerning behavior through `calt`.
+# Keep JetBrains Mono's contextual alternates, ligatures, and slashed zero.
 font-feature = calt
 font-feature = liga
 font-feature = zero
 
-# Vertical cell height spacing, icon scaling, and baseline adjustments
-# A small amount of extra leading keeps Commit Mono comfortable at 15 pt.
+# A little extra leading and modest icon scaling keep the grid readable.
 adjust-cell-height = 2
-adjust-font-baseline = 0
-adjust-icon-height = 25%
+adjust-icon-height = 10%
 
 # Box and line-drawing symbol thickness adjustment
 adjust-box-thickness = 1
@@ -98,7 +95,7 @@ window-padding-balance = true
 # background-opacity = 0.85
 background-opacity = 0.80
 background-blur-radius = 20
-window-colorspace = display-p3
+window-colorspace = srgb
 
 # macOS Specific Aesthetics:
 # 'tabs' integrates the tab bar into the title bar (like Arc browser).
@@ -187,6 +184,12 @@ keybind = cmd+s>j=goto_split:bottom
 keybind = cmd+s>k=goto_split:top
 keybind = cmd+s>h=goto_split:left
 keybind = cmd+s>l=goto_split:right
+
+# Emit distinct CSI-u sequences so tmux can recognize Ctrl+Shift navigation.
+keybind = ctrl+shift+h=csi:104;6u
+keybind = ctrl+shift+j=csi:106;6u
+keybind = ctrl+shift+k=csi:107;6u
+keybind = ctrl+shift+l=csi:108;6u
 
 keybind = cmd+s>z=toggle_split_zoom
 keybind = cmd+s>f=toggle_window_float_on_top
