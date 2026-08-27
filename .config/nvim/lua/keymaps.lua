@@ -55,17 +55,25 @@ vim.api.nvim_create_autocmd("FileType", {
 
 vim.keymap.set("n", "<leader>lo", "<cmd>lopen<CR>", { desc = "Open location list panel" })
 vim.keymap.set("n", "<leader>lc", "<cmd>lclose<CR>", { desc = "Close location list panel" })
+vim.keymap.set("n", "<leader>l/", function()
+	if vim.fn.getreg("/") == "" then
+		vim.notify("No search pattern", vim.log.levels.WARN)
+		return
+	end
+
+	local ok, err = pcall(vim.cmd, "silent lvimgrep //gj %")
+	if not ok then
+		vim.notify(err, vim.log.levels.ERROR)
+		return
+	end
+	vim.cmd.lopen()
+end, { desc = "Send last search matches to location list" })
 vim.keymap.set("n", "<leader>fl", function()
 	require("fzf-lua").loclist()
 end, { desc = "Fuzzy search location list" })
 
--- Equalize windows while preserving the aerial sidebar width
-
 -- [[ Terminal ]]
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-
--- [[ UI toggles ]]
-vim.keymap.set("n", "<leader>ua", "<cmd>AerialToggle!<CR>", { desc = "Toggle symbol sidebar (aerial)" })
 
 -- Repeat the latest Ex (:) command, including commands run from Harpoon via vim.cmd().
 vim.keymap.set("n", "<leader>.", function()

@@ -21,7 +21,6 @@ return {
 				floats = "normal",
 			},
 			integrations = {
-				aerial = true,
 				cmp = true,
 				gitsigns = true,
 				treesitter = true,

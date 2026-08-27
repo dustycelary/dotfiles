@@ -8,7 +8,7 @@ Personal Neovim configuration using [lazy.nvim](https://github.com/folke/lazy.nv
 
 - **Neovim** 0.10 or newer
 - **git** (lazy.nvim uses it to clone plugins)
-- **A Nerd Font** — icons throughout the UI require one (bufferline, aerial, completion menu, etc.)
+- **A Nerd Font** — icons throughout the UI require one (bufferline, completion menu, etc.)
 - **fzf** — the fuzzy finder binary used by fzf-lua
 - **fd** — fast file finder used by `<leader>sf`
 - **ripgrep** (`rg`) — used by `<leader>sg` for live grep
@@ -232,16 +232,17 @@ lazy.nvim installs all plugins on first launch. Mason then installs LSP servers.
 | `<leader>sg` | Live grep (ripgrep) |
 | `<leader>sb` | Switch buffer |
 | `<leader>sh` | Search help tags |
-| `<leader>ua` | Toggle symbol sidebar (aerial) |
 | `<leader>ha` | Harpoon: add file |
 | `<leader>hh` | Harpoon: open menu |
 | `<leader>1-4` | Harpoon: jump to slot |
 | `grd` | Go to definition |
 | `grr` | LSP references |
+| `go` | Document symbols (Markdown shows searchable H1-H6 heading paths) |
 | `<leader>ca` | Code actions |
 | `<leader>cn` | Rename symbol |
 | `<leader>cf` | Format file |
 | `<leader>ub` | Toggle git blame |
 | `<leader>uc` | Toggle colorscheme (carbonfox <-> catppuccin-latte light) |
 | `]d` / `[d` | Next / prev diagnostic |
+| `<leader>l/` | Send last `/` search matches to location list |
 | `<Tab>` / `<S-Tab>` | Next / prev buffer |

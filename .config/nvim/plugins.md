@@ -1,18 +1,5 @@
 # Neovim Plugins
 
-## aerial.nvim
-Symbol sidebar and breadcrumb winbar. Shows a tree of functions, classes, headings and other symbols in a right-hand split. Also drives the breadcrumb path shown in the winbar at the top of each buffer.
-
-| Key | Action |
-|-----|--------|
-| `<leader>ua` | Toggle sidebar |
-| `<leader>sa` | Search symbols (fzf) |
-| `<leader>sn` | Toggle floating nav (with preview) |
-
-The winbar is suppressed automatically on nofile, terminal, aerial, fzf, lazy, and mason buffers. The sidebar width is preserved when you equalize windows with `<C-w>=`.
-
----
-
 ## nvim-autopairs
 Auto-closes brackets, quotes, and parens on insert. Treesitter-aware — won't close pairs inside Lua strings or JS template literals. Integrated with nvim-cmp: automatically appends `()` when confirming a function or method completion.
 
@@ -112,14 +99,13 @@ Files use `fd` (includes gitignored files by default, includes hidden files, exc
 | `<leader>sd` | Document diagnostics |
 | `<leader>sD` | Workspace diagnostics |
 | `<leader>sc` | Commands |
-| `<leader>sa` | Aerial symbols |
 | `<leader>st` | Markdown and .env TODO search |
 | `grd` | Go to definition |
 | `grr` | References |
 | `gri` | Implementations |
 | `go` / `<leader>fS` | Fuzzy-search document symbols |
 
-All FZF pickers default to fuzzy matching. `<leader>fg` fuzzy-filters all ripgrep results, while `<leader>fG` deliberately starts with live ripgrep/regex search; in either grep picker, press `<C-g>` to switch modes. `<leader>fs` starts with static, fuzzy workspace symbols. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` to populate quickfix or `<C-l>` to populate the current window's location list. When no attached LSP provides document symbols, `go` falls back to Treesitter symbols.
+All FZF pickers default to fuzzy matching. `<leader>fg` fuzzy-filters all ripgrep results, while `<leader>fG` deliberately starts with live ripgrep/regex search; in either grep picker, press `<C-g>` to switch modes. `<leader>fs` starts with static, fuzzy workspace symbols, so combining a filename and symbol in the query restricts the results to that file. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` to populate quickfix or `<C-l>` to populate the current window's location list. In Markdown, `go` parses the current file directly so heading levels and parent paths are searchable; other filetypes use LSP document symbols.
 
 Project-wide rename: `<leader>cR` prompts for search and replacement strings, opens fzf grep, and on confirm sends matches to quickfix then runs `cfdo %s/.../.../ | update` across all matched files.
 
@@ -233,7 +219,7 @@ LSP client setup. Mason installs and manages language server binaries.
 | `grD` | Go to declaration |
 | `grr` | References (fzf) |
 | `gri` | Implementations (fzf) |
-| `go` | Document symbols (fzf) |
+| `go` | Document symbols (Markdown shows searchable H1-H6 heading paths) |
 | `<leader>cn` | Rename symbol |
 | `<leader>ca` | Code actions (normal + visual) |
 | `<leader>cs` | Signature help |
@@ -415,6 +401,7 @@ Motions:
 | `]t` / `[t` | TODO Comment | Jump to next / previous TODO comment |
 | `]q` / `[q` | Quickfix | Jump to next / previous quickfix item |
 | `]l` / `[l` | Loclist | Jump to next / previous loclist item |
+| `<leader>l/` | Loclist | Replace it with matches from the last `/` search and open it |
 
 ---
 
