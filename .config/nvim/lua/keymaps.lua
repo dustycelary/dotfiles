@@ -33,6 +33,8 @@ vim.keymap.set("n", "<S-Down>", "2<C-w>-", { desc = "Decrease window height" })
 vim.keymap.set("n", "<leader><space>", "<cmd>b#<cr>", { desc = "Toggle last active buffer" })
 
 vim.keymap.set("n", "<leader>wc", "<cmd>close<CR>", { desc = "Close window" })
+vim.keymap.set("n", "<leader>z", "<cmd>tab split<CR>", { desc = "Zoom window" })
+vim.keymap.set("n", "<leader>Z", "<cmd>tabclose<CR>", { desc = "Unzoom window" })
 
 -- [[ Tab Pages ]]
 vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "New tab page" })

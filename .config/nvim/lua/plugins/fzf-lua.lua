@@ -103,15 +103,14 @@ return {
 			["ctrl-q"] = fzf.actions.file_sel_to_qf,
 			["ctrl-l"] = fzf.actions.file_sel_to_ll,
 
-			-- Note: Fixed alt-h to match your prompt's comment (was alt-u in your code)
-			["alt-i"] = fzf.actions.toggle_ignore,
-			["alt-u"] = fzf.actions.toggle_hidden,
+			["alt-g"] = fzf.actions.toggle_ignore,
+			["alt-b"] = fzf.actions.toggle_hidden,
 		}
 
 		fzf.setup({
 			-- 2. Global settings for hidden and ignored files
 			defaults = {
-				hidden = false, -- Hide dotfiles by default; alt-u toggles them
+				hidden = false, -- Hide dotfiles by default; alt-b toggles them
 				no_ignore = true, -- Include files ignored by .gitignore
 				formatter = "path.filename_first",
 			},
@@ -151,20 +150,10 @@ return {
 		{ "<leader>fo", "<cmd>FzfLua oldfiles<cr>", desc = "Fzf Old Files" },
 		{ "<leader>fm", "<cmd>FzfLua marks<cr>", desc = "Fzf Marks" },
 		{ '<leader>f"', "<cmd>FzfLua registers<cr>", desc = "Fzf Registers" },
-		{ "<leader>fs", "<cmd>FzfLua lsp_workspace_symbols<cr>", desc = "Fzf Workspace Symbols" },
+		{ "<leader>fs", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Fzf Workspace Symbols" },
 		{ "<leader>fd", "<cmd>FzfLua diagnostics_workspace<cr>", desc = "Fzf Workspace Diagnostics" },
 		{ "<leader>fD", "<cmd>FzfLua diagnostics_document<cr>", desc = "Fzf Document Diagnostics" },
-		{
-			"go",
-			function()
-				if vim.bo.filetype == "markdown" then
-					markdown_headings()
-				else
-					require("fzf-lua").lsp_document_symbols()
-				end
-			end,
-			desc = "Document Symbols",
-		},
+		{ "go", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document Symbols" },
 		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Fzf Commands" },
 	},
 }

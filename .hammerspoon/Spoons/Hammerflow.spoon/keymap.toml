@@ -18,10 +18,10 @@ show_ui = true            # optional, default true, show the ui with your key ma
 key_maps_per_line = 1     # optional, default 5, number of key maps per line in the ui
 
 '.' = ["repeat", "   repeat"]
-b = ["Safari", "   safari"]
+b = ["function:openSafariWindowHere", "   safari"]
 g = ["Ghostty", "   ghostty"]
 j = ["Jellyfin Media Player", "   jellyfin"]
-c = ["ChatGPT", "   chatgpt"]
+# c = ["ChatGPT", "   chatgpt"]
 r = ["Reminders", "   reminders"]
 n = ["Notes", "   notes"]
 e = ["Marta", "   marta"]
@@ -29,7 +29,8 @@ e = ["Marta", "   marta"]
 
 'space' = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
 # h = ["hs:local w = hs.window.focusedWindow(); if w then local t = w:application():name() .. ': ' .. w:title(); hs.pasteboard.setContents(t); hs.alert('Copied: ' .. t) else hs.alert('No focused window') end", " copy app + window"]
-# c = ["function:openAlfredClipboard", "   clipboard"]
+c = ["function:openAlfredClipboard", "   clipboard"]
+# c= ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"clip\r\"'", " clipboard"]
 # j = ["https://gemini.google.com", "   new gemini tab"]
 
 
@@ -45,6 +46,7 @@ D = ["cmd:open /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/ad
 c = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"cs \"'", "Cheatsheets"]
 m = ["cmd:open ~/Documents", "main (docs)"]
 p = ["cmd:open ~/Developer", "developer"]
+s = ["function:openMartaLookup", "marta global search"]
 # ~/.hammerspoon/home.toml
 
 

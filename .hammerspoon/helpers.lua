@@ -15,6 +15,133 @@ local helpers = {
 		end)
 	end,
 
+	openMartaLookup = function()
+		local bundleID = "org.yanex.marta"
+		local attempts = 0
+		local launchTimer
+
+		local function openLookup(app)
+			app:activate(true)
+			-- Target Marta directly so Cmd-P cannot reach the previously focused app.
+			hs.eventtap.keyStroke({ "cmd" }, "p", 0, app)
+		end
+
+		local app = hs.application.get(bundleID)
+		if app and app:mainWindow() then
+			openLookup(app)
+			return
+		end
+
+		hs.application.launchOrFocusByBundleID(bundleID)
+		launchTimer = hs.timer.doEvery(0.05, function()
+			attempts = attempts + 1
+			app = hs.application.get(bundleID)
+
+			if app and app:mainWindow() then
+				launchTimer:stop()
+				openLookup(app)
+			elseif attempts >= 100 then
+				launchTimer:stop()
+				hs.alert.show("Marta did not finish launching", 3)
+			end
+		end)
+	end,
+
+	openSafariWindowHere = function()
+		local aerospace = "/opt/homebrew/bin/aerospace"
+		local bundleID = "com.apple.Safari"
+		local workspace = ""
+		local hasAerospace = false
+
+		local output, status = hs.execute(aerospace .. " list-workspaces --focused")
+		if status and output and output ~= "" then
+			workspace = output:match("^%s*(.-)%s*$") or ""
+			if workspace ~= "" then
+				hasAerospace = true
+			end
+		end
+
+		local existingWindowIDs = {}
+		local app = hs.application.get(bundleID)
+		if app then
+			for _, window in ipairs(app:allWindows()) do
+				existingWindowIDs[window:id()] = true
+			end
+
+			app:activate(true)
+			local created = hs.osascript.applescript(
+				'tell application id "com.apple.Safari" to make new document'
+			)
+			if not created then
+				local menuOk = app:selectMenuItem({ "File", "New Window" })
+				if not menuOk then
+					hs.eventtap.keyStroke({ "cmd" }, "n", 0, app)
+				end
+			end
+		else
+			hs.application.launchOrFocusByBundleID(bundleID)
+		end
+
+		local attempts = 0
+		local windowTimer
+		windowTimer = hs.timer.doEvery(0.05, function()
+			attempts = attempts + 1
+			app = hs.application.get(bundleID)
+			if app then
+				for _, window in ipairs(app:allWindows()) do
+					if not existingWindowIDs[window:id()] then
+						windowTimer:stop()
+
+						local function focusAndPlaceWindow()
+							if hasAerospace then
+								local moveAttempts = 0
+								local function moveToCapturedWorkspace()
+									moveAttempts = moveAttempts + 1
+									local task = hs.task.new(aerospace, function(exitCode)
+										if exitCode == 0 then
+											hs.task.new(aerospace, nil, {
+												"focus",
+												"--window-id",
+												tostring(window:id()),
+											}):start()
+											app:activate(true)
+											window:focus()
+										elseif moveAttempts < 40 then
+											hs.timer.doAfter(0.05, moveToCapturedWorkspace)
+										else
+											app:activate(true)
+											window:focus()
+										end
+									end, {
+										"move-node-to-workspace",
+										"--focus-follows-window",
+										"--window-id",
+										tostring(window:id()),
+										"--",
+										workspace,
+									})
+									task:start()
+								end
+								moveToCapturedWorkspace()
+							else
+								app:activate(true)
+								window:focus()
+							end
+						end
+
+						focusAndPlaceWindow()
+						return
+					end
+				end
+			end
+
+			if attempts >= 100 then
+				windowTimer:stop()
+				hs.alert.show("Safari did not create a new window", 3)
+			end
+		end)
+	end,
+
 	showResourceViewer = function()
 		-- Customize applications to monitor here
 		local targetApps = { "Ghostty", "Safari", "Ollama", "Hammerspoon", "Docker", "Slack", "Code", "Finder" }

@@ -105,7 +105,7 @@ Files use `fd` (includes gitignored files by default, includes hidden files, exc
 | `gri` | Implementations |
 | `go` / `<leader>fS` | Fuzzy-search document symbols |
 
-All FZF pickers default to fuzzy matching. `<leader>fg` fuzzy-filters all ripgrep results, while `<leader>fG` deliberately starts with live ripgrep/regex search; in either grep picker, press `<C-g>` to switch modes. `<leader>fs` starts with static, fuzzy workspace symbols, so combining a filename and symbol in the query restricts the results to that file. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` to populate quickfix or `<C-l>` to populate the current window's location list. In Markdown, `go` parses the current file directly so heading levels and parent paths are searchable; other filetypes use LSP document symbols.
+All FZF pickers default to fuzzy matching. `<leader>fg` fuzzy-filters all ripgrep results, while `<leader>fG` deliberately starts with live ripgrep/regex search; in either grep picker, press `<C-g>` to switch modes. `<leader>fs` performs a live LSP workspace-symbol search, which is compatible with language servers such as BasedPyright that require a non-empty symbol query. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` to populate quickfix or `<C-l>` to populate the current window's location list. In Markdown, `go` parses the current file directly so heading levels and parent paths are searchable; other filetypes use LSP document symbols.
 
 Project-wide rename: `<leader>cR` prompts for search and replacement strings, opens fzf grep, and on confirm sends matches to quickfix then runs `cfdo %s/.../.../ | update` across all matched files.
 

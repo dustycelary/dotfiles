@@ -85,6 +85,25 @@ _comp_options+=(globdots)
 # Initialize zoxide when installed; use `z` to jump to frequently used folders.
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
+
+  # Bind Alt-Z to insert a recently visited directory selected with FZF.
+  recent-directory-widget() {
+    local directory
+    zle -I
+
+    directory=$(command zoxide query --interactive --) || {
+      zle reset-prompt
+      return
+    }
+
+    if [[ -n "$directory" ]]; then
+      [[ -n "$LBUFFER" && "$LBUFFER" != *[[:space:]] ]] && LBUFFER+=' '
+      LBUFFER+="${(q)directory}"
+    fi
+    zle reset-prompt
+  }
+  zle -N recent-directory-widget
+  bindkey '^[z' recent-directory-widget
 fi
 
 # Initialize pyenv when installed so its selected Python version is available.
