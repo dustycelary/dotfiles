@@ -142,7 +142,7 @@ gaps.outer.right =      5
     # alt-j = 'focus --boundaries workspace --boundaries-action wrap-around-the-workspace down'
     # alt-k = 'focus --boundaries workspace --boundaries-action wrap-around-the-workspace up'
     # alt-l = 'focus --boundaries workspace --boundaries-action wrap-around-the-workspace right'
-    # Strict workspace-bound window focus
+    # Keep directional window focus within the current monitor's workspace.
     alt-h = 'focus --boundaries workspace --boundaries-action wrap-around-the-workspace left'
     alt-j = 'focus --boundaries workspace --boundaries-action wrap-around-the-workspace down'
     alt-k = 'focus --boundaries workspace --boundaries-action wrap-around-the-workspace up'
@@ -195,14 +195,11 @@ gaps.outer.right =      5
 
     alt-0 = 'balance-sizes'
 
-    # Monitor focus only: H = previous, L = next.
-    alt-ctrl-h = 'focus-monitor --wrap-around prev'
-    alt-ctrl-l = 'focus-monitor --wrap-around next'
-
-    # alt-ctrl-h = 'focus-monitor --wrap-around left'
-    # alt-ctrl-l = 'focus-monitor --wrap-around right'
-    # alt-ctrl-j = 'focus-monitor --wrap-around down'
-    # alt-ctrl-k = 'focus-monitor --wrap-around up'
+    # Directional monitor focus only; never traverse containers on one monitor.
+    alt-ctrl-h = 'focus-monitor --wrap-around left'
+    alt-ctrl-j = 'focus-monitor --wrap-around down'
+    alt-ctrl-k = 'focus-monitor --wrap-around up'
+    alt-ctrl-l = 'focus-monitor --wrap-around right'
     # See: https://nikitabobko.github.io/AeroSpace/commands#mode
     # alt-shift-semicolon = 'mode service'
     alt-shift-space = 'mode service'
