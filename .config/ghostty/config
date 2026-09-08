@@ -7,22 +7,10 @@
 # ------------------------------------------------------------------------------
 # 1. TYPOGRAPHY & FONTS
 # ------------------------------------------------------------------------------
-# JetBrains Mono NF provides clear punctuation and bundled Nerd Font symbols.
-
-# font-family = Monofoki Nerd Font
-# font-family = CommitMono Nerd Font
-
-# font-family = BlexMono Nerd Font
 font-family = IoskeleyMono Nerd Font
-# font-family = Iosevka Custom Extended
-# font-family = Iosevka NFM
 font-size = 14
-font-thicken = false
-# font-thicken-strength = 80
 
-# Keep JetBrains Mono's contextual alternates, ligatures, and slashed zero.
-font-feature = calt
-font-feature = liga
+# Use the font's slashed-zero alternate.
 font-feature = zero
 
 # A little extra leading and modest icon scaling keep the grid readable.
@@ -39,15 +27,7 @@ adjust-underline-thickness = 1
 # ------------------------------------------------------------------------------
 # 2. THEMES & COLOR INTEGRATION
 # ------------------------------------------------------------------------------
-# You can set static themes, or separate light/dark themes to match macOS.
-# To see all options, run `ghostty +list-themes`.
-
-# Theme choice:
-# theme = Catppuccin Latte
 theme = Carbonfox
-
-# Auto-switching theme (uncomment to enable auto-switch matching macOS Light/Dark mode):
-# theme = light:Gruvbox Light,dark:Carbonfox
 
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system
@@ -55,26 +35,6 @@ window-theme = system
 # High-contrast selection colors for Carbonfox.
 selection-background = #3b5f8a
 selection-foreground = #f2f4f8
-# cursor-color = #f2f4f8
-# cursor-text = #161616
-
-# Custom Gruvbox Material Hard Dark Palette Override (commented out)
-# palette = 0=#1d2021
-# palette = 1=#ea6962
-# palette = 2=#a9b665
-# palette = 3=#d8a657
-# palette = 4=#7daea3
-# palette = 5=#d3869b
-# palette = 6=#89b482
-# palette = 7=#d4be98
-# palette = 8=#32302f
-# palette = 9=#ea6962
-# palette = 10=#a9b665
-# palette = 11=#d8a657
-# palette = 12=#7daea3
-# palette = 13=#d3869b
-# palette = 14=#89b482
-# palette = 15=#d4be98
 
 # ------------------------------------------------------------------------------
 # 3. WINDOW AESTHETICS & LAYOUT
@@ -91,32 +51,21 @@ window-padding-x = 12
 window-padding-y = 12
 window-padding-balance = true
 
-# Opacity and blur (Glassmorphism effect)
-# background-opacity = 0.85
+# Opacity and blur
 background-opacity = 0.92
 background-blur-radius = 20
-window-colorspace = srgb
 
-# macOS Specific Aesthetics:
-# 'tabs' integrates the tab bar into the title bar (like Arc browser).
-# Alternatively, use 'hidden' to hide titlebar completely (drag with opt+click).
-# macos-titlebar-style = hidden
-# macos-titlebar-proxy-icon = hidden
 macos-icon = holographic
 
 # ------------------------------------------------------------------------------
 # 4. TABS & MULTI-WINDOW BEHAVIOR
 # ------------------------------------------------------------------------------
-window-show-tab-bar = auto
-tab-inherit-working-directory = true
-
 # Fade out unfocused split panes to emphasize your active workspace
 unfocused-split-opacity = 0.75
 
 # ------------------------------------------------------------------------------
 # 5. CURSOR BEHAVIOR
 # ------------------------------------------------------------------------------
-cursor-style = block
 cursor-style-blink = true
 mouse-hide-while-typing = true
 
@@ -124,12 +73,10 @@ mouse-hide-while-typing = true
 # 6. SYSTEM & CLIPBOARD
 # ------------------------------------------------------------------------------
 scrollback-limit = 50000
-shell-integration = zsh
 shell-integration-features = no-cursor,sudo,no-title
 
 copy-on-select = clipboard
 clipboard-read = allow
-clipboard-write = allow
 macos-option-as-alt = true
 
 # ------------------------------------------------------------------------------
@@ -138,8 +85,6 @@ macos-option-as-alt = true
 # Toggle with cmd+alt+` from anywhere on macOS.
 keybind = global:cmd+alt+`=toggle_quick_terminal
 quick-terminal-position = bottom
-quick-terminal-autohide = true
-quick-terminal-animation-duration = 0.2
 
 # ------------------------------------------------------------------------------
 # 8. KEYBINDINGS & WORKFLOW SHORTCUTS
@@ -151,8 +96,6 @@ keybind = cmd+s>r=reload_config
 keybind = cmd+s>x=close_surface
 keybind = cmd+s>n=new_window
 keybind = cmd+s>w=write_scrollback_file:open
-# Note: toggle_window_decorations is for Linux/GTK; macOS titlebar styles require opening a new window or restarting Ghostty.
-# keybind = cmd+s>d=toggle_window_decorations
 
 # Tab Management
 keybind = cmd+s>c=new_tab
@@ -185,12 +128,6 @@ keybind = cmd+s>k=goto_split:top
 keybind = cmd+s>h=goto_split:left
 keybind = cmd+s>l=goto_split:right
 
-# Emit distinct CSI-u sequences so tmux can recognize Ctrl+Shift navigation.
-keybind = ctrl+shift+h=csi:104;6u
-keybind = ctrl+shift+j=csi:106;6u
-keybind = ctrl+shift+k=csi:107;6u
-keybind = ctrl+shift+l=csi:108;6u
-
 keybind = cmd+s>z=toggle_split_zoom
 keybind = cmd+s>f=toggle_window_float_on_top
 keybind = cmd+s>e=equalize_splits
@@ -200,11 +137,3 @@ keybind = cmd+s>ctrl+h=resize_split:left,15
 keybind = cmd+s>ctrl+j=resize_split:down,15
 keybind = cmd+s>ctrl+k=resize_split:up,15
 keybind = cmd+s>ctrl+l=resize_split:right,15
-
-# Shell Prompt Jumping (Jump back to previous outputs)
-keybind = cmd+up=unbind
-keybind = cmd+down=unbind
-keybind = cmd+left=unbind
-keybind = cmd+right=unbind
-keybind = cmd+up=jump_to_prompt:-1
-keybind = cmd+down=jump_to_prompt:1

@@ -17,8 +17,6 @@ export ZSH="$HOME/.oh-my-zsh"
 
 # Keep Zsh's native prompt instead of loading an Oh My Zsh theme.
 ZSH_THEME=""
-# Show username@hostname current-folder %
-PROMPT='%n@%m %1~ %# '
 
 
 # Use fd for FZF file searches, including hidden files but excluding bulky data.
@@ -41,6 +39,15 @@ plugins=(
 # Initialize Oh My Zsh and the plugins listed above.
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
   source "$ZSH/oh-my-zsh.sh"
+fi
+
+# Show the time, user, host, and current directory.
+PROMPT='%F{cyan}[%*]%f %n@%m %1~ %# '
+
+# Ghostty only injects its integration into shells it launches directly.
+# Source it in tmux-created shells so they also emit semantic prompt markers.
+if [[ -n "${TMUX:-}" && -n "${GHOSTTY_RESOURCES_DIR:-}" && -r "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration" ]]; then
+  source "$GHOSTTY_RESOURCES_DIR/shell-integration/zsh/ghostty-integration"
 fi
 
 
