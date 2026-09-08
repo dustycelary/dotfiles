@@ -1,5 +1,9 @@
 # ~/.bashrc - Interactive Bash configuration for macOS & Linux
 
+
+echo 'eval "$(starship init bash)"' >> ~/.bashrc
+source ~/.bashrc
+
 # Stop here when Bash is not running interactively.
 [[ $- != *i* ]] && return
 
