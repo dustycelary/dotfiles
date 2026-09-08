@@ -42,7 +42,8 @@ gaps.outer.right = 10
 
 [mode.main.binding]
     alt-slash = 'layout tiles vertical horizontal'
-    alt-comma = 'layout accordion vertical horizontal'
+    # alt-comma = 'layout accordion vertical horizontal' # Reserved for tmux pane navigation
+    alt-quote = 'layout accordion vertical horizontal'
 
     alt-h = 'focus --wrap-around left'
     alt-j = 'focus --wrap-around down'
@@ -54,8 +55,9 @@ gaps.outer.right = 10
     alt-shift-k = 'move up'
     alt-shift-l = 'move right'
 
-    alt-minus = 'resize smart -50'
-    alt-equal = 'resize smart +50'
+    # alt-minus = 'resize smart -50' # Reserved for tmux window navigation
+    # alt-equal = 'resize smart +50' # Reserved for tmux window navigation
+    alt-r = 'mode resize'
 
     alt-y = 'workspace --auto-back-and-forth 1-look'
     alt-u = 'workspace --auto-back-and-forth 2-build'
@@ -100,3 +102,18 @@ gaps.outer.right = 10
     j = ['join-with down', 'mode main']
     k = ['join-with up', 'mode main']
     l = ['join-with right', 'mode main']
+
+[mode.resize.binding]
+    h = 'resize width -50'
+    j = 'resize height +50'
+    k = 'resize height -50'
+    l = 'resize width +50'
+
+    shift-h = 'resize width -100'
+    shift-j = 'resize height +100'
+    shift-k = 'resize height -100'
+    shift-l = 'resize width +100'
+
+    0 = ['balance-sizes', 'mode main']
+    enter = 'mode main'
+    esc = 'mode main'

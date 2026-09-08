@@ -12,6 +12,7 @@ font-size = 14
 
 # Use the font's slashed-zero alternate.
 font-feature = zero
+font-feature = zero, liga, calt
 
 # A little extra leading and modest icon scaling keep the grid readable.
 adjust-cell-height = 2
@@ -36,6 +37,8 @@ window-theme = system
 selection-background = #3b5f8a
 selection-foreground = #f2f4f8
 
+cursor-color = #78a9ff
+
 # ------------------------------------------------------------------------------
 # 3. WINDOW AESTHETICS & LAYOUT
 # ------------------------------------------------------------------------------
@@ -44,7 +47,7 @@ selection-foreground = #f2f4f8
 # Initial window dimensions
 window-width = 100
 window-height = 28
-window-save-state = always
+window-save-state = never
 
 # Spacing & margins (adds a modern, clean breathing room)
 window-padding-x = 12
@@ -56,6 +59,9 @@ background-opacity = 0.92
 background-blur-radius = 20
 
 macos-icon = holographic
+macos-titlebar-style = tabs
+macos-titlebar-proxy-icon = hidden
+macos-window-shadow = false
 
 # ------------------------------------------------------------------------------
 # 4. TABS & MULTI-WINDOW BEHAVIOR
@@ -66,6 +72,7 @@ unfocused-split-opacity = 0.75
 # ------------------------------------------------------------------------------
 # 5. CURSOR BEHAVIOR
 # ------------------------------------------------------------------------------
+cursor-style = bar
 cursor-style-blink = true
 mouse-hide-while-typing = true
 
@@ -73,7 +80,8 @@ mouse-hide-while-typing = true
 # 6. SYSTEM & CLIPBOARD
 # ------------------------------------------------------------------------------
 scrollback-limit = 50000
-shell-integration-features = no-cursor,sudo,no-title
+# shell-integration-features = no-cursor,sudo,no-title
+shell-integration-features = sudo,no-title
 
 copy-on-select = clipboard
 clipboard-read = allow
@@ -82,9 +90,13 @@ macos-option-as-alt = true
 # ------------------------------------------------------------------------------
 # 7. QUICK TERMINAL (DROP-DOWN OVERLAY)
 # ------------------------------------------------------------------------------
-# Toggle with cmd+alt+` from anywhere on macOS.
-keybind = global:cmd+alt+`=toggle_quick_terminal
-quick-terminal-position = bottom
+# Toggle with ctrl+alt+g from anywhere on macOS.
+keybind = global:ctrl+alt+g=toggle_quick_terminal
+
+# bottom, top, left, right
+quick-terminal-position = right 
+quick-terminal-size = 40%,100%
+initial-window = true
 
 # ------------------------------------------------------------------------------
 # 8. KEYBINDINGS & WORKFLOW SHORTCUTS

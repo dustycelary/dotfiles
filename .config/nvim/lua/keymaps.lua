@@ -10,8 +10,8 @@ vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert new line below without 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 
 -- [[ Horizontal scrolling ]]
-vim.keymap.set("n", "<M-.>", "5zl", { desc = "Scroll view right" })
-vim.keymap.set("n", "<M-,>", "5zh", { desc = "Scroll view left" })
+-- vim.keymap.set("n", "<M-.>", "5zl", { desc = "Scroll view right" })
+-- vim.keymap.set("n", "<M-,>", "5zh", { desc = "Scroll view left" })
 
 -- [[ Navigation ]]
 vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
