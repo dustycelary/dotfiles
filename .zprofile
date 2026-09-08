@@ -1,10 +1,9 @@
-# check link 
+# Initialize Homebrew where installed.
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
 
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-
-# Created by `pipx` on 2026-02-24 15:31:38
-export PATH="$PATH:/Users/fungus/.local/bin"
-
-
-# Added by Antigravity CLI installer
-export PATH="/Users/fungus/.local/bin:$PATH"
+# Add user-installed command-line tools on both macOS and Linux.
+export PATH="$HOME/.local/bin:$PATH"
