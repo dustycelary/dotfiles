@@ -44,4 +44,3 @@ for f in "${FILES[@]}"; do
 # Cross-platform compatible line:
   ln -sfn "$src" "$dst" && echo "  linked ~/$f"
 done
-

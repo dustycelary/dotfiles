@@ -24,7 +24,7 @@ j = ["Jellyfin Media Player", "   jellyfin"]
 # c = ["ChatGPT", "   chatgpt"]
 r = ["Reminders", "   reminders"]
 n = ["Notes", "   notes"]
-e = ["Marta", "   marta"]
+e = ["Mail", "   mail"]
 
 
 'space' = ["cmd:osascript -e 'tell application id \"com.runningwithcrayons.Alfred\" to search \"m \"'", " Menu Search"]
