@@ -14,8 +14,8 @@
 
 # font-family = BlexMono Nerd Font
 font-family = IoskeleyMono Nerd Font
-# font-family = Iosevka NF
-# font-family = Iosevka Custom
+# font-family = Iosevka Custom Extended
+# font-family = Iosevka NFM
 font-size = 14
 font-thicken = false
 # font-thicken-strength = 80
@@ -27,7 +27,7 @@ font-feature = zero
 
 # A little extra leading and modest icon scaling keep the grid readable.
 adjust-cell-height = 2
-adjust-icon-height = 10%
+adjust-icon-height = 30%
 
 # Box and line-drawing symbol thickness adjustment
 adjust-box-thickness = 1
@@ -93,7 +93,7 @@ window-padding-balance = true
 
 # Opacity and blur (Glassmorphism effect)
 # background-opacity = 0.85
-background-opacity = 0.80
+background-opacity = 0.92
 background-blur-radius = 20
 window-colorspace = srgb
 
