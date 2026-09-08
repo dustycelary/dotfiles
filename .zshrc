@@ -17,6 +17,9 @@ export ZSH="$HOME/.oh-my-zsh"
 
 # Keep Zsh's native prompt instead of loading an Oh My Zsh theme.
 ZSH_THEME=""
+# Show username@hostname current-folder %
+PROMPT='%n@%m %1~ %# '
+
 
 # Use fd for FZF file searches, including hidden files but excluding bulky data.
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv'
