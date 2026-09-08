@@ -15,7 +15,7 @@ export PYTHONDONTWRITEBYTECODE=1
 # Tell Oh My Zsh where it is installed.
 export ZSH="$HOME/.oh-my-zsh"
 
-# Do not load an Oh My Zsh theme because Pure prompt is initialized below.
+# Keep Zsh's native prompt instead of loading an Oh My Zsh theme.
 ZSH_THEME=""
 
 # Use fd for FZF file searches, including hidden files but excluding bulky data.
@@ -36,7 +36,9 @@ plugins=(
 )
 
 # Initialize Oh My Zsh and the plugins listed above.
-source "$ZSH/oh-my-zsh.sh"
+if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
+  source "$ZSH/oh-my-zsh.sh"
+fi
 
 
 # -----------------------------------------------------------------------------
@@ -118,16 +120,6 @@ fi
 
 
 # -----------------------------------------------------------------------------
-# Prompt
-# -----------------------------------------------------------------------------
-
-# Initialize Pure prompt (https://github.com/sindresorhus/pure).
-fpath+=("/opt/homebrew/share/zsh/site-functions")
-autoload -U promptinit; promptinit
-prompt pure
-
-
-# -----------------------------------------------------------------------------
 # Aliases
 # -----------------------------------------------------------------------------
 
@@ -150,6 +142,17 @@ alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 # Small helper functions
 # -----------------------------------------------------------------------------
 
+# Fallback pbcopy implementation for Linux / Raspberry Pi OS
+if ! command -v pbcopy >/dev/null 2>&1; then
+  if command -v xclip >/dev/null 2>&1; then
+    pbcopy() { xclip -selection clipboard "$@"; }
+  elif command -v xsel >/dev/null 2>&1; then
+    pbcopy() { xsel --clipboard --input "$@"; }
+  elif command -v wl-copy >/dev/null 2>&1; then
+    pbcopy() { wl-copy "$@"; }
+  fi
+fi
+
 # Create a directory, including missing parents, and enter it.
 mkcd() {
   mkdir -p "$1" && cd "$1"
@@ -169,7 +172,7 @@ bin() {
   echo "Moved to rubbish: $*"
 }
 
-# Copy text, piped input, or file contents to the macOS clipboard.
+# Copy text, piped input, or file contents to the clipboard.
 clip() {
   if [[ $# -eq 1 && -f "$1" ]]; then
     pbcopy < "$1"
@@ -181,30 +184,32 @@ clip() {
   fi
 }
 
-# Copy actual file(s) to the macOS clipboard (for pasting in Finder, Slack, etc.).
-copyfile() {
-  if [[ $# -eq 0 ]]; then
-    echo "Usage: copyfile <file1> [file2 ...]" >&2
-    return 1
-  fi
-  local files=()
-  for file in "$@"; do
-    if [[ ! -e "$file" ]]; then
-      echo "Error: file '$file' does not exist." >&2
+# Copy actual file(s) to the macOS clipboard (macOS only)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  copyfile() {
+    if [[ $# -eq 0 ]]; then
+      echo "Usage: copyfile <file1> [file2 ...]" >&2
       return 1
     fi
-    local abs_path
-    abs_path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
-    files+=("POSIX file \"$abs_path\"")
-  done
-  local list
-  list=$(IFS=,; echo "${files[*]}")
-  osascript -e "set the clipboard to {$list}"
-  echo "Copied $# file(s) to clipboard."
-}
-alias cpf='copyfile'
+    local files=()
+    for file in "$@"; do
+      if [[ ! -e "$file" ]]; then
+        echo "Error: file '$file' does not exist." >&2
+        return 1
+      fi
+      local abs_path
+      abs_path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
+      files+=("POSIX file \"$abs_path\"")
+    done
+    local list
+    list=$(IFS=,; echo "${files[*]}")
+    osascript -e "set the clipboard to {$list}"
+    echo "Copied $# file(s) to clipboard."
+  }
+  alias cpf='copyfile'
+fi
 
-# Copy the current directory to the macOS clipboard.
+# Copy the current directory to the clipboard.
 copy-pwd() {
   pwd | pbcopy
   echo "Copied: $(pwd)"

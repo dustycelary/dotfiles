@@ -23,7 +23,6 @@ FILES=(
   .zprofile
   .gitconfig
   .tmux.conf
-  .p10k.zsh
   .inputrc
   .config/ghostty/config
   .config/nvim
