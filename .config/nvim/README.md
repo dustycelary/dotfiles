@@ -30,7 +30,7 @@ These are called by conform.nvim on save and must be on your `PATH`:
 
 ### LSP servers
 
-Mason installs these automatically on first launch: `basedpyright`, `lua_ls`, `html`, `bashls`, `marksman`, `dockerls`, `yamlls`.
+Mason installs these automatically on first launch: `basedpyright`, `lua_ls`, `html`, `bashls`, `marksman`, `dockerls`, `yamlls`, `jsonls`, `taplo`, `phpactor`.
 
 **`clangd` is not managed by Mason** — it must be installed manually on every platform (see the platform sections below). After installing it, uncomment the `clangd` lines in `lua/plugins/lsp.lua`:
 

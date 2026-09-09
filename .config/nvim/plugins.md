@@ -210,6 +210,7 @@ LSP client setup. Mason installs and manages language server binaries.
 | marksman | Markdown |
 | dockerls | Dockerfile |
 | yamlls | YAML (schemastore schemas, formatter disabled) |
+| taplo | TOML |
 
 | Key | Action |
 |-----|--------|
