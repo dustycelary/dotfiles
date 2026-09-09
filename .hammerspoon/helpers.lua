@@ -69,9 +69,7 @@ local helpers = {
 			end
 
 			app:activate(true)
-			local created = hs.osascript.applescript(
-				'tell application id "com.apple.Safari" to make new document'
-			)
+			local created = hs.osascript.applescript('tell application id "com.apple.Safari" to make new document')
 			if not created then
 				local menuOk = app:selectMenuItem({ "File", "New Window" })
 				if not menuOk then
@@ -99,11 +97,13 @@ local helpers = {
 									moveAttempts = moveAttempts + 1
 									local task = hs.task.new(aerospace, function(exitCode)
 										if exitCode == 0 then
-											hs.task.new(aerospace, nil, {
-												"focus",
-												"--window-id",
-												tostring(window:id()),
-											}):start()
+											hs.task
+												.new(aerospace, nil, {
+													"focus",
+													"--window-id",
+													tostring(window:id()),
+												})
+												:start()
 											app:activate(true)
 											window:focus()
 										elseif moveAttempts < 40 then
@@ -248,7 +248,7 @@ local helpers = {
 				h = canvasH - 20,
 			},
 			text = table.concat(lines, "\n"),
-			textFont = "SF Mono",
+			textFont = "JetBrainsMono NF",
 			textSize = 15,
 			textColor = { white = 0.95, alpha = 1 },
 		}
@@ -534,7 +534,7 @@ local helpers = {
 			strokeColor = { white = 0.5, alpha = 0.8 },
 			fillColor = { white = 0.08, alpha = 0.95 },
 			textColor = { white = 0.95, alpha = 1 },
-			textFont = "SF Mono",
+			textFont = "JetBrainsMono NF",
 			textSize = 15,
 			radius = 10,
 			padding = 16,

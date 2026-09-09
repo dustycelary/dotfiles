@@ -36,12 +36,10 @@ Ghost text shows the top suggestion inline as you type.
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
 
-## colorscheme (nightfox.nvim & catppuccin/nvim)
-Default colorscheme is `carbonfox` (dark). Toggles to `catppuccin-latte` (light) via `catppuccin/nvim`.
-
-| Key | Action |
-|-----|--------|
-| `<leader>uc` | Toggle colorscheme (`carbonfox` dark <-> `catppuccin-latte` light) |
+## colorscheme (github-nvim-theme)
+Default colorscheme is GitHub Dark Default via `projekt0n/github-nvim-theme`,
+with terminal colors and automatic plugin integrations enabled. Floating and
+sidebar-style windows use the theme's darker backgrounds.
 
 ---
 

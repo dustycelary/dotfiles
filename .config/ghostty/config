@@ -28,16 +28,10 @@ adjust-underline-thickness = 1
 # ------------------------------------------------------------------------------
 # 2. THEMES & COLOR INTEGRATION
 # ------------------------------------------------------------------------------
-theme = Carbonfox
+theme = GitHub Dark Default
 
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system
-
-# High-contrast selection colors for Carbonfox.
-selection-background = #3b5f8a
-selection-foreground = #f2f4f8
-
-cursor-color = #78a9ff
 
 # ------------------------------------------------------------------------------
 # 3. WINDOW AESTHETICS & LAYOUT
@@ -55,7 +49,7 @@ window-padding-y = 12
 window-padding-balance = true
 
 # Opacity and blur
-background-opacity = 0.92
+background-opacity = 0.97
 background-blur-radius = 20
 
 macos-icon = holographic

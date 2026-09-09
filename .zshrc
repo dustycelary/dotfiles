@@ -34,6 +34,7 @@ plugins=(
   zsh-completions
   zsh-autosuggestions
   zsh-syntax-highlighting
+  aliases
 )
 
 # Initialize Oh My Zsh and the plugins listed above.
@@ -123,30 +124,6 @@ if command -v pyenv >/dev/null 2>&1; then
   eval "$(pyenv init - zsh)"
 fi
 
-# Replace ls with lsd when installed and provide common listing shortcuts.
-if command -v lsd >/dev/null 2>&1; then
-  alias ls='lsd -1'
-fi
-
-
-# -----------------------------------------------------------------------------
-# Aliases
-# -----------------------------------------------------------------------------
-
-# Reload or edit shell and application configuration files.
-alias rezsh='source ~/.zshrc'
-alias ezsh='nvim ~/.zshrc'
-alias envim='nvim ~/.config/nvim/init.lua'
-alias eghostty='nvim ~/.config/ghostty/config'
-
-# Run frequently used project commands.
-alias rag='docker compose run --rm ingest'
-alias sp_rag='docker exec -it postgres psql -U dev_user -d spotify_rag'
-
-# Open frequently used notes and search scripts.
-alias qn_s='nvim ~/Documents/Notes/QuickNote/scratch.md'
-alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
-
 
 # -----------------------------------------------------------------------------
 # Small helper functions
@@ -194,45 +171,6 @@ clip() {
   fi
 }
 
-# Copy actual file(s) to the macOS clipboard (macOS only)
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  copyfile() {
-    if [[ $# -eq 0 ]]; then
-      echo "Usage: copyfile <file1> [file2 ...]" >&2
-      return 1
-    fi
-    local files=()
-    for file in "$@"; do
-      if [[ ! -e "$file" ]]; then
-        echo "Error: file '$file' does not exist." >&2
-        return 1
-      fi
-      local abs_path
-      abs_path="$(cd "$(dirname "$file")" && pwd)/$(basename "$file")"
-      files+=("POSIX file \"$abs_path\"")
-    done
-    local list
-    list=$(IFS=,; echo "${files[*]}")
-    osascript -e "set the clipboard to {$list}"
-    echo "Copied $# file(s) to clipboard."
-  }
-  alias cpf='copyfile'
-fi
-
-# Copy the current directory to the clipboard.
-copy-pwd() {
-  pwd | pbcopy
-  echo "Copied: $(pwd)"
-}
-alias cpwd='copy-pwd'
-
-# Bind Ctrl-Y Ctrl-P to copy the current directory without disturbing the prompt.
-copy-pwd-widget() {
-  copy-pwd
-  zle reset-prompt
-}
-zle -N copy-pwd-widget
-bindkey '^y^p' copy-pwd-widget
 
 # Search file contents locally with FZF and rga, returning the selected path.
 _content_search_select() {
@@ -260,3 +198,33 @@ content-search-widget() {
 }
 zle -N content-search-widget
 bindkey '^g' content-search-widget
+
+
+
+
+# -----------------------------------------------------------------------------
+# Aliases
+# -----------------------------------------------------------------------------
+
+# Reload or edit shell and application configuration files.
+alias rezsh='source ~/.zshrc'
+alias ezsh='nvim ~/.zshrc'
+alias envim='nvim ~/.config/nvim/init.lua'
+alias eghostty='nvim ~/.config/ghostty/config'
+alias etmux='nvim ~/.tmux.conf'
+
+
+# Run frequently used project commands.
+alias rag='docker compose run --rm ingest'
+alias sp_rag='docker exec -it postgres psql -U dev_user -d spotify_rag'
+
+# Open frequently used notes and search scripts.
+alias qn_s='nvim ~/Documents/Notes/QuickNote/scratch.md'
+alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
+
+
+# Replace ls with lsd when installed and provide common listing shortcuts.
+if command -v lsd >/dev/null 2>&1; then
+  alias ls='lsd -1'
+fi
+

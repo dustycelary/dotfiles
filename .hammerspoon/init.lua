@@ -35,7 +35,7 @@ spoon.Hammerflow.registerFormat({
 	strokeColor = { white = 1, alpha = 0.8 },
 	fillColor = { white = 0.1, alpha = 0.9 },
 	textColor = { white = 1, alpha = 1 },
-	textFont = "SF Mono",
+	textFont = "JetBrainsMono NF",
 	textSize = 18,
 	-- textSize = 13,
 	radius = 10,
