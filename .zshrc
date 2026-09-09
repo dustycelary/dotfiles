@@ -42,8 +42,8 @@ if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
   source "$ZSH/oh-my-zsh.sh"
 fi
 
-# Show the time, user, host, and current directory.
-PROMPT='%F{cyan}[%*]%f %n@%m %1~ %# '
+# Show the user, host, and current directory.
+PROMPT='%n@%m %1~ %# '
 
 # Ghostty only injects its integration into shells it launches directly.
 # Source it in tmux-created shells so they also emit semantic prompt markers.
@@ -61,8 +61,13 @@ HISTFILE="$HOME/.zsh_history"
 HISTSIZE=100000
 SAVEHIST=100000
 
-# Share new commands between open terminals and remove older duplicates.
-setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS
+# Share new commands between open terminals and keep duplicate entries out of
+# saved history and interactive history searches.
+setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_SAVE_NO_DUPS HIST_FIND_NO_DUPS
+
+# If history ever exceeds its configured size, discard duplicates before
+# discarding unique older commands.
+setopt HIST_EXPIRE_DUPS_FIRST
 
 # Reload history from disk before opening FZF history search (Ctrl+R).
 fzf-history-widget-sync() {
@@ -200,6 +205,47 @@ zle -N content-search-widget
 bindkey '^g' content-search-widget
 
 
+# -----------------------------------------------------------------------------
+# Hooks
+# -----------------------------------------------------------------------------
+
+# Report commands that take at least three seconds to finish.
+autoload -Uz add-zsh-hook
+zmodload zsh/datetime
+
+# Do not persist one-word commands that add little value to shell history.
+filter_trivial_history() {
+  emulate -L zsh
+  local -a words
+
+  words=(${(z)1})
+  (( ${#words} != 1 )) || [[ "${words[1]}" != (clear|pwd|ls|ll|exit) ]]
+}
+
+typeset -gF command_started_at=0
+
+record_command_start() {
+  command_started_at=$EPOCHREALTIME
+  return 0
+}
+
+report_slow_command() {
+  local -F 1 duration
+
+  if (( command_started_at > 0 )); then
+    duration=$(( EPOCHREALTIME - command_started_at ))
+    (( duration >= 3.0 )) && print -P "%F{yellow}Command took ${duration}s%f"
+  fi
+
+  command_started_at=0
+  return 0
+}
+
+add-zsh-hook preexec record_command_start
+add-zsh-hook precmd report_slow_command
+add-zsh-hook zshaddhistory filter_trivial_history
+
+
 
 
 # -----------------------------------------------------------------------------
@@ -207,7 +253,7 @@ bindkey '^g' content-search-widget
 # -----------------------------------------------------------------------------
 
 # Reload or edit shell and application configuration files.
-alias rezsh='source ~/.zshrc'
+alias rezsh='exec zsh'
 alias ezsh='nvim ~/.zshrc'
 alias envim='nvim ~/.config/nvim/init.lua'
 alias eghostty='nvim ~/.config/ghostty/config'
@@ -227,4 +273,4 @@ alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 if command -v lsd >/dev/null 2>&1; then
   alias ls='lsd -1'
 fi
-
+alias lt='ls -ltrh'

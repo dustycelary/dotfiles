@@ -74,8 +74,7 @@ mouse-hide-while-typing = true
 # 6. SYSTEM & CLIPBOARD
 # ------------------------------------------------------------------------------
 scrollback-limit = 50000
-# shell-integration-features = no-cursor,sudo,no-title
-shell-integration-features = sudo,no-title
+shell-integration-features = no-cursor,sudo,no-title
 
 copy-on-select = clipboard
 clipboard-read = allow
