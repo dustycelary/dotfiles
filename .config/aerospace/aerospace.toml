@@ -14,13 +14,7 @@ default-root-container-orientation = 'auto'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 automatically-unhide-macos-hidden-apps = false
 
-persistent-workspaces = [
-    '1-look',
-    '2-build',
-    '3-org',
-    '4-med',
-    '5-temp',
-]
+persistent-workspaces = ['1-look', '2-build', '3-org', '4-med', '5-temp']
 
 on-mode-changed = []
 focus-follows-mouse.enabled = false
@@ -41,79 +35,79 @@ gaps.outer.top = 10
 gaps.outer.right = 10
 
 [mode.main.binding]
-    alt-slash = 'layout tiles vertical horizontal'
-    # alt-comma = 'layout accordion vertical horizontal' # Reserved for tmux pane navigation
-    alt-quote = 'layout accordion vertical horizontal'
+alt-slash = 'layout h_tiles v_tiles'
+# alt-comma = 'layout h_accordion v_accordion' # Reserved for tmux pane navigation
+alt-quote = 'layout v_accordion h_accordion'
 
-    alt-h = 'focus --wrap-around left'
-    alt-j = 'focus --wrap-around down'
-    alt-k = 'focus --wrap-around up'
-    alt-l = 'focus --wrap-around right'
+alt-h = 'focus --wrap-around left'
+alt-j = 'focus --wrap-around down'
+alt-k = 'focus --wrap-around up'
+alt-l = 'focus --wrap-around right'
 
-    alt-shift-h = 'move left'
-    alt-shift-j = 'move down'
-    alt-shift-k = 'move up'
-    alt-shift-l = 'move right'
+alt-shift-h = 'move left'
+alt-shift-j = 'move down'
+alt-shift-k = 'move up'
+alt-shift-l = 'move right'
 
-    # alt-minus = 'resize smart -50' # Reserved for tmux window navigation
-    # alt-equal = 'resize smart +50' # Reserved for tmux window navigation
-    alt-r = 'mode resize'
+# alt-minus = 'resize smart -50' # Reserved for tmux window navigation
+# alt-equal = 'resize smart +50' # Reserved for tmux window navigation
+alt-r = 'mode resize'
 
-    alt-y = 'workspace --auto-back-and-forth 1-look'
-    alt-u = 'workspace --auto-back-and-forth 2-build'
-    alt-i = 'workspace --auto-back-and-forth 3-org'
-    alt-o = 'workspace --auto-back-and-forth 4-med'
-    alt-p = 'workspace --auto-back-and-forth 5-temp'
+alt-y = 'workspace --auto-back-and-forth 1-look'
+alt-u = 'workspace --auto-back-and-forth 2-build'
+alt-i = 'workspace --auto-back-and-forth 3-org'
+alt-o = 'workspace --auto-back-and-forth 4-med'
+alt-p = 'workspace --auto-back-and-forth 5-temp'
 
-    alt-shift-y = 'move-node-to-workspace --focus-follows-window 1-look'
-    alt-shift-u = 'move-node-to-workspace --focus-follows-window 2-build'
-    alt-shift-i = 'move-node-to-workspace --focus-follows-window 3-org'
-    alt-shift-o = 'move-node-to-workspace --focus-follows-window 4-med'
-    alt-shift-p = 'move-node-to-workspace --focus-follows-window 5-temp'
+alt-shift-y = 'move-node-to-workspace --focus-follows-window 1-look'
+alt-shift-u = 'move-node-to-workspace --focus-follows-window 2-build'
+alt-shift-i = 'move-node-to-workspace --focus-follows-window 3-org'
+alt-shift-o = 'move-node-to-workspace --focus-follows-window 4-med'
+alt-shift-p = 'move-node-to-workspace --focus-follows-window 5-temp'
 
-    alt-ctrl-shift-h = 'move-node-to-monitor --focus-follows-window --wrap-around left'
-    alt-ctrl-shift-j = 'move-node-to-monitor --focus-follows-window --wrap-around down'
-    alt-ctrl-shift-k = 'move-node-to-monitor --focus-follows-window --wrap-around up'
-    alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window --wrap-around right'
+alt-ctrl-shift-h = 'move-node-to-monitor --focus-follows-window --wrap-around left'
+alt-ctrl-shift-j = 'move-node-to-monitor --focus-follows-window --wrap-around down'
+alt-ctrl-shift-k = 'move-node-to-monitor --focus-follows-window --wrap-around up'
+alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window --wrap-around right'
 
-    alt-leftSquareBracket = 'workspace --wrap-around prev'
-    alt-rightSquareBracket = 'workspace --wrap-around next'
+alt-leftSquareBracket = 'workspace --wrap-around prev'
+alt-rightSquareBracket = 'workspace --wrap-around next'
 
-    alt-f = 'fullscreen'
-    alt-tab = 'focus-back-and-forth || workspace-back-and-forth'
-    alt-m = 'move-workspace-to-monitor --wrap-around next'
-    alt-shift-tab = 'move-workspace-to-monitor --wrap-around prev'
-    alt-0 = 'balance-sizes'
+alt-f = 'fullscreen'
+alt-tab = 'focus-back-and-forth || workspace-back-and-forth'
+alt-m = 'move-workspace-to-monitor --wrap-around next'
+alt-shift-tab = 'move-workspace-to-monitor --wrap-around prev'
+alt-0 = 'balance-sizes'
 
-    alt-ctrl-h = 'focus-monitor --wrap-around left'
-    alt-ctrl-j = 'focus-monitor --wrap-around down'
-    alt-ctrl-k = 'focus-monitor --wrap-around up'
-    alt-ctrl-l = 'focus-monitor --wrap-around right'
+alt-ctrl-h = 'focus-monitor --wrap-around left'
+alt-ctrl-j = 'focus-monitor --wrap-around down'
+alt-ctrl-k = 'focus-monitor --wrap-around up'
+alt-ctrl-l = 'focus-monitor --wrap-around right'
 
-    alt-space = 'mode service'
+alt-shift-space = 'mode service'
 
 [mode.service.binding]
-    esc = ['reload-config', 'mode main']
-    r = ['flatten-workspace-tree', 'mode main']
-    f = ['layout floating tiling', 'mode main']
-    backspace = ['close-all-windows-but-current', 'mode main']
+esc = ['reload-config', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+f = ['layout floating tiling', 'mode main']
+backspace = ['close-all-windows-but-current', 'mode main']
 
-    h = ['join-with left', 'mode main']
-    j = ['join-with down', 'mode main']
-    k = ['join-with up', 'mode main']
-    l = ['join-with right', 'mode main']
+h = ['join-with left', 'layout accordion', 'mode main']
+j = ['join-with down', 'layout accordion', 'mode main']
+k = ['join-with up', 'layout accordion', 'mode main']
+l = ['join-with right', 'layout accordion', 'mode main']
 
 [mode.resize.binding]
-    h = 'resize width -50'
-    j = 'resize height +50'
-    k = 'resize height -50'
-    l = 'resize width +50'
+h = 'resize width -50'
+j = 'resize height +50'
+k = 'resize height -50'
+l = 'resize width +50'
 
-    shift-h = 'resize width -100'
-    shift-j = 'resize height +100'
-    shift-k = 'resize height -100'
-    shift-l = 'resize width +100'
+shift-h = 'resize width -100'
+shift-j = 'resize height +100'
+shift-k = 'resize height -100'
+shift-l = 'resize width +100'
 
-    0 = ['balance-sizes', 'mode main']
-    enter = 'mode main'
-    esc = 'mode main'
+0 = ['balance-sizes', 'mode main']
+enter = 'mode main'
+esc = 'mode main'

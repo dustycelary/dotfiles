@@ -25,6 +25,10 @@ return {
 				no_ignore = true, -- Include files ignored by .gitignore
 				formatter = "path.filename_first",
 			},
+			grep = {
+				rg_glob = true, -- Auto-parse globs after '--' (e.g., search_term -- *.lua)
+				rg_opts = "--column --line-number --no-heading --color=always --smart-case --hidden --glob !.git/ --glob !.venv/ --glob !venv/ --max-columns=4000 -e",
+			},
 			lsp = {
 				formatter = "path.filename_first",
 			},

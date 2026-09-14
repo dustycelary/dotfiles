@@ -4,6 +4,9 @@
 export EDITOR='nvim'
 export VISUAL='nvim'
 
+# Reduce delay when pressing Escape or keybindings (10ms)
+export KEYTIMEOUT=1
+
 # Keep Python from creating __pycache__ directories and .pyc files.
 export PYTHONDONTWRITEBYTECODE=1
 
@@ -18,6 +21,12 @@ export ZSH="$HOME/.oh-my-zsh"
 # Keep Zsh's native prompt instead of loading an Oh My Zsh theme.
 ZSH_THEME=""
 
+# Skip security checks on completion directories to save disk I/O on lower-power hosts
+ZSH_DISABLE_COMPFIX="true"
+
+# Cache completion dump per host
+ZSH_COMPDUMP="$HOME/.zcompdump-${HOST}-${ZSH_VERSION}"
+
 
 # Use fd for FZF file searches, including hidden files but excluding bulky data.
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv'
@@ -26,16 +35,18 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv'
 export FZF_DEFAULT_OPTS='--height=60% --layout=reverse --border'
 
 # Load Git helpers, fuzzy finding, and interactive completion enhancements.
-# Syntax highlighting stays last because it must wrap the other Zsh widgets.
 plugins=(
   git
   fzf
-  fzf-tab
   zsh-completions
   zsh-autosuggestions
-  zsh-syntax-highlighting
   aliases
 )
+
+# Skip heavy syntax-highlighting & tab completion widgets on low-power ARM devices (e.g. Raspberry Pi)
+if [[ "$(uname -m)" != "arm"* && "$(uname -m)" != "aarch64"* ]]; then
+  plugins+=(fzf-tab zsh-syntax-highlighting)
+fi
 
 # Initialize Oh My Zsh and the plugins listed above.
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
@@ -124,9 +135,15 @@ if command -v zoxide >/dev/null 2>&1; then
   bindkey '^[z' recent-directory-widget
 fi
 
-# Initialize pyenv when installed so its selected Python version is available.
+# Initialize pyenv lazily when installed so it doesn't slow down shell startup.
 if command -v pyenv >/dev/null 2>&1; then
-  eval "$(pyenv init - zsh)"
+  pyenv() {
+    unset -f pyenv python pip
+    eval "$(command pyenv init - zsh)"
+    pyenv "$@"
+  }
+  python() { pyenv; python "$@"; }
+  pip()    { pyenv; pip "$@"; }
 fi
 
 
