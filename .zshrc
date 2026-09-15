@@ -261,18 +261,24 @@ report_slow_command() {
 # Emit OSC 133 prompt markers so tmux (and terminals) can navigate prompts
 # (used as a fallback when Ghostty's native shell integration is not active, e.g. over SSH).
 if [[ ! -r "${GHOSTTY_RESOURCES_DIR:-}/shell-integration/zsh/ghostty-integration" ]]; then
-  emit_osc133_prompt_start() {
-    print -n "\e]133;A\e\\"
-    return 0
+  _setup_osc133_prompt() {
+    if [[ "$PROMPT" != *"\e]133;A"* ]]; then
+      PROMPT=$'%{\e]133;A\a%}'"${PROMPT}"$'%{\e]133;B\a%}'
+    fi
   }
 
-  emit_osc133_command_start() {
-    print -n "\e]133;C\e\\"
-    return 0
+  _osc133_preexec() {
+    print -n "\e]133;C\a"
   }
 
-  add-zsh-hook precmd emit_osc133_prompt_start
-  add-zsh-hook preexec emit_osc133_command_start
+  _osc133_precmd() {
+    local last_status=$?
+    print -n "\e]133;D;${last_status}\a"
+  }
+
+  add-zsh-hook precmd _setup_osc133_prompt
+  add-zsh-hook precmd _osc133_precmd
+  add-zsh-hook preexec _osc133_preexec
 fi
 
 add-zsh-hook preexec record_command_start
