@@ -222,6 +222,17 @@ zle -N content-search-widget
 bindkey '^g' content-search-widget
 
 
+# Interactive fuzzy search for active aliases
+fa() {
+  alias | fzf --prompt="Aliases > " \
+              --header="Enter: execute | Esc: exit" \
+              --preview="echo {}" \
+              --preview-window=down:3:wrap \
+        | cut -d'=' -f1 \
+        | read -r choice && [[ -n "$choice" ]] && print -z "$choice"
+}
+
+
 # -----------------------------------------------------------------------------
 # Hooks
 # -----------------------------------------------------------------------------
