@@ -308,6 +308,15 @@ alias sp_rag='docker exec -it postgres psql -U dev_user -d spotify_rag'
 alias qn_s='nvim ~/Documents/Notes/QuickNote/scratch.md'
 alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 
+# for homelab help 
+# Media directory base path
+export MEDIA_PATH="/mnt/t7/data/media"
+
+alias get-codecs="find \"\$MEDIA_PATH\" -type f \( -iname '*.mkv' -o -iname '*.mp4' \) -exec ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 '{}' \; -print | paste - - | awk -F'\t' '{printf \"%-10s %s\n\", \$1, \$2}'"
+
+alias get-hevc="find \"\$MEDIA_PATH\" -type f \( -iname '*.mkv' -o -iname '*.mp4' \) -exec ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 '{}' \; -print | paste - - | awk -F'\t' '\$1 ~ /^(hevc|h265|x265)$/ {print \$2}'"
+
+alias media-summary="find \"\$MEDIA_PATH\" -type f \( -iname '*.mkv' -o -iname '*.mp4' \) -exec ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 '{}' \; | sort | uniq -c"
 
 # Replace ls with lsd when installed and provide common listing shortcuts.
 if command -v lsd >/dev/null 2>&1; then
