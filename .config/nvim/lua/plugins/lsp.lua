@@ -96,11 +96,11 @@ return {
 						basedpyright = {
 							analysis = {
 								typeCheckingMode = "basic",
-								autoImportCompletions = false,
+								autoImportCompletions = true,
 								diagnosticMode = "openFilesOnly",
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
-								indexing = false,
+								indexing = true,
 								ignore = {
 									"**/.venv",
 									"**/venv",
@@ -137,9 +137,14 @@ return {
 			}
 
 			-- Setup and enable all Mason-installed servers
+			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
 			local mason_lspconfig = require("mason-lspconfig")
 			for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
-				local config = vim.tbl_deep_extend("force", { workspace_required = false }, custom_servers[name] or {})
+				local config = vim.tbl_deep_extend("force", {
+					workspace_required = false,
+					capabilities = capabilities,
+				}, custom_servers[name] or {})
 				vim.lsp.config(name, config)
 				vim.lsp.enable(name)
 			end
@@ -204,6 +209,13 @@ return {
 			vim.keymap.set("n", "]e", function()
 				jump_diag(1, vim.diagnostic.severity.ERROR)
 			end, { desc = "Next error" })
+			local virtual_text_enabled = false
+			vim.keymap.set("n", "<leader>uV", function()
+				virtual_text_enabled = not virtual_text_enabled
+				vim.diagnostic.config({ virtual_text = virtual_text_enabled })
+				vim.notify("Native virtual text: " .. (virtual_text_enabled and "ON" or "OFF"), vim.log.levels.INFO, { title = "Diagnostics" })
+			end, { desc = "Toggle native LSP virtual text" })
+
 			vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Show diagnostic float" })
 			vim.keymap.set("n", "<leader>cq", vim.diagnostic.setqflist, { desc = "Diagnostics → quickfix" })
 			vim.keymap.set("n", "<leader>cl", vim.diagnostic.setloclist, { desc = "Diagnostics → loclist" })

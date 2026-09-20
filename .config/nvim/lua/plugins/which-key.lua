@@ -41,6 +41,7 @@ return {
 			{ "<leader>u", group = "UI Toggles" },
 			{ "<leader>w", group = "Windows & Splits" },
 			{ "<leader>x", group = "Diagnostics" },
+			{ "<leader>?", "<cmd>FzfLua keymaps<cr>", desc = "Search all keymaps" },
 			{ "gr", group = "LSP Definitions / References" },
 			{ "]", group = "Next Motion" },
 			{ "[", group = "Previous Motion" },
