@@ -334,3 +334,9 @@ if command -v lsd >/dev/null 2>&1; then
   alias ls='lsd -1'
 fi
 alias lt='ls -ltrh'
+
+# zsh-autosuggestions (and other plugins) re-wrap ZLE widgets at load time and
+# can clobber the bracketed-paste binding along the way. Re-bind it here,
+# after everything else has loaded, so pastes stay wrapped as one block
+# instead of leaking a stray trailing "~" from an unconsumed end marker.
+bindkey '^[[200~' bracketed-paste

@@ -40,6 +40,23 @@ vim.opt.sidescrolloff = 8
 vim.opt.cursorline = true
 -- vim.opt.clipboard = "unnamedplus" -- Use system clipboard by default
 
+-- Over SSH there's no pbcopy/xclip to talk to, so route the "+ register
+-- through OSC 52 instead: it rides the terminal escape sequence back up
+-- through tmux/ssh to Ghostty, which writes it to the real macOS clipboard.
+if vim.env.SSH_TTY then
+	vim.g.clipboard = {
+		name = "OSC 52",
+		copy = {
+			["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+			["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+		},
+		paste = {
+			["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+			["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+		},
+	}
+end
+
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 vim.opt.equalalways = true -- always equalize window sizes when splitting/closing

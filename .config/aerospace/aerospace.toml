@@ -23,7 +23,12 @@ key-mapping.preset = 'qwerty'
 on-window-detected = [
     { if = 'test %{app-bundle-id} = com.apple.Safari', run = 'move-node-to-workspace 1-look' },
     { if = 'test %{app-bundle-id} = com.apple.iCal || test %{app-bundle-id} = com.apple.reminders || test %{app-bundle-id} = com.apple.mail', run = 'move-node-to-workspace 3-org' },
-    { if = 'test %{app-bundle-id} = com.mitchellh.ghostty || test %{app-bundle-id} = com.apple.Terminal', run = 'move-node-to-workspace 2-build' },
+    # Ghostty's tabs are native NSWindow tab groups, so each new tab is its
+    # own AX window to Aerospace, not just a tab in the current one. Tiling
+    # it would reserve a tile for a window that only renders when its tab is
+    # frontmost, leaving a blank pane. Float by default; toggle to tiling
+    # per-window (alt-backslash, f) for windows you actually want tiled.
+    { if = 'test %{app-bundle-id} = com.mitchellh.ghostty || test %{app-bundle-id} = com.apple.Terminal', run = ['move-node-to-workspace 2-build', 'layout floating'] },
     { if = 'test %{app-bundle-id} = com.spotify.client', run = 'move-node-to-workspace 4-med' },
     { if = 'test %{app-bundle-id} = com.apple.finder', run = 'move-node-to-workspace 5-temp' },
 ]
