@@ -159,9 +159,9 @@ Prevents bad habits by blocking the spamming of movement keys (like `h`, `j`, `k
 ---
 
 ## harpoon2
-Quick-access bookmarks for up to 4 files per project. List is saved automatically on toggle (`save_on_toggle = true`).
+Quick-access bookmarks for up to 4 files per project, scoped to the current directory — each project gets its own file list. List is saved automatically on toggle (`save_on_toggle = true`).
 
-Also includes a custom Terminal Command Runner. If inside Tmux, commands are automatically sent to the other pane (splitting the window if only Neovim is open) without changing editor focus. If run outside Tmux, it falls back to a Neovim split terminal.
+Also includes a custom Terminal Command Runner. Unlike files, commands are shared **globally** across every project (same 4 slots everywhere) rather than scoped per directory. If inside Tmux, commands are automatically sent to the other pane (splitting the window if only Neovim is open) without changing editor focus. If run outside Tmux, it falls back to a Neovim split terminal.
 
 | Key | Action |
 |-----|--------|
@@ -183,17 +183,6 @@ Vertical indent guides using `│`. The current scope (the function or block you
 
 ## lazydev.nvim
 Neovim Lua API type stubs for `lua_ls` and `nvim-cmp`. Only active in lua filetype. Provides completions and type info for `vim.*`, `vim.api.*`, `vim.fn.*`, etc. Its cmp source is registered at `group_index = 0`, so it takes priority over the LSP source in neovim lua files.
-
----
-
-## lsp_signature.nvim
-Floating signature help while typing function arguments. Appears automatically on `InsertEnter` when the cursor is inside a function call.
-
-| Key | Action |
-|-----|--------|
-| `<C-k>` | Toggle floating window |
-
-Virtual text hints are disabled (too noisy). The window closes automatically after 4 seconds of inactivity.
 
 ---
 

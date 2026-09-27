@@ -165,14 +165,14 @@ return {
 					vim.keymap.set("n", "gri", function()
 						require("fzf-lua").lsp_implementations({ jump1 = true })
 					end, { buffer = b, desc = "LSP implementations" })
-					vim.keymap.set(
-						"n",
-						"<leader>cs",
-						function()
-							require("lsp_signature").toggle_float_win()
-						end,
-						{ buffer = b, desc = "Toggle signature help" }
-					)
+					vim.keymap.set("n", "<leader>cs", function()
+						local blink = require("blink.cmp")
+						if blink.is_signature_visible() then
+							blink.hide_signature()
+						else
+							blink.show_signature()
+						end
+					end, { buffer = b, desc = "Toggle signature help" })
 					vim.keymap.set("n", "<leader>cn", vim.lsp.buf.rename, { buffer = b, desc = "Rename symbol" })
 					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = b, desc = "Code actions" })
 					vim.keymap.set(
@@ -217,21 +217,6 @@ return {
 			vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Show diagnostic float" })
 			vim.keymap.set("n", "<leader>cq", vim.diagnostic.setqflist, { desc = "Diagnostics → quickfix" })
 			vim.keymap.set("n", "<leader>cl", vim.diagnostic.setloclist, { desc = "Diagnostics → loclist" })
-		end,
-	},
-	{
-		"ray-x/lsp_signature.nvim",
-		event = "VeryLazy",
-		opts = {
-			bind = true,
-			handler_opts = { border = "rounded" },
-			hint_enable = false,
-			floating_window = true,
-			toggle_key = "<C-k>",
-			toggle_key_flip_floatwin_setting = true,
-		},
-		config = function(_, opts)
-			require("lsp_signature").setup(opts)
 		end,
 	},
 	{

@@ -1,4 +1,24 @@
 -- Harpoon 2 — fast file & command bookmarks & navigation.
+-- Files are scoped to the current directory (harpoon's normal per-project
+-- behavior). Commands are shared globally across every project instead: the
+-- "cmd" list's storage key is forced to a constant whenever it's the list
+-- being touched, either directly (add/select, flagged via using_global_key)
+-- or through the quick-menu UI (detected via ui.active_list.name == "cmd").
+local GLOBAL_CMD_KEY = "__global_commands__"
+local using_global_key = false
+
+local function cmd_list()
+	using_global_key = true
+	local ok, list = pcall(function()
+		return require("harpoon"):list("cmd")
+	end)
+	using_global_key = false
+	if not ok then
+		error(list)
+	end
+	return list
+end
+
 return {
 	"ThePrimeagen/harpoon",
 	branch = "harpoon2",
@@ -7,6 +27,16 @@ return {
 		settings = {
 			save_on_toggle = true,
 			sync_on_ui_close = true,
+			key = function()
+				if using_global_key then
+					return GLOBAL_CMD_KEY
+				end
+				local ui = require("harpoon").ui
+				if ui.active_list and ui.active_list.name == "cmd" then
+					return GLOBAL_CMD_KEY
+				end
+				return vim.loop.cwd()
+			end,
 		},
 	},
 	config = function(_, opts)
@@ -28,7 +58,7 @@ return {
 		})
 	end,
 	keys = {
-		-- File Bookmarks
+		-- File Bookmarks (per directory)
 		{
 			"<leader>ha",
 			function()
@@ -87,13 +117,13 @@ return {
 			desc = "Harpoon previous file",
 		},
 
-		-- Command Bookmarks
+		-- Command Bookmarks (global, shared across every project)
 		{
 			"<leader>hc",
 			function()
 				vim.ui.input({ prompt = "Add Harpoon Command: " }, function(input)
 					if input and input ~= "" then
-						require("harpoon"):list("cmd"):add({ value = input })
+						cmd_list():add({ value = input })
 					end
 				end)
 			end,
@@ -102,36 +132,35 @@ return {
 		{
 			"<leader>hm",
 			function()
-				local harpoon = require("harpoon")
-				harpoon.ui:toggle_quick_menu(harpoon:list("cmd"))
+				require("harpoon").ui:toggle_quick_menu(cmd_list())
 			end,
 			desc = "Harpoon command quick menu",
 		},
 		{
 			"<leader>h1",
 			function()
-				require("harpoon"):list("cmd"):select(1)
+				cmd_list():select(1)
 			end,
 			desc = "Harpoon run command 1",
 		},
 		{
 			"<leader>h2",
 			function()
-				require("harpoon"):list("cmd"):select(2)
+				cmd_list():select(2)
 			end,
 			desc = "Harpoon run command 2",
 		},
 		{
 			"<leader>h3",
 			function()
-				require("harpoon"):list("cmd"):select(3)
+				cmd_list():select(3)
 			end,
 			desc = "Harpoon run command 3",
 		},
 		{
 			"<leader>h4",
 			function()
-				require("harpoon"):list("cmd"):select(4)
+				cmd_list():select(4)
 			end,
 			desc = "Harpoon run command 4",
 		},
