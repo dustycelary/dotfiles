@@ -32,7 +32,7 @@ Ghost text shows the top suggestion inline as you type.
 | `<Tab>` | Next item or jump snippet stop |
 | `<S-Tab>` | Previous item or jump snippet stop back |
 | `<C-b>` / `<C-f>` | Scroll docs |
-| `<C-Space>` | Force open completion |
+| `<M-Space>` / `<C-e>` | Force open completion / toggle docs |
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
 
@@ -291,6 +291,19 @@ Guides Neovim motions by showing inline hints for available movement options (li
 
 ## quick-scope
 Highlights the best `f`/`F`/`t`/`T` jump target on each line when you press those keys — underlines the first unique character per word so you can pick your target immediately. No configuration needed.
+
+---
+
+## flash.nvim
+Jump anywhere on screen fast: type a search prefix and flash labels every match with a highlighted character to jump straight to it. Also supports jumping to Treesitter nodes.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `s` | Normal/Visual/Op-pending | Flash jump (label-based search jump) |
+| `S` | Normal/Visual/Op-pending | Flash Treesitter jump |
+| `r` | Op-pending | Remote Flash (operate on a remote match) |
+| `R` | Op-pending/Visual | Treesitter search |
+| `<c-s>` | Command-line | Toggle Flash during `/` or `?` search |
 
 ---
 

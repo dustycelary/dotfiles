@@ -63,7 +63,9 @@ vim.opt.foldnestmax = 8 -- limit nesting depth
 -- own options
 
 -- getting rid of comments when starting new line using 'o'
+local user_config_group = vim.api.nvim_create_augroup("UserConfig", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
+	group = user_config_group,
 	pattern = "*",
 	callback = function()
 		vim.opt_local.formatoptions:remove("o")

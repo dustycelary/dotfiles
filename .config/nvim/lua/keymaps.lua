@@ -48,7 +48,9 @@ vim.keymap.set("n", "<leader>fq", function()
 end, { desc = "Fuzzy search quickfix list" })
 
 -- Close quickfix/loclist window with 'q' when focused inside it
+local qf_augroup = vim.api.nvim_create_augroup("QuickfixKeymaps", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
+	group = qf_augroup,
 	pattern = "qf",
 	callback = function(event)
 		vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = event.buf, silent = true, desc = "Close quickfix" })

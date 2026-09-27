@@ -3,12 +3,17 @@
     {
       "start": "23:00",
       "end": "23:59",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
     },
     {
       "start": "00:01",
       "end": "11:00",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
 
   ],
@@ -16,25 +21,35 @@
     {
       "start": "23:00",
       "end": "23:59",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
     },
     {
       "start": "00:01",
       "end": "11:00",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
 
   ],
   "tuesday": [
     {
       "start": "23:00",
-      "end": "23:01",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "end": "23:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
     },
     {
       "start": "00:01",
       "end": "11:00",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
 
   ],
@@ -42,46 +57,68 @@
     {
       "start": "23:00",
       "end": "23:59",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
     },
     {
       "start": "00:01",
-      "end": "00:02",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
-
   ],
   "thursday": [
     {
       "start": "23:00",
       "end": "23:59",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "00:01",
+      "end": "11:00",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
   ],
   "friday": [
     {
       "start": "23:00",
       "end": "23:59",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
     },
     {
       "start": "00:01",
       "end": "11:00",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
-
   ],
   "saturday": [
     {
       "start": "23:00",
       "end": "23:59",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
     },
     {
       "start": "00:01",
       "end": "11:00",
-      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/myblock.selfcontrol"
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/junk_apps.selfcontrol"
+    },
+    {
+      "start": "11:01",
+      "end": "22:59",
+      "blocklist": "/Users/fungus/Documents/dotfiles/.hammerspoon/hammer-control/mindsight_block.selfcontrol"
     }
-
   ]
 }

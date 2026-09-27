@@ -25,6 +25,7 @@ on-window-detected = [
     { if = 'test %{app-bundle-id} = com.apple.iCal || test %{app-bundle-id} = com.apple.reminders || test %{app-bundle-id} = com.apple.mail', run = 'move-node-to-workspace 3-org' },
     { if = 'test %{app-bundle-id} = com.mitchellh.ghostty || test %{app-bundle-id} = com.apple.Terminal', run = 'move-node-to-workspace 2-build' },
     { if = 'test %{app-bundle-id} = com.spotify.client', run = 'move-node-to-workspace 4-med' },
+    { if = 'test %{app-bundle-id} = com.apple.finder', run = 'move-node-to-workspace 5-temp' },
 ]
 
 gaps.inner.horizontal = 10
@@ -53,11 +54,11 @@ alt-shift-l = 'move right'
 # alt-equal = 'resize smart +50' # Reserved for tmux window navigation
 alt-r = 'mode resize'
 
-alt-y = 'workspace --auto-back-and-forth 1-look'
-alt-u = 'workspace --auto-back-and-forth 2-build'
-alt-i = 'workspace --auto-back-and-forth 3-org'
-alt-o = 'workspace --auto-back-and-forth 4-med'
-alt-p = 'workspace --auto-back-and-forth 5-temp'
+alt-y = 'workspace 1-look'
+alt-u = 'workspace 2-build'
+alt-i = 'workspace 3-org'
+alt-o = 'workspace 4-med'
+alt-p = 'workspace 5-temp'
 
 alt-shift-y = 'move-node-to-workspace --focus-follows-window 1-look'
 alt-shift-u = 'move-node-to-workspace --focus-follows-window 2-build'
@@ -84,7 +85,8 @@ alt-ctrl-j = 'focus-monitor --wrap-around down'
 alt-ctrl-k = 'focus-monitor --wrap-around up'
 alt-ctrl-l = 'focus-monitor --wrap-around right'
 
-alt-shift-space = 'mode service'
+# alt-shift-space = 'mode service'
+alt-backslash = 'mode service'
 
 [mode.service.binding]
 esc = ['reload-config', 'mode main']

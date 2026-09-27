@@ -26,20 +26,14 @@ return {
 	},
 	{
 		"neovim/nvim-lspconfig",
-		lazy = false,
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = { "b0o/schemastore.nvim" },
 		config = function()
-			-- Border UI & CursorHold hover diagnostics
+			-- Border UI & hover handlers
 			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
 			vim.lsp.handlers["textDocument/signatureHelp"] =
 				vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 			vim.diagnostic.config({ float = { border = "rounded" } })
-
-			vim.api.nvim_create_autocmd("CursorHold", {
-				callback = function()
-					vim.diagnostic.open_float(nil, { focusable = false, scope = "cursor" })
-				end,
-			})
 
 			-- LspInfo command
 			local function lsp_info()
@@ -137,7 +131,11 @@ return {
 			}
 
 			-- Setup and enable all Mason-installed servers
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local ok, blink = pcall(require, "blink.cmp")
+			if ok then
+				capabilities = blink.get_lsp_capabilities(capabilities)
+			end
 
 			local mason_lspconfig = require("mason-lspconfig")
 			for _, name in ipairs(mason_lspconfig.get_installed_servers()) do

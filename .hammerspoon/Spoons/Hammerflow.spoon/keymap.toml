@@ -72,6 +72,7 @@ m = [
     "hs:hs.urlevent.openURL('kmtrigger://macro=move_reminder')",
     "Move reminders",
 ]
+d = ["hs:hs.urlevent.openURL('kmtrigger://macro=add_date')", "Move reminders"]
 k = ["hs:hs.urlevent.openURL('kmtrigger://macro=search_km')", "Search KM"]
 s = [
     "hs:hs.urlevent.openURL('kmtrigger://macro=search_snippets')",
@@ -95,7 +96,8 @@ q = [
     "nvim scratch.md",
 ]
 f = ["cmd:shortcuts run 'add_to_shopping'", "Add to shopping list"]
-r = ["cmd:shortcuts run 'open_reminder_list'", "Open reminder list"]
+r = ["cmd:shortcuts run 'New Inbox Reminder'", "New inbox reminder"]
+# r = ["cmd:shortcuts run 'open_reminder_list'", "Open reminder list"]
 
 
 [p]
