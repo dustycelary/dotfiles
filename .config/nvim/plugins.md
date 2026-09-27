@@ -236,20 +236,6 @@ Diagnostic virtual text and virtual lines are disabled globally in `init.lua` â€
 ## neoscroll.nvim
 Smooth animated scrolling for `<C-u>`, `<C-d>`, `<C-b>`, `<C-f>`, `<C-y>`, `<C-e>`, `zt`, `zz`, `zb`. Cursor is hidden during scroll. Does not respect `scrolloff`. Stops at EOF.
 
-## mini.files
-Miller columns (cascading floating window panels) file explorer. Allows navigating directories like macOS Finder column view using `h`/`j`/`k`/`l`, creating/moving files, and live file preview.
-
-| Key | Action |
-|-----|--------|
-| `<leader>ef` | Toggle mini.files (Column Explorer) |
-| `l` / `<CR>` | Enter directory / open file |
-| `h` | Go up to parent directory column |
-| `=` | Synchronize/save changes to disk |
-| `q` | Close mini.files |
-| `g?` | Show help |
-
----
-
 ## oil.nvim
 File explorer that lets you edit the filesystem like a normal Vim buffer. Replaces netrw. You can create, rename, delete, move, and copy files and directories using standard Vim commands (`dd`, `cw`, `o`, `:%s`, `:w`).
 
@@ -343,20 +329,6 @@ Highlights `TODO`, `FIXME`, `HACK`, `NOTE`, `WARN`, `PERF`, `TEST` comments with
 
 ---
 
-## trouble.nvim
-Pretty split panel list for showing diagnostics, LSP references, definitions, quickfix, and location lists.
-
-| Key | Action |
-|-----|--------|
-| `<leader>xx` | Toggle workspace diagnostics panel |
-| `<leader>xX` | Toggle buffer diagnostics panel |
-| `<leader>xs` | Toggle symbols outline panel |
-| `<leader>xl` | Toggle LSP definitions/references split |
-| `<leader>xq` | Toggle quickfix panel |
-| `<leader>xL` | Toggle location list panel |
-
----
-
 ## treesitter
 Three plugins bundled together.
 
@@ -447,7 +419,7 @@ Key group prefixes:
 | `<leader>s` | Search / Find |
 | `<leader>u` | UI Toggles |
 | `<leader>w` | Surrounds (sandwich) |
-| `<leader>x` | Trouble / Diagnostics |
+| `<leader>x` | Diagnostics |
 | `gr` | LSP / References |
 | `]` / `[` | Next / Prev Motions |
 | `a` / `i` (in `o`/`x` mode) | Around / Inside Text Objects |
