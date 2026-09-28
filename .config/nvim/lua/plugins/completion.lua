@@ -11,9 +11,13 @@ return {
 		},
 	},
 	-- 2. LuaSnip snippet engine
+	-- No version pin: blink.cmp's snippets.preset = "luasnip" supports LuaSnip's
+	-- default branch directly (see blink.cmp UPGRADE.md). Forward/backward jumping
+	-- is handled by blink via <Tab>/<S-Tab> (snippet_forward/snippet_backward), so
+	-- LuaSnip is only wired here for the one thing blink has no command for:
+	-- cycling a choice node's options.
 	{
 		"L3MON4D3/LuaSnip",
-		version = "v2.*",
 		build = "make install_jsregexp",
 		dependencies = { "rafamadriz/friendly-snippets" },
 		config = function()
@@ -36,18 +40,14 @@ return {
 			vim.keymap.set({ "i", "s" }, "<C-l>", function()
 				if luasnip.choice_active() then
 					luasnip.change_choice(1)
-				elseif luasnip.expand_or_jumpable() then
-					luasnip.expand_or_jump()
 				end
-			end, { desc = "LuaSnip jump forward / choice" })
+			end, { desc = "LuaSnip next choice" })
 
 			vim.keymap.set({ "i", "s" }, "<C-h>", function()
 				if luasnip.choice_active() then
 					luasnip.change_choice(-1)
-				elseif luasnip.jumpable(-1) then
-					luasnip.jump(-1)
 				end
-			end, { desc = "LuaSnip jump backward / choice" })
+			end, { desc = "LuaSnip previous choice" })
 		end,
 	},
 	-- 3. Supermaven AI inline completion (DISABLED: change enabled = true to turn back on)
@@ -87,16 +87,15 @@ return {
 		version = "*",
 		opts = {
 			keymap = {
-				preset = "default",
+				-- "enter" preset: <CR> accepts the selected item (falls back to a literal
+				-- <CR> when nothing is selected, since preselect is disabled below).
+				preset = "enter",
 				["<C-y>"] = { "select_and_accept" },
-				["<CR>"] = { "accept", "fallback" },
 				["<M-Space>"] = { "show", "show_documentation", "hide_documentation" },
-				["<C-e>"] = { "show", "show_documentation", "hide_documentation" },
 				["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
 				["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
 			},
 			appearance = {
-				use_nvim_cmp_as_default = true,
 				nerd_font_variant = "mono",
 			},
 			snippets = { preset = "luasnip" },
@@ -111,6 +110,7 @@ return {
 				},
 			},
 			completion = {
+				list = { selection = { preselect = false } },
 				menu = {
 					draw = {
 						columns = {

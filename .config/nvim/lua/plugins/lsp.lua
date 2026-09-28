@@ -2,13 +2,14 @@
 return {
 	{
 		"williamboman/mason.nvim",
-		lazy = false,
+		event = { "BufReadPre", "BufNewFile" },
+		cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUpdate", "MasonLog" },
 		opts = {},
 	},
 	{
 		"williamboman/mason-lspconfig.nvim",
 		dependencies = { "mason.nvim", "neovim/nvim-lspconfig" },
-		lazy = false,
+		event = { "BufReadPre", "BufNewFile" },
 		opts = {
 			ensure_installed = {
 				"html",
@@ -29,12 +30,6 @@ return {
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = { "b0o/schemastore.nvim" },
 		config = function()
-			-- Border UI & hover handlers
-			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
-			vim.lsp.handlers["textDocument/signatureHelp"] =
-				vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
-			vim.diagnostic.config({ float = { border = "rounded" } })
-
 			-- LspInfo command
 			local function lsp_info()
 				local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -51,25 +46,41 @@ return {
 			vim.api.nvim_create_user_command("LspInfo", lsp_info, { desc = "Show attached LSP clients" })
 			vim.keymap.set("n", "<leader>ci", lsp_info, { desc = "LSP info" })
 
-			-- Dynamic Python Virtualenv Path helper
-			local function get_python_path(start_path)
-				local match = vim.fs.find(".venv", {
-					path = start_path or vim.fn.getcwd(),
+			-- Resolve the interpreter + version for the closest .venv (falls back to python3 on PATH)
+			local function resolve_python(root)
+				local venv_dir = vim.fs.find(".venv", {
+					path = root or vim.fn.getcwd(),
 					upward = true,
 					type = "directory",
 				})[1]
-				if match and vim.fn.executable(match .. "/bin/python") == 1 then
-					return match .. "/bin/python"
+
+				local venv_path, venv_name
+				local python
+				if venv_dir and vim.fn.executable(venv_dir .. "/bin/python") == 1 then
+					venv_path = vim.fs.dirname(venv_dir)
+					venv_name = ".venv"
+					python = venv_dir .. "/bin/python"
+				else
+					python = vim.fn.exepath("python3")
+					if python == "" then
+						python = vim.fn.exepath("python")
+					end
+					if python == "" then
+						python = "python3"
+					end
 				end
-				local python3 = vim.fn.exepath("python3")
-				if python3 ~= "" then
-					return python3
+
+				local version
+				local ok, output =
+					pcall(vim.fn.system, { python, "-c", "import sys; print('%d.%d' % sys.version_info[:2])" })
+				if ok and vim.v.shell_error == 0 then
+					version = vim.trim(output)
 				end
-				local python = vim.fn.exepath("python")
-				return python ~= "" and python or "python3"
+
+				return venv_path, venv_name, version
 			end
 
-			-- Custom server overrides
+			-- Custom server overrides (merged over the "*" defaults set below)
 			local custom_servers = {
 				basedpyright = {
 					root_markers = {
@@ -81,9 +92,14 @@ return {
 						"requirements.txt",
 					},
 					before_init = function(_, config)
-						local root = config.root_dir or vim.fn.getcwd()
+						local bufname = vim.api.nvim_buf_get_name(0)
+						local start_path = config.root_dir
+							or (bufname ~= "" and vim.fs.dirname(bufname))
+							or vim.fn.getcwd()
+						local venv_path, venv_name, python_version = resolve_python(start_path)
 						config.settings = vim.tbl_deep_extend("force", config.settings or {}, {
-							python = { pythonPath = get_python_path(root) },
+							python = { venvPath = venv_path, venv = venv_name },
+							basedpyright = { analysis = { pythonVersion = python_version } },
 						})
 					end,
 					settings = {
@@ -127,34 +143,36 @@ return {
 							validate = true,
 						},
 					},
+					-- yaml-language-server always advertises formatting; disable it up front
+					-- (via on_init, before the client ever attaches) since prettier/conform owns
+					-- yaml formatting instead.
+					on_init = function(client)
+						client.server_capabilities.documentFormattingProvider = false
+					end,
 				},
 			}
 
-			-- Setup and enable all Mason-installed servers
+			-- Base config applied to every server: capabilities + relaxed workspace requirement.
+			-- mason-lspconfig's automatic_enable (default: on) calls vim.lsp.enable() for every
+			-- Mason-installed server, so we only need to declare configs here, not loop & enable.
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local ok, blink = pcall(require, "blink.cmp")
 			if ok then
 				capabilities = blink.get_lsp_capabilities(capabilities)
 			end
 
-			local mason_lspconfig = require("mason-lspconfig")
-			for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
-				local config = vim.tbl_deep_extend("force", {
-					workspace_required = false,
-					capabilities = capabilities,
-				}, custom_servers[name] or {})
+			vim.lsp.config("*", {
+				capabilities = capabilities,
+				workspace_required = false,
+			})
+
+			for name, config in pairs(custom_servers) do
 				vim.lsp.config(name, config)
-				vim.lsp.enable(name)
 			end
 
-			-- LSP buffer keymaps & autocmds
+			-- LSP buffer keymaps
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
-					local client = vim.lsp.get_client_by_id(args.data.client_id)
-					if client and client.name == "yamlls" then
-						client.server_capabilities.documentFormattingProvider = false
-					end
-
 					local b = args.buf
 
 					vim.keymap.set("n", "grd", function()
@@ -184,34 +202,15 @@ return {
 				end,
 			})
 
-			-- Diagnostic jump mappings
-			local function jump_diag(count, severity)
-				if vim.diagnostic.jump then
-					vim.diagnostic.jump({ count = count, severity = severity })
-				else
-					vim.diagnostic[count > 0 and "goto_next" or "goto_prev"](
-						severity and { severity = severity } or nil
-					)
-				end
-			end
-
-			vim.keymap.set("n", "[d", function()
-				jump_diag(-1)
-			end, { desc = "Previous diagnostic" })
-			vim.keymap.set("n", "]d", function()
-				jump_diag(1)
-			end, { desc = "Next diagnostic" })
-			vim.keymap.set("n", "[e", function()
-				jump_diag(-1, vim.diagnostic.severity.ERROR)
-			end, { desc = "Previous error" })
-			vim.keymap.set("n", "]e", function()
-				jump_diag(1, vim.diagnostic.severity.ERROR)
-			end, { desc = "Next error" })
 			local virtual_text_enabled = false
 			vim.keymap.set("n", "<leader>uV", function()
 				virtual_text_enabled = not virtual_text_enabled
 				vim.diagnostic.config({ virtual_text = virtual_text_enabled })
-				vim.notify("Native virtual text: " .. (virtual_text_enabled and "ON" or "OFF"), vim.log.levels.INFO, { title = "Diagnostics" })
+				vim.notify(
+					"Native virtual text: " .. (virtual_text_enabled and "ON" or "OFF"),
+					vim.log.levels.INFO,
+					{ title = "Diagnostics" }
+				)
 			end, { desc = "Toggle native LSP virtual text" })
 
 			vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Show diagnostic float" })

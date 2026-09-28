@@ -41,6 +41,7 @@ plugins=(
   zsh-completions
   zsh-autosuggestions
   aliases
+  fzf-marks
 )
 
 # Skip heavy syntax-highlighting & tab completion widgets on low-power ARM devices (e.g. Raspberry Pi)
@@ -87,6 +88,10 @@ fzf-history-widget-sync() {
 }
 zle -N fzf-history-widget-sync
 bindkey '^r' fzf-history-widget-sync
+
+# Edit the current command line in $EDITOR (nvim). oh-my-zsh already binds
+# this to ^X^E; rebind it to Alt+V, a single Meta-tap instead of a chord.
+bindkey '^[v' edit-command-line
 
 # Normalize excess spaces and review history expansions before executing them.
 setopt HIST_REDUCE_BLANKS HIST_VERIFY
@@ -175,11 +180,9 @@ f() {
 }
 
 # Move files to a recoverable rubbish directory on the Desktop.
-bin() {
-  mkdir -p "$HOME/Desktop/rubbish"
-  mv "$@" "$HOME/Desktop/rubbish/"
-  echo "Moved to rubbish: $*"
-}
+setopt null_glob
+t() { for p in "$@"; do [ -e "$p" ] && mv "$p" ~/.Trash/"${p:t} $(date +%H%M%S)-$RANDOM" && echo "trashed: $p"; done }
+L=~/Library
 
 # Copy text, piped input, or file contents to the clipboard.
 clip() {

@@ -4,6 +4,22 @@ vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert new line below without 
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 
+-- [[ Diagnostics ]]
+-- Defined here (not inside lsp.lua's lazy-loaded config) so they exist
+-- even before any LSP client has attached.
+vim.keymap.set("n", "[d", function()
+	vim.diagnostic.jump({ count = -1 })
+end, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", function()
+	vim.diagnostic.jump({ count = 1 })
+end, { desc = "Next diagnostic" })
+vim.keymap.set("n", "[e", function()
+	vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Previous error" })
+vim.keymap.set("n", "]e", function()
+	vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Next error" })
+
 -- [[ Navigation ]]
 vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
 

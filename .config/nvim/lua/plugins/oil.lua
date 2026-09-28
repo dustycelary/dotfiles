@@ -38,7 +38,6 @@ return {
 			max_height = 0.9,
 			min_height = { 10, 0.1 },
 			height = nil,
-			border = "rounded",
 			win_options = {
 				winblend = 0,
 			},
@@ -50,11 +49,7 @@ return {
 			max_height = { 10, 0.9 },
 			min_height = { 5, 0.1 },
 			height = nil,
-			border = "rounded",
 			min_update_interval = 50,
-		},
-		keymaps_help = {
-			border = "rounded",
 		},
 		keymaps = {
 			["g?"] = "actions.show_help",

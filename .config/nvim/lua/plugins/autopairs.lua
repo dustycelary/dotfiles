@@ -1,6 +1,7 @@
 -- nvim-autopairs — auto-closes brackets, quotes, parens on insert.
 -- Treesitter-aware: won't close pairs inside lua strings or js template literals.
--- Integrated with nvim-cmp: automatically appends () when confirming a function completion.
+-- Auto-() on function completion is handled by blink.cmp's own
+-- completion.accept.auto_brackets, not nvim-autopairs.
 return {
 	"windwp/nvim-autopairs",
 	event = "InsertEnter",

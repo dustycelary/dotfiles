@@ -7,26 +7,31 @@ return {
 	config = function()
 		require("nvim-treesitter").setup()
 
-		-- install parsers asynchronously (excluding Nvim built-ins: c, lua, vim, vimdoc, query, markdown, markdown_inline)
-		require("nvim-treesitter").install({
-			"json",
-			"javascript",
-			"typescript",
-			"tsx",
-			"yaml",
-			"html",
-			"css",
-			"prisma",
-			"svelte",
-			"graphql",
-			"bash",
-			"zsh",
-			"dockerfile",
-			"gitignore",
-			"python",
-			"php",
-			"toml",
-		})
+		-- install missing parsers asynchronously, deferred past startup
+		-- (excluding Nvim built-ins: c, lua, vim, vimdoc, query, markdown, markdown_inline)
+		-- install() already no-ops per-parser against what's on disk; deferring the
+		-- call just keeps that check off the synchronous startup path.
+		vim.schedule(function()
+			require("nvim-treesitter").install({
+				"json",
+				"javascript",
+				"typescript",
+				"tsx",
+				"yaml",
+				"html",
+				"css",
+				"prisma",
+				"svelte",
+				"graphql",
+				"bash",
+				"zsh",
+				"dockerfile",
+				"gitignore",
+				"python",
+				"php",
+				"toml",
+			})
+		end)
 
 		-- enable highlighting
 		vim.api.nvim_create_autocmd("FileType", {
