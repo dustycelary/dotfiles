@@ -45,6 +45,14 @@ vim.keymap.set("n", "<leader>wz", function()
 	end
 end, { desc = "Toggle zoom current window" })
 
+-- [[ Buffers ]]
+-- bufferline.nvim is disabled on Pi (see its spec), so take over its keys
+-- with the built-in :bnext/:bprev — same muscle memory, zero plugin cost.
+if require("is_pi").is_pi then
+	vim.keymap.set("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" })
+	vim.keymap.set("n", "<S-h>", "<cmd>bprev<CR>", { desc = "Previous buffer" })
+end
+
 -- Bookmarks (<leader>m...) are registered by lua/bookmarks.lua's own setup(),
 -- next to the functions they call.
 

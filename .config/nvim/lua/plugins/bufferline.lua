@@ -4,6 +4,9 @@ return {
 	version = "*",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	event = "VeryLazy",
+	-- Tabline re-renders on every buffer/diagnostic event; Pi uses the
+	-- built-in tabline instead (see take-over keymaps below reusing Tab keys).
+	enabled = not require("is_pi").is_pi,
 	opts = {
 		options = {
 			mode = "buffers",

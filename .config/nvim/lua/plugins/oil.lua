@@ -7,7 +7,9 @@ return {
 		delete_to_trash = true, -- Trash mode enabled by default
 		skip_confirm_for_simple_edits = true,
 		constrain_cursor = "editable", -- Keeps cursor on filename column
-		experimental_watch_for_changes = true, -- Auto-refresh when files change on disk
+		-- Filesystem watcher wakes on every external change; cheap on Mac,
+		-- constant wakeups on Pi. Manual <C-r> refresh still works there.
+		experimental_watch_for_changes = not require("is_pi").is_pi,
 		columns = {
 			"icon",
 			-- "permissions",

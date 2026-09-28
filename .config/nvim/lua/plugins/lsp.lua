@@ -1,4 +1,23 @@
 -- LSP setup — mason + mason-lspconfig + nvim-lspconfig.
+-- On Pi (see lua/is_pi.lua): only lua_ls + bashls auto-install. The Node/Python
+-- servers (basedpyright, yamlls, jsonls, html, dockerls, marksman, taplo,
+-- phpactor) each cost a persistent process + RAM; install them manually with
+-- :MasonInstall if you need one, preferably from apt (clangd especially —
+-- Mason's binary is x86_64-only).
+local is_pi = require("is_pi").is_pi
+local pi_servers = { "lua_ls", "bashls" }
+local full_servers = {
+	"html",
+	"dockerls",
+	"lua_ls",
+	"marksman",
+	"bashls",
+	"basedpyright",
+	"yamlls",
+	"jsonls",
+	"taplo",
+	"phpactor",
+}
 return {
 	{
 		"williamboman/mason.nvim",
@@ -11,18 +30,10 @@ return {
 		dependencies = { "mason.nvim", "neovim/nvim-lspconfig" },
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
-			ensure_installed = {
-				"html",
-				"dockerls",
-				"lua_ls",
-				"marksman",
-				"bashls",
-				"basedpyright",
-				"yamlls",
-				"jsonls",
-				"taplo",
-				"phpactor",
-			},
+			ensure_installed = is_pi and pi_servers or full_servers,
+			-- Don't auto-enable every Mason-installed server on Pi: only the
+			-- ones in ensure_installed above. Manual :MasonInstall stays opt-in.
+			automatic_enable = is_pi and pi_servers or true,
 		},
 	},
 	{
@@ -105,12 +116,14 @@ return {
 					settings = {
 						basedpyright = {
 							analysis = {
-								typeCheckingMode = "basic",
+								-- Pi: no type-checking, no indexing — completions +
+								-- diagnostics only. Desktop keeps basic + indexing.
+								typeCheckingMode = is_pi and "off" or "basic",
 								autoImportCompletions = true,
 								diagnosticMode = "openFilesOnly",
 								autoSearchPaths = true,
-								useLibraryCodeForTypes = true,
-								indexing = true,
+								useLibraryCodeForTypes = not is_pi,
+								indexing = not is_pi,
 								ignore = {
 									"**/.venv",
 									"**/venv",
@@ -224,16 +237,22 @@ return {
 		"stevearc/conform.nvim",
 		event = { "BufReadPre", "BufNewFile" },
 		config = function()
+			local is_pi = require("is_pi").is_pi
 			require("conform").setup({
 				formatters_by_ft = {
 					htmldjango = { "djlint" },
-					python = { "ruff_fix", "ruff_format", "ruff_organize_imports" },
+					-- One ruff call on Pi (3x spawn on save is noticeable);
+					-- full fix+format+organize chain on desktop.
+					python = is_pi and { "ruff_format" } or { "ruff_fix", "ruff_format", "ruff_organize_imports" },
 					json = { "clang-format" },
 					c = { "clang-format" },
 					lua = { "stylua" },
 					jsonl = { "jq_jsonl" },
-					markdown = { "markdownlint" },
-					yaml = { "prettier" },
+					-- Node-based formatters (prettier, markdownlint) each spawn
+					-- node (~300-500ms on Pi); skip them there, keep manual
+					-- <leader>cf which still tries LSP fallback off.
+					markdown = is_pi and {} or { "markdownlint" },
+					yaml = is_pi and {} or { "prettier" },
 				},
 				formatters = {
 					jq_jsonl = {
@@ -246,7 +265,9 @@ return {
 					if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
 						return
 					end
-					return { timeout_ms = 500, lsp_fallback = true }
+					-- No LSP fallback on Pi: with most servers disabled it would
+					-- just add a blocking timeout to every save.
+					return { timeout_ms = is_pi and 2000 or 500, lsp_fallback = not is_pi }
 				end,
 			})
 			vim.keymap.set("n", "<leader>cf", function()

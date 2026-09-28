@@ -6,6 +6,9 @@ return {
 	"rachartier/tiny-inline-diagnostic.nvim",
 	event = "VeryLazy",
 	priority = 1000,
+	-- Wraps + renders virtual text for every line; on Pi fall back to the
+	-- native float (<leader>ce) which is already wired in lsp.lua.
+	enabled = not require("is_pi").is_pi,
 	keys = {
 		{
 			"<leader>ud",

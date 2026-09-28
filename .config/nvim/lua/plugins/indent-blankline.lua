@@ -6,6 +6,9 @@
 return {
 	"lukas-reineke/indent-blankline.nvim",
 	main = "ibl",
+	-- Per-line extmarks + scope redraws are one of the heaviest UI costs on
+	-- weak ARM cores; disable on Pi, keep on desktop.
+	enabled = not require("is_pi").is_pi,
 	opts = {
 		indent = {
 			char = "│",

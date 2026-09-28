@@ -197,11 +197,29 @@ chmod +x stylua
 sudo mv stylua /usr/local/bin/
 ```
 
-### 6. Clone this config
+### 6. Clone this config + put hot paths on the SSD
 
 ```sh
 git clone <your-repo-url> ~/.config/nvim
 ```
+
+If your fast SSD is at `/mnt/t7` (yours), keep lazy plugins, Mason, treesitter
+parsers, cache and shada off the SD card:
+
+```sh
+mkdir -p /mnt/t7/nvim/{data,cache,state}
+```
+
+`.zshrc` / `.bashrc` already export `XDG_DATA_HOME=/mnt/t7/nvim/data`,
+`XDG_CACHE_HOME=/mnt/t7/nvim/cache`, `XDG_STATE_HOME=/mnt/t7/nvim/state` when
+`/mnt/t7/nvim` exists — so no extra step after pulling dotfiles. Verify inside
+nvim with `:echo stdpath("data")` (should print `/mnt/t7/nvim/data/nvim`).
+The `nvim` binary itself stays on the SD (`/usr/local/bin/nvim`); only data moves.
+
+Low-power mode (`lua/is_pi.lua`) auto-enables on ARM Linux or with
+`NVIM_PROFILE=pi`: no bufferline / indent-blankline / treesitter-context /
+tiny-inline-diagnostics, manual folds, no relativenumber/cursorline, minimal
+treesitter parsers + LSP servers (lua_ls, bashls), light blink + conform.
 
 ### 7. Launch Neovim
 

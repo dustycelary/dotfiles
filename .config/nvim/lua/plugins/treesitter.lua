@@ -12,7 +12,15 @@ return {
 		-- install() already no-ops per-parser against what's on disk; deferring the
 		-- call just keeps that check off the synchronous startup path.
 		vim.schedule(function()
-			require("nvim-treesitter").install({
+			-- Full list on desktop; on Pi install only what you edit daily.
+			-- Each extra parser is disk + compile time + highlight cost.
+			-- Add more later with :TSInstall <lang>.
+			local parsers = require("is_pi").is_pi and {
+				"bash",
+				"python",
+				"toml",
+				"yaml",
+			} or {
 				"json",
 				"javascript",
 				"typescript",
@@ -30,7 +38,8 @@ return {
 				"python",
 				"php",
 				"toml",
-			})
+			}
+			require("nvim-treesitter").install(parsers)
 		end)
 
 		-- enable highlighting
