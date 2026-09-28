@@ -9,14 +9,14 @@ return {
 			function()
 				require("persistence").load()
 			end,
-			desc = "Restore session for current dir",
+			desc = "Restore session for cwd",
 		},
 		{
 			"<leader>Ss",
 			function()
 				require("persistence").select()
 			end,
-			desc = "Select session to restore",
+			desc = "Select session",
 		},
 		{
 			"<leader>Sl",
@@ -30,7 +30,7 @@ return {
 			function()
 				require("persistence").stop()
 			end,
-			desc = "Don't save current session",
+			desc = "Stop saving session",
 		},
 	},
 }

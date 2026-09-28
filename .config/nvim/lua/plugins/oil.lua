@@ -66,7 +66,7 @@ return {
 			["-"] = "actions.parent",
 			["_"] = "actions.open_cwd",
 			["`"] = "actions.cd",
-			["~"] = { "actions.cd", opts = { scope = "tab" }, desc = ":tcd to the current oil directory" },
+			["~"] = { "actions.cd", opts = { scope = "tab" }, desc = "Change tab directory here (:tcd)" },
 			["gs"] = "actions.change_sort",
 			["gx"] = "actions.open_external",
 			["g."] = "actions.toggle_hidden",
@@ -105,8 +105,9 @@ return {
 			end,
 		})
 
-		-- [[ Navigation ]]
-		vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
+		-- `-` is declared in `keys` above, which is also what lazy-loads oil; a
+		-- second vim.keymap.set here would only overwrite it with a different
+		-- description, so which-key would show one thing and lazy another.
 
 		-- Expand %% to the current directory on the command line
 		vim.keymap.set("c", "%%", function()

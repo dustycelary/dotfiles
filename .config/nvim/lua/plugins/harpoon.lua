@@ -73,7 +73,7 @@ return {
 			function()
 				require("harpoon"):list():add()
 			end,
-			desc = "Harpoon add file",
+			desc = "Add file to list",
 		},
 		{
 			"<leader>hh",
@@ -81,7 +81,7 @@ return {
 				local harpoon = require("harpoon")
 				harpoon.ui:toggle_quick_menu(harpoon:list())
 			end,
-			desc = "Harpoon file quick menu",
+			desc = "File quick menu",
 		},
 		{
 			"<leader>1",
@@ -116,14 +116,14 @@ return {
 			function()
 				require("harpoon"):list():next()
 			end,
-			desc = "Harpoon next file",
+			desc = "Next file in list",
 		},
 		{
 			"<leader>hp",
 			function()
 				require("harpoon"):list():prev()
 			end,
-			desc = "Harpoon previous file",
+			desc = "Previous file in list",
 		},
 
 		-- Command Bookmarks (global, shared across every project)
@@ -138,7 +138,7 @@ return {
 					end
 				end)
 			end,
-			desc = "Harpoon add command",
+			desc = "Add command to list",
 		},
 		{
 			"<leader>hm",
@@ -147,7 +147,7 @@ return {
 					require("harpoon").ui:toggle_quick_menu(list)
 				end)
 			end,
-			desc = "Harpoon command quick menu",
+			desc = "Command quick menu",
 		},
 		{
 			"<leader>h1",
@@ -156,7 +156,7 @@ return {
 					list:select(1)
 				end)
 			end,
-			desc = "Harpoon run command 1",
+			desc = "Run command 1",
 		},
 		{
 			"<leader>h2",
@@ -165,7 +165,7 @@ return {
 					list:select(2)
 				end)
 			end,
-			desc = "Harpoon run command 2",
+			desc = "Run command 2",
 		},
 		{
 			"<leader>h3",
@@ -174,7 +174,7 @@ return {
 					list:select(3)
 				end)
 			end,
-			desc = "Harpoon run command 3",
+			desc = "Run command 3",
 		},
 		{
 			"<leader>h4",
@@ -183,7 +183,7 @@ return {
 					list:select(4)
 				end)
 			end,
-			desc = "Harpoon run command 4",
+			desc = "Run command 4",
 		},
 	},
 }

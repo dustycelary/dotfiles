@@ -11,7 +11,7 @@ return {
 			function()
 				require("gitsigns").toggle_current_line_blame()
 			end,
-			desc = "Toggle git blame",
+			desc = "Toggle inline git blame",
 		},
 	},
 	opts = {

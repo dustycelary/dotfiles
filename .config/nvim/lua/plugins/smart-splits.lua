@@ -18,10 +18,10 @@ return {
 		default_amount = 2,
 	},
 	keys = {
-		{ "<C-h>", function() require("smart-splits").move_cursor_left() end, desc = "Move to left split/pane" },
-		{ "<C-j>", function() require("smart-splits").move_cursor_down() end, desc = "Move to below split/pane" },
-		{ "<C-k>", function() require("smart-splits").move_cursor_up() end, desc = "Move to above split/pane" },
-		{ "<C-l>", function() require("smart-splits").move_cursor_right() end, desc = "Move to right split/pane" },
+		{ "<C-h>", function() require("smart-splits").move_cursor_left() end, desc = "Focus split/pane left" },
+		{ "<C-j>", function() require("smart-splits").move_cursor_down() end, desc = "Focus split/pane down" },
+		{ "<C-k>", function() require("smart-splits").move_cursor_up() end, desc = "Focus split/pane up" },
+		{ "<C-l>", function() require("smart-splits").move_cursor_right() end, desc = "Focus split/pane right" },
 
 		{ "<S-Left>", function() require("smart-splits").resize_left() end, desc = "Decrease window width" },
 		{ "<S-Right>", function() require("smart-splits").resize_right() end, desc = "Increase window width" },

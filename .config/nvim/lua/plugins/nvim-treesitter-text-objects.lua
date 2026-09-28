@@ -85,9 +85,9 @@ return {
 		}
 
 		local swap_prev_maps = {
-			["<leader>Na"] = { query = "@parameter.inner", desc = "Swap parameter with prev" },
-			["<leader>N:"] = { query = "@property.outer", desc = "Swap object property with prev" },
-			["<leader>Nm"] = { query = "@function.outer", desc = "Swap function with prev" },
+			["<leader>Na"] = { query = "@parameter.inner", desc = "Swap parameter with previous" },
+			["<leader>N:"] = { query = "@property.outer", desc = "Swap object property with previous" },
+			["<leader>Nm"] = { query = "@function.outer", desc = "Swap function with previous" },
 		}
 
 		for key, map in pairs(swap_next_maps) do
@@ -124,21 +124,21 @@ return {
 		}
 
 		local move_prev_start = {
-			["[f"] = { query = "@call.outer", desc = "Prev function call start" },
-			["[m"] = { query = "@function.outer", desc = "Prev method/function def start" },
-			["[c"] = { query = "@class.outer", desc = "Prev class start" },
-			["[i"] = { query = "@conditional.outer", desc = "Prev conditional start" },
-			["[o"] = { query = "@loop.outer", desc = "Prev loop start" },
-			["[x"] = { query = "@exception.outer", desc = "Prev try/except block start" },
+			["[f"] = { query = "@call.outer", desc = "Previous function call start" },
+			["[m"] = { query = "@function.outer", desc = "Previous method/function def start" },
+			["[c"] = { query = "@class.outer", desc = "Previous class start" },
+			["[i"] = { query = "@conditional.outer", desc = "Previous conditional start" },
+			["[o"] = { query = "@loop.outer", desc = "Previous loop start" },
+			["[x"] = { query = "@exception.outer", desc = "Previous try/except block start" },
 		}
 
 		local move_prev_end = {
-			["[F"] = { query = "@call.outer", desc = "Prev function call end" },
-			["[M"] = { query = "@function.outer", desc = "Prev method/function def end" },
-			["[C"] = { query = "@class.outer", desc = "Prev class end" },
-			["[I"] = { query = "@conditional.outer", desc = "Prev conditional end" },
-			["[O"] = { query = "@loop.outer", desc = "Prev loop end" },
-			["[X"] = { query = "@exception.outer", desc = "Prev try/except block end" },
+			["[F"] = { query = "@call.outer", desc = "Previous function call end" },
+			["[M"] = { query = "@function.outer", desc = "Previous method/function def end" },
+			["[C"] = { query = "@class.outer", desc = "Previous class end" },
+			["[I"] = { query = "@conditional.outer", desc = "Previous conditional end" },
+			["[O"] = { query = "@loop.outer", desc = "Previous loop end" },
+			["[X"] = { query = "@exception.outer", desc = "Previous try/except block end" },
 		}
 
 		local function set_move_keymaps(bufnr)

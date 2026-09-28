@@ -2,8 +2,8 @@
 
 - [x] why is this still happening and isn't displaying file name ? [image]('/Users/fungus/Documents/screenshots/Screenshot\ 2026-09-28\ at\ 05.29.45.png')
 - [ ] Add a better renaming plugin
-- [ ] wheres file searching plugin for home folders? (directories)
-- [ ] reorganise bookmarks so its keymaps aren't put in [file]((k))
+- [x] wheres file searching plugin for home folders? (directories)
+- [x] reorganise bookmarks so its keymaps aren't put in [file]((k))
 - [x] why cna't i see brackets in markdown as i' mediting it?
 
 # done

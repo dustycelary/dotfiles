@@ -1,6 +1,6 @@
 -- [[ Editor ]]
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
-vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert new line below without splitting line" })
+vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert line below without splitting" })
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 
@@ -53,13 +53,13 @@ vim.keymap.set("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix pane
 vim.keymap.set("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix panel" })
 vim.keymap.set("n", "<leader>fq", function()
 	require("fzf-lua").quickfix()
-end, { desc = "Fuzzy search quickfix list" })
+end, { desc = "Search quickfix list" })
 
 vim.keymap.set("n", "<leader>lo", "<cmd>lopen<CR>", { desc = "Open location list panel" })
 vim.keymap.set("n", "<leader>lc", "<cmd>lclose<CR>", { desc = "Close location list panel" })
 vim.keymap.set("n", "<leader>fl", function()
 	require("fzf-lua").loclist()
-end, { desc = "Fuzzy search location list" })
+end, { desc = "Search location list" })
 
 -- Close quickfix/loclist window with 'q' when focused inside it
 local qf_augroup = vim.api.nvim_create_augroup("QuickfixKeymaps", { clear = true })
@@ -67,7 +67,7 @@ vim.api.nvim_create_autocmd("FileType", {
 	group = qf_augroup,
 	pattern = "qf",
 	callback = function(event)
-		vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = event.buf, silent = true, desc = "Close quickfix" })
+		vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = event.buf, silent = true, desc = "Close quickfix panel" })
 	end,
 })
 

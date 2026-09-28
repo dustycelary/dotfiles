@@ -46,9 +46,9 @@ return {
 		})
 
 		-- set up incremental selection (undo steps back through selection history)
-		vim.keymap.set("n", "<S-CR>", require("incselect").init)
-		vim.keymap.set("x", "<S-CR>", require("incselect").parent)
-		vim.keymap.set("x", "<bs>", require("incselect").undo)
+		vim.keymap.set("n", "<S-CR>", require("incselect").init, { desc = "Select node under cursor" })
+		vim.keymap.set("x", "<S-CR>", require("incselect").parent, { desc = "Expand selection to parent node" })
+		vim.keymap.set("x", "<bs>", require("incselect").undo, { desc = "Shrink selection to previous node" })
 
 		-- use bash parser for sh, zsh, conf, env, and toml files
 		vim.treesitter.language.register("bash", "sh")

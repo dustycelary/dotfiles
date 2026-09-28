@@ -44,7 +44,7 @@ return {
 				vim.notify(table.concat(lines, "\n"), vim.log.levels.INFO, { title = "LSP clients" })
 			end
 			vim.api.nvim_create_user_command("LspInfo", lsp_info, { desc = "Show attached LSP clients" })
-			vim.keymap.set("n", "<leader>ci", lsp_info, { desc = "LSP info" })
+			vim.keymap.set("n", "<leader>ci", lsp_info, { desc = "LSP client info" })
 
 			-- Resolve the interpreter + version for the closest .venv (falls back to python3 on PATH)
 			local function resolve_python(root)
@@ -179,10 +179,10 @@ return {
 						require("fzf-lua").lsp_definitions({ jump1 = true })
 					end, { buffer = b, desc = "Go to definition" })
 					vim.keymap.set("n", "grD", vim.lsp.buf.declaration, { buffer = b, desc = "Go to declaration" })
-					vim.keymap.set("n", "grr", vim.lsp.buf.references, { buffer = b, desc = "LSP references → Quickfix" })
+					vim.keymap.set("n", "grr", vim.lsp.buf.references, { buffer = b, desc = "References → quickfix" })
 					vim.keymap.set("n", "gri", function()
 						require("fzf-lua").lsp_implementations({ jump1 = true })
-					end, { buffer = b, desc = "LSP implementations" })
+					end, { buffer = b, desc = "Implementations" })
 					vim.keymap.set("n", "<leader>cs", function()
 						local blink = require("blink.cmp")
 						if blink.is_signature_visible() then
@@ -191,7 +191,9 @@ return {
 							blink.show_signature()
 						end
 					end, { buffer = b, desc = "Toggle signature help" })
-					vim.keymap.set("n", "<leader>cn", vim.lsp.buf.rename, { buffer = b, desc = "Rename symbol" })
+					-- <leader>cn (rename symbol) belongs to inc-rename.nvim. It has to
+					-- stay out of here: a buffer-local map would shadow the global one
+					-- and we'd be back to the preview-less prompt.
 					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = b, desc = "Code actions" })
 					vim.keymap.set(
 						"v",
@@ -211,11 +213,11 @@ return {
 					vim.log.levels.INFO,
 					{ title = "Diagnostics" }
 				)
-			end, { desc = "Toggle native LSP virtual text" })
+			end, { desc = "Toggle LSP virtual text" })
 
 			vim.keymap.set("n", "<leader>ce", vim.diagnostic.open_float, { desc = "Show diagnostic float" })
 			vim.keymap.set("n", "<leader>cq", vim.diagnostic.setqflist, { desc = "Diagnostics → quickfix" })
-			vim.keymap.set("n", "<leader>cl", vim.diagnostic.setloclist, { desc = "Diagnostics → loclist" })
+			vim.keymap.set("n", "<leader>cl", vim.diagnostic.setloclist, { desc = "Diagnostics → location list" })
 		end,
 	},
 	{
@@ -249,7 +251,7 @@ return {
 			})
 			vim.keymap.set("n", "<leader>cf", function()
 				require("conform").format({ async = true })
-			end, { desc = "Format file" })
+			end, { desc = "Format buffer" })
 		end,
 	},
 }

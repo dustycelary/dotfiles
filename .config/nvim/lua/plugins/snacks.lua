@@ -18,7 +18,7 @@ return {
 			function()
 				Snacks.rename.rename_file()
 			end,
-			desc = "Rename file (LSP-aware)",
+			desc = "Rename file",
 		},
 	},
 }

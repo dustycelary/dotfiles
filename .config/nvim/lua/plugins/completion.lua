@@ -41,13 +41,13 @@ return {
 				if luasnip.choice_active() then
 					luasnip.change_choice(1)
 				end
-			end, { desc = "LuaSnip next choice" })
+			end, { desc = "Next snippet choice" })
 
 			vim.keymap.set({ "i", "s" }, "<C-h>", function()
 				if luasnip.choice_active() then
 					luasnip.change_choice(-1)
 				end
-			end, { desc = "LuaSnip previous choice" })
+			end, { desc = "Previous snippet choice" })
 		end,
 	},
 	-- 3. Supermaven AI inline completion (DISABLED: change enabled = true to turn back on)
