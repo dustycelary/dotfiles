@@ -20,20 +20,11 @@ vim.keymap.set("n", "]e", function()
 	vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
 end, { desc = "Next error" })
 
--- [[ Navigation ]]
-vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
-
 -- [[ Clipboard ]]
 vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste clipboard" })
 
 -- [[ Windows ]]
--- <C-hjkl> movement and <S-arrow> resizing live in plugins/smart-splits.lua so
--- they cross the nvim/tmux boundary. Everything below is split *management*,
--- which has no multiplexer involvement.
---
--- Note: <leader><space> is no longer `:b#` — it's the buffer switcher (see
--- fzf-lua.lua). Plain <C-^> is still the native alternate-buffer jump.
 vim.keymap.set("n", "<leader>ws", "<C-w>s", { desc = "Split horizontal" })
 vim.keymap.set("n", "<leader>wv", "<C-w>v", { desc = "Split vertical" })
 vim.keymap.set("n", "<leader>wq", "<C-w>q", { desc = "Close window" })
@@ -54,16 +45,8 @@ vim.keymap.set("n", "<leader>wz", function()
 	end
 end, { desc = "Toggle zoom current window" })
 
--- [[ Bookmarks — global & persistent, see lua/bookmarks.lua ]]
-vim.keymap.set("n", "<leader>mm", function()
-	require("bookmarks").pick()
-end, { desc = "Find bookmark" })
-vim.keymap.set("n", "<leader>ma", function()
-	require("bookmarks").add()
-end, { desc = "Bookmark current file/dir" })
-vim.keymap.set("n", "<leader>mc", function()
-	require("bookmarks").add_cwd()
-end, { desc = "Bookmark cwd" })
+-- Bookmarks (<leader>m...) are registered by lua/bookmarks.lua's own setup(),
+-- next to the functions they call.
 
 -- [[ Quickfix & Location List ]]
 vim.keymap.set("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix panel" })

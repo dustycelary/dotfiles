@@ -105,6 +105,9 @@ return {
 			end,
 		})
 
+		-- [[ Navigation ]]
+		vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
+
 		-- Expand %% to the current directory on the command line
 		vim.keymap.set("c", "%%", function()
 			if vim.bo.filetype == "oil" then

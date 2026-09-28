@@ -12,19 +12,13 @@
 # font-family = CommitMono Nerd Font
 # font-family = VictorMono Nerd Font
 # font-family = Iosevka Nerd Font Mono
-font-family = "IoskeleyMonoTerm Nerd Font Mono"
-font-style = "Medium"
-font-style-bold = "SemiBold"
-font-style-italic = "Medium Italic"
-font-style-bold-italic = "SemiBold Italic"
-# True fixed-width Nerd Font icons (unlike the non-Term build above), and
-# semi-condensed width lands closest to Berkeley Mono's restrained,
-# engineering-drafting proportions of anything installed.
-# To try narrower cut, use: font-style = "SemiCondensed Medium" (+ SemiBold etc.)
+font-family = "Monaspace Argon NF"
+# Monaspace ships Regular/Bold/Italic — leave font-style at default.
+# NF build already includes Nerd Font icons.
 # font-family = scientifica
 # font-family = UbuntuMono Nerd Font
 
-font-size = 16
+# font-size = 14
 
 # font-family = Iosevka Fergus
 # font-family-bold = "Iosevka Fergus"
@@ -34,21 +28,17 @@ font-size = 16
 
 
 
-# Slashed zero like the marketing shot. Disable calt/liga/dlig to match
-# that shot (explicit :: * &|, no ligatures).
-font-feature = zero
-font-feature = -calt
-font-feature = -liga
-font-feature = -dlig
+# Monaspace is designed around texture-healing + ligatures — keep them on.
+# Use -calt, -liga if you want explicit glyphs like Berkeley shot.
+font-feature = calt
+font-feature = liga
 
-# Iosevka Regular is thinner than Berkeley Regular — Medium + light
-# macOS thickening gets the stroke weight closer.
-font-thicken = true
-font-thicken-strength = 80
+# Monaspace Regular is correct weight — keep crisp.
+font-thicken = false
 
-# Berkeley has tighter sides, airier lines than Iosevka defaults.
-adjust-cell-height = 8%
-adjust-cell-width = -5%
+# Monaspace metrics are roomy already, no extra leading needed.
+adjust-cell-height = 0%
+adjust-cell-width = 0%
 # adjust-icon-height = 30%
 
 # Box and line-drawing symbol thickness adjustment

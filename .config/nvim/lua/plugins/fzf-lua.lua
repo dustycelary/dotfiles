@@ -164,7 +164,8 @@ return {
 		-- [[ Directories — search outside the current project ]]
 		{ "<leader>dh", files_in("~"), desc = "Files in ~" },
 		{ "<leader>dn", files_in("~/Documents"), desc = "Files in ~/Documents" },
-		{ "<leader>dd", files_in("~/Documents/dotfiles"), desc = "Files in dotfiles" },
-		{ "<leader>du", files_in("~/OneDrive/Documents/university"), desc = "Files in university" },
+		{ "<leader>dd", files_in("~/Downloads"), desc = "Files in Downloads" },
+		{ "<leader>do", files_in("~/OneDrive"), desc = "Files in Onedrive" },
+		{ "<leader>dc", files_in("~/Developer"), desc = "Files in Developer" },
 	},
 }

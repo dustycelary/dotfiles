@@ -20,21 +20,5 @@ return {
 			end,
 			desc = "Rename file (LSP-aware)",
 		},
-		-- Plain `:bd` also closes whatever windows held the buffer; this keeps
-		-- the split layout intact and drops another buffer in its place.
-		{
-			"<leader>bd",
-			function()
-				Snacks.bufdelete()
-			end,
-			desc = "Delete buffer (keep split)",
-		},
-		{
-			"<leader>bo",
-			function()
-				Snacks.bufdelete.other()
-			end,
-			desc = "Delete other buffers",
-		},
 	},
 }

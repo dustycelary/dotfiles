@@ -109,18 +109,45 @@ function M.pick()
 		return
 	end
 
-	-- fzf hands back the display string, so keep a map back to the real path.
-	local by_display, entries = {}, {}
+	-- Mirror fzf-lua's `path.filename_first` formatter: basename first, parent
+	-- directory dimmed off to the right. Without this a long path is truncated
+	-- from the right and every entry reads as an indistinguishable
+	-- "~/Library/CloudStorage/OneDrive-Personal/Documents/tech...".
+	local utils = require("fzf-lua.utils")
+
+	local rows, width = {}, 0
 	for _, p in ipairs(list) do
 		local isdir = vim.fn.isdirectory(p) == 1
-		local missing = not isdir and vim.fn.filereadable(p) == 0
-		local display = string.format("%s  %s", missing and "" or (isdir and "" or ""), vim.fn.fnamemodify(p, ":~"))
-		by_display[display] = p
-		table.insert(entries, display)
+		local row = {
+			path = p,
+			icon = (not isdir and vim.fn.filereadable(p) == 0) and "" or (isdir and "" or ""),
+			name = vim.fn.fnamemodify(p, ":t"),
+			parent = vim.fn.fnamemodify(vim.fn.fnamemodify(p, ":h"), ":~"),
+		}
+		if row.name == "" then -- e.g. "/" — nothing to split off
+			row.name, row.parent = p, ""
+		end
+		width = math.max(width, vim.fn.strdisplaywidth(row.name))
+		table.insert(rows, row)
+	end
+	width = math.min(width, 40) -- don't let one long name push every path off-screen
+
+	-- fzf hands back the display string, so keep a map back to the real path.
+	-- Key it on the *uncolored* text: whether fzf strips the ANSI escapes from
+	-- its output depends on the code path, so normalize both sides.
+	local by_display, entries = {}, {}
+	for _, row in ipairs(rows) do
+		local pad = string.rep(" ", math.max(1, width - vim.fn.strdisplaywidth(row.name) + 2))
+		local prefix = string.format("%s  %s%s", row.icon, row.name, pad)
+		by_display[prefix .. row.parent] = row.path
+		table.insert(entries, prefix .. utils.ansi_codes.grey(row.parent))
 	end
 
 	local function selected(sel)
-		return sel and sel[1] and by_display[sel[1]]
+		if not (sel and sel[1]) then
+			return nil
+		end
+		return by_display[utils.strip_ansi_coloring(sel[1])]
 	end
 
 	require("fzf-lua").fzf_exec(entries, {
@@ -178,6 +205,18 @@ function M.pick()
 			end,
 		},
 	})
+end
+
+-- Keymaps live here rather than in lua/keymaps.lua so the whole feature is one
+-- file. Called from init.lua; the which-key group for <leader>m is declared in
+-- plugins/which-key.lua. fzf-lua is only required inside pick(), so loading
+-- this module at startup pulls in nothing else.
+function M.setup()
+	vim.keymap.set("n", "<leader>mm", M.pick, { desc = "Find bookmark" })
+	vim.keymap.set("n", "<leader>ma", function()
+		M.add()
+	end, { desc = "Bookmark current file/dir" })
+	vim.keymap.set("n", "<leader>mc", M.add_cwd, { desc = "Bookmark cwd" })
 end
 
 return M
