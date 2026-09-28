@@ -1,22 +1,37 @@
 return {
 	{
-		"projekt0n/github-nvim-theme",
-		name = "github-theme",
+		"catppuccin/nvim",
+		name = "catppuccin",
 		lazy = false,
 		priority = 1000,
 		config = function()
-			require("github-theme").setup({
-				options = {
-					transparent = false,
-					terminal_colors = true,
-					darken = {
-						floats = true,
-						sidebars = { enable = true },
-					},
+			require("catppuccin").setup({
+				flavour = "mocha",
+				transparent_background = false,
+				terminal_colors = true,
+				dim_inactive = {
+					enabled = false,
+					shade = "dark",
+					percentage = 0.15,
+				},
+				integrations = {
+					cmp = true,
+					gitsigns = true,
+					harpoon = true,
+					indent_blankline = { enabled = true },
+					mason = true,
+					native_lsp = { enabled = true },
+					treesitter = true,
+					treesitter_context = true,
+					which_key = true,
+					fzf = true,
+					render_markdown = true,
+					flash = true,
+					oil = true,
 				},
 			})
 			vim.o.background = "dark"
-			vim.cmd.colorscheme("github_dark_default")
+			vim.cmd.colorscheme("catppuccin")
 		end,
 	},
 }

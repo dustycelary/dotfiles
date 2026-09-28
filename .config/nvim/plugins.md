@@ -36,10 +36,12 @@ Ghost text shows the top suggestion inline as you type.
 
 Sort order: exact match → score → recently used → locality → kind → length. Formatting shows a kind icon with the kind name (e.g. Function, Variable) rather than the source name.
 
-## colorscheme (github-nvim-theme)
-Default colorscheme is GitHub Dark Default via `projekt0n/github-nvim-theme`,
-with terminal colors and automatic plugin integrations enabled. Floating and
-sidebar-style windows use the theme's darker backgrounds.
+## colorscheme (catppuccin)
+Default colorscheme is Catppuccin Mocha via `catppuccin/nvim`,
+with terminal colors and automatic plugin integrations enabled
+(cmp, gitsigns, treesitter, which-key, etc.). To switch flavour,
+change `flavour` in `lua/plugins/colorscheme.lua` to `latte`,
+`frappe`, `macchiato`, or `mocha`.
 
 ---
 

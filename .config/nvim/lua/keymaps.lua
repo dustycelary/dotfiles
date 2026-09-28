@@ -28,16 +28,42 @@ vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank clipboard" })
 vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste clipboard" })
 
 -- [[ Windows ]]
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to below window" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to above window" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+-- <C-hjkl> movement and <S-arrow> resizing live in plugins/smart-splits.lua so
+-- they cross the nvim/tmux boundary. Everything below is split *management*,
+-- which has no multiplexer involvement.
+--
+-- Note: <leader><space> is no longer `:b#` — it's the buffer switcher (see
+-- fzf-lua.lua). Plain <C-^> is still the native alternate-buffer jump.
+vim.keymap.set("n", "<leader>ws", "<C-w>s", { desc = "Split horizontal" })
+vim.keymap.set("n", "<leader>wv", "<C-w>v", { desc = "Split vertical" })
+vim.keymap.set("n", "<leader>wq", "<C-w>q", { desc = "Close window" })
+vim.keymap.set("n", "<leader>wo", "<C-w>o", { desc = "Close all other windows" })
+vim.keymap.set("n", "<leader>w=", "<C-w>=", { desc = "Equalize window sizes" })
 
-vim.keymap.set("n", "<S-Left>", "2<C-w><", { desc = "Decrease window width" })
-vim.keymap.set("n", "<S-Right>", "2<C-w>>", { desc = "Increase window width" })
-vim.keymap.set("n", "<S-Up>", "2<C-w>+", { desc = "Increase window height" })
-vim.keymap.set("n", "<S-Down>", "2<C-w>-", { desc = "Decrease window height" })
-vim.keymap.set("n", "<leader><space>", "<cmd>b#<cr>", { desc = "Toggle last active buffer" })
+-- Zoom toggle. `equalalways` re-balances on every split/close, so rather than
+-- trying to save and restore exact dimensions this just re-maximizes or
+-- re-equalizes; the tab-scoped flag keeps the state per layout.
+vim.keymap.set("n", "<leader>wz", function()
+	if vim.t.zoomed then
+		vim.cmd("wincmd =")
+		vim.t.zoomed = nil
+	else
+		vim.cmd("wincmd |")
+		vim.cmd("wincmd _")
+		vim.t.zoomed = true
+	end
+end, { desc = "Toggle zoom current window" })
+
+-- [[ Bookmarks — global & persistent, see lua/bookmarks.lua ]]
+vim.keymap.set("n", "<leader>mm", function()
+	require("bookmarks").pick()
+end, { desc = "Find bookmark" })
+vim.keymap.set("n", "<leader>ma", function()
+	require("bookmarks").add()
+end, { desc = "Bookmark current file/dir" })
+vim.keymap.set("n", "<leader>mc", function()
+	require("bookmarks").add_cwd()
+end, { desc = "Bookmark cwd" })
 
 -- [[ Quickfix & Location List ]]
 vim.keymap.set("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix panel" })

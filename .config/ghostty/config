@@ -12,15 +12,19 @@
 # font-family = CommitMono Nerd Font
 # font-family = VictorMono Nerd Font
 # font-family = Iosevka Nerd Font Mono
-font-family = IoskeleyMono Nerd Font
+font-family = "IoskeleyMonoTerm Nerd Font Mono"
+font-style = "Medium"
+font-style-bold = "SemiBold"
+font-style-italic = "Medium Italic"
+font-style-bold-italic = "SemiBold Italic"
 # True fixed-width Nerd Font icons (unlike the non-Term build above), and
 # semi-condensed width lands closest to Berkeley Mono's restrained,
 # engineering-drafting proportions of anything installed.
-# font-family = IoskeleyMonoTerm Nerd Font 
+# To try narrower cut, use: font-style = "SemiCondensed Medium" (+ SemiBold etc.)
 # font-family = scientifica
 # font-family = UbuntuMono Nerd Font
 
-# font-size = 14
+font-size = 16
 
 # font-family = Iosevka Fergus
 # font-family-bold = "Iosevka Fergus"
@@ -30,32 +34,34 @@ font-family = IoskeleyMono Nerd Font
 
 
 
-# Use the font's slashed-zero alternate. (`liga` is a no-op on every
-# installed font here — they all do ligatures via `calt` instead.)
-font-feature = zero, calt
+# Slashed zero like the marketing shot. Disable calt/liga/dlig to match
+# that shot (explicit :: * &|, no ligatures).
+font-feature = zero
+font-feature = -calt
+font-feature = -liga
+font-feature = -dlig
 
-# Berkeley Mono's look is crisp and precise, not heavy — keep this off
-# so strokes stay thin rather than synthetically bolded.
-font-thicken = false
-font-thicken-strength = 130
+# Iosevka Regular is thinner than Berkeley Regular — Medium + light
+# macOS thickening gets the stroke weight closer.
+font-thicken = true
+font-thicken-strength = 80
 
-# IoskeleyMono's own ascent+descent already run tall (same spread as
-# Iosevka, which it's built from), so less extra leading is needed
-# here than CommitMono wanted (was 2).
-adjust-cell-height = 0
-adjust-icon-height = 30%
+# Berkeley has tighter sides, airier lines than Iosevka defaults.
+adjust-cell-height = 8%
+adjust-cell-width = -5%
+# adjust-icon-height = 30%
 
 # Box and line-drawing symbol thickness adjustment
-adjust-box-thickness = 1
+# adjust-box-thickness = 1
 
 # Clean up underlines so they don't clash with descenders
-adjust-underline-position = 1
-adjust-underline-thickness = 1
+# adjust-underline-position = 1
+# adjust-underline-thickness = 1
 
 # ------------------------------------------------------------------------------
 # 2. THEMES & COLOR INTEGRATION
 # ------------------------------------------------------------------------------
-theme = GitHub Dark Default
+theme = Catppuccin Mocha
 
 # Controls native macOS titlebar/scrollbar styling matching light/dark mode
 window-theme = system

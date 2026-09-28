@@ -1,16 +1,71 @@
 # todo
 
-- [ ] add settings that make it easier to navigate files or windows/splits
-- [ ] add comamnds like:
-  - <leader>ff → files in current project
-  - <leader>fh → files in home directory
-  - <leader>fu → files in ~/Uni
-  - <leader>dn → files in ~/Documents
-- [ ] another way to quickly search buffers.
-- [ ] can i bookmark directories or files that i can access from any working directory, that just makes it easy to find them, persistent and global, and easy to search them all.
+- [ ] why is this still happening and isn't displaying file name ? [image]('/Users/fungus/Documents/screenshots/Screenshot\ 2026-09-28\ at\ 05.29.45.png')
+- [ ] Add a better renaming function
 
-- [ ] how to change fzf lua so i don't have this issue with not enough space [image]('/Users/fungus/Documents/screenshots/Screenshot\ 2026-09-28\ at\ 04.44.27.png')
-- [ ] change <leader>space so it does a quick search of buffers?
+# done
+
+- [x] add settings that make it easier to navigate files or windows/splits
+      — `smart-splits.nvim`: `<C-hjkl>` now crosses the nvim/tmux boundary and
+      `<S-arrows>` resize through to tmux panes (needs the `is_vim` passthrough
+      block in `.tmux.conf`). New `<leader>w` group: `ws`/`wv` split, `wq`/`wo`
+      close, `w=` equalize, `wz` zoom toggle, `wh/wj/wk/wl` swap buffers between
+      splits. Plus `<leader>bd` / `<leader>bo` (snacks.bufdelete) to close a
+      buffer without collapsing its window.
+- [x] add comamnds like: — all under a single `<leader>d` "Directories" group.
+  - `<leader>ff` → files in current project (now resolves the **git root**, not
+    cwd; `<leader>fF` kept for plain cwd)
+  - `<leader>dh` → files in home directory
+  - `<leader>du` → files in `~/OneDrive/Documents/university` (there is no `~/Uni`)
+  - `<leader>dn` → files in `~/Documents`, `<leader>dd` → dotfiles
+  - NOTE: these override the global `hidden`/`no_ignore` defaults, otherwise a
+    `$HOME` search walks `~/Library` and every `node_modules`. alt-g / alt-b
+    still toggle the unfiltered behavior back on inside the picker.
+- [x] another way to quickly search buffers. — `<leader><space>` (see below);
+      `<leader>fb` is still the full picker.
+- [x] can i bookmark directories or files ... persistent and global
+      — `lua/bookmarks.lua`, stored in `stdpath("data")/bookmarks.json`, so it's
+      identical from every cwd. `<leader>ma` adds the current file (or the Oil
+      directory you're browsing), `<leader>mc` adds cwd, `<leader>mm` fuzzy-finds
+      them. In the picker: `<CR>` open (directories open in Oil), `ctrl-s/v/t`
+      split/vsplit/tab, `ctrl-f` find files *under* that bookmark, `ctrl-x`
+      remove. Distinct from Harpoon, which stays project-scoped.
+
+- [x] how to change fzf lua so i don't have this issue with not enough space
+      — fzf-lua sizes its float against the whole editor, not the current split,
+      and its `flex` preview flips to stacked-vertical below `flip_columns`
+      (default 100), which is what the screenshot showed. `winopts` is now a
+      function evaluated per-invocation: 0.90 × 0.92, `flip_columns = 110`, and
+      **the preview starts hidden under 100 columns** — `<C-/>` toggles it back
+      (`<F4>` still works; `<F2>`/`<F3>` are eaten by tmux). Zooming the tmux
+      pane (F3) and reopening gets the side-by-side preview back with no restart.
+- [x] change <leader>space so it does a quick search of buffers?
+      — yes, with `sort_lastused` so the alternate buffer is first: `<leader><space><CR>`
+      is the old `:b#`. The `:b#` mapping is gone — native `<C-^>` still does it.
+
+# maps
+
+┌───────────────────────────┬──────────────────────────────────────────────────────┐
+│            Key            │                        Action                        │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>dh dn dd du       │ Files in ~ / ~/Documents / dotfiles / university     │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>ff                │ Files at git root (was cwd); <leader>fF is plain cwd │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader><space>           │ Buffer switcher, alternate buffer sorted first       │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>ma mc mm          │ Bookmark file/dir · bookmark cwd · find bookmarks    │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>ws wv wq wo w= wz │ Split, close, equalize, zoom toggle                  │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>wh/wj/wk/wl       │ Swap buffers between splits                          │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>bd <leader>bo     │ Delete buffer / others, keeping the split layout     │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <C-/> (in fzf)            │ Toggle preview                                       │
+└───────────────────────────┴──────────────────────
+
+# not asked AI
 
 - [x] add vim fugitive
 - [x] change toggle git blame to <leader>ub, then remove the now empty which-key group.
