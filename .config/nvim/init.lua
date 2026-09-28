@@ -6,8 +6,6 @@ require("config")
 require("keymaps")
 require("bookmarks").setup()
 
-local is_pi = require("is_pi").is_pi
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
 	vim.fn.system({
@@ -22,10 +20,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("plugins", {
-	-- On Pi the background update checker + change-detection git polling
-	-- thrash the SD card; check manually with :Lazy on the Pi.
-	checker = { enabled = not is_pi, notify = false },
-	change_detection = { enabled = not is_pi, notify = false },
+	checker = { enabled = true, notify = false },
+	change_detection = { notify = true },
 	performance = {
 		rtp = {
 			-- skip sourcing built-in runtime plugins we don't use, to shave a

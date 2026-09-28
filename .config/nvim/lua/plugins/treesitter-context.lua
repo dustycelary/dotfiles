@@ -2,8 +2,6 @@
 return {
 	"nvim-treesitter/nvim-treesitter-context",
 	event = "BufReadPost",
-	-- Polls treesitter on every scroll; noticeable on Pi. Off there.
-	enabled = not require("is_pi").is_pi,
 	opts = {
 		enable = true,
 		max_lines = 3,

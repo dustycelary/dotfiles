@@ -2,8 +2,6 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-local is_pi = require("is_pi").is_pi
-
 -- Ensure Homebrew, standard binary, and Mason-installed tool paths are in PATH
 -- so LSP/formatter executables (ruff, stylua, prettier, ...) are found
 local extra_paths = {
@@ -27,9 +25,7 @@ vim.g.loaded_netrwPlugin = 1
 
 -- Display options
 vim.opt.number = true -- Show line numbers
--- relativenumber + cursorline force a full-window redraw on every move;
--- fine on Mac, visibly laggy on Pi over SSH / software rendering.
-vim.opt.relativenumber = not is_pi -- Show relative numbers
+vim.opt.relativenumber = true -- Show relative numbers
 vim.opt.ignorecase = true -- Case insensitive search
 vim.opt.smartcase = true
 vim.opt.signcolumn = "yes" -- Always show sign column (for gitsigns etc)
@@ -41,24 +37,20 @@ vim.opt.smarttab = true
 -- vim.opt.smartindent = true
 vim.opt.expandtab = true -- Convert tabs to spaces by default
 
--- Use treesitter's indentexpr where a parser provides one (falls back to autoindent).
--- Skipped entirely on Pi: the per-FileType query lookup + indentexpr
--- evaluation costs more than it saves on weak ARM cores.
-if not is_pi then
-	_G.__ts_indentexpr = function()
-		return require("nvim-treesitter").indentexpr()
-	end
-	vim.api.nvim_create_autocmd("FileType", {
-		group = vim.api.nvim_create_augroup("UserTreesitterIndent", { clear = true }),
-		pattern = "*",
-		callback = function(args)
-			local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
-			if lang and pcall(vim.treesitter.query.get, lang, "indents") then
-				vim.bo[args.buf].indentexpr = "v:lua.__ts_indentexpr()"
-			end
-		end,
-	})
+-- Use treesitter's indentexpr where a parser provides one (falls back to autoindent)
+_G.__ts_indentexpr = function()
+	return require("nvim-treesitter").indentexpr()
 end
+vim.api.nvim_create_autocmd("FileType", {
+	group = vim.api.nvim_create_augroup("UserTreesitterIndent", { clear = true }),
+	pattern = "*",
+	callback = function(args)
+		local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
+		if lang and pcall(vim.treesitter.query.get, lang, "indents") then
+			vim.bo[args.buf].indentexpr = "v:lua.__ts_indentexpr()"
+		end
+	end,
+})
 vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
 vim.opt.shiftwidth = 4 -- Size of an indent
 vim.opt.softtabstop = 4 -- Number of spaces that a <Tab> counts for while performing editing operations
@@ -66,7 +58,7 @@ vim.opt.softtabstop = 4 -- Number of spaces that a <Tab> counts for while perfor
 vim.opt.undofile = true
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
-vim.opt.cursorline = not is_pi
+vim.opt.cursorline = true
 -- vim.opt.clipboard = "unnamedplus" -- Use system clipboard by default
 
 -- Over SSH there's no pbcopy/xclip to talk to, so route the "+ register
@@ -107,14 +99,8 @@ vim.opt.list = false -- show whitespace characters
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣", extends = "›", precedes = "‹" }
 
 -- Folding
--- Treesitter foldexpr re-parses on every fold operation; on Pi fall back to
--- cheap manual folds (still open by default).
-if is_pi then
-	vim.opt.foldmethod = "manual"
-else
-	vim.opt.foldmethod = "expr"
-	vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-end
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 vim.opt.foldlevel = 99 -- start with all folds open
 vim.opt.foldcolumn = "0"
 vim.opt.foldtext = ""

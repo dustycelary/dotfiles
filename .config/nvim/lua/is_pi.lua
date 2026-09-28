@@ -9,11 +9,14 @@ local sysname = vim.uv.os_uname().sysname or ""
 local profile = vim.env.NVIM_PROFILE or ""
 local flag = vim.env.NVIM_PI or ""
 
-M.is_pi = profile == "pi"
-	or flag == "1"
+-- Coerce everything to strict booleans: string:match() returns a string/nil,
+-- which used to leak through as M.is_pi = "arm"/nil and made `and/or` picks
+-- elsewhere fragile. This is now always true/false.
+M.is_pi = (profile == "pi")
+	or (flag == "1")
 	or (
 		sysname == "Linux"
-		and (machine == "aarch64" or machine == "armv7l" or machine:match("^arm"))
+		and (machine == "aarch64" or machine == "armv7l" or machine:match("^arm") ~= nil)
 	)
 
 return M

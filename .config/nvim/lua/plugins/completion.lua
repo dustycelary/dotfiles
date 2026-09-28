@@ -1,7 +1,4 @@
 -- Completion Domain — blink.cmp, LuaSnip, lazydev, and Supermaven AI (disabled)
--- On Pi: no ghost text / auto docs / signature popups (each is a redraw +
--- timer per keystroke), no friendly-snippets bulk load.
-local is_pi = require("is_pi").is_pi
 return {
 	-- 1. Neovim Lua API type stubs for lua_ls
 	{
@@ -22,9 +19,7 @@ return {
 	{
 		"L3MON4D3/LuaSnip",
 		build = "make install_jsregexp",
-		-- friendly-snippets ships thousands of VSCode snippets; skip the bulk
-		-- load on Pi (your own ./snippets still load below).
-		dependencies = is_pi and {} or { "rafamadriz/friendly-snippets" },
+		dependencies = { "rafamadriz/friendly-snippets" },
 		config = function()
 			local luasnip = require("luasnip")
 
@@ -34,9 +29,7 @@ return {
 				delete_check_events = "TextChanged",
 			})
 
-			if not is_pi then
-				require("luasnip.loaders.from_vscode").lazy_load()
-			end
+			require("luasnip.loaders.from_vscode").lazy_load()
 			require("luasnip.loaders.from_vscode").lazy_load({
 				paths = { vim.fn.stdpath("config") .. "/snippets" },
 			})
@@ -90,7 +83,7 @@ return {
 	-- 4. Next-Gen Autocompletion Engine (blink.cmp)
 	{
 		"saghen/blink.cmp",
-		dependencies = is_pi and { "L3MON4D3/LuaSnip" } or { "rafamadriz/friendly-snippets", "L3MON4D3/LuaSnip" },
+		dependencies = { "rafamadriz/friendly-snippets", "L3MON4D3/LuaSnip" },
 		version = "*",
 		opts = {
 			keymap = {
@@ -128,12 +121,10 @@ return {
 						},
 					},
 				},
-				-- Auto docs + ghost text re-render on every keystroke; manual
-				-- (<M-Space>) on Pi instead.
-				documentation = { auto_show = not is_pi, auto_show_delay_ms = 200 },
-				ghost_text = { enabled = not is_pi },
+				documentation = { auto_show = true, auto_show_delay_ms = 200 },
+				ghost_text = { enabled = true },
 			},
-			signature = { enabled = not is_pi },
+			signature = { enabled = true },
 		},
 		opts_extend = { "sources.default" },
 	},
