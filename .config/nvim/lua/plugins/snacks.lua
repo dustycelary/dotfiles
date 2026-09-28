@@ -1,10 +1,24 @@
--- snacks.nvim — only the notifier module is enabled here, replacing raw
--- vim.notify (which can't render multi-line messages like the LSP client list).
+-- snacks.nvim — notifier replaces raw vim.notify (which can't render
+-- multi-line messages like the LSP client list). rename gives LSP-aware
+-- file renaming; the Oil hookup lives in oil.lua's OilActionsPost autocmd.
+-- quickfile renders the initial buffer before other plugins load, which
+-- only works if snacks itself loads eagerly — hence lazy = false, per
+-- upstream's own recommended config for bigfile/quickfile/dashboard users.
 return {
 	"folke/snacks.nvim",
 	priority = 1000,
 	lazy = false,
 	opts = {
 		notifier = { enabled = true },
+		quickfile = { enabled = true },
+	},
+	keys = {
+		{
+			"<leader>cR",
+			function()
+				Snacks.rename.rename_file()
+			end,
+			desc = "Rename file (LSP-aware)",
+		},
 	},
 }

@@ -95,6 +95,8 @@ vim.opt.winborder = "rounded" -- default border for all floating windows (hover,
 vim.opt.inccommand = "nosplit" -- live preview :s and cmdline commands
 vim.opt.splitkeep = "screen" -- keep text on screen steady when splitting/closing
 vim.opt.completeopt = { "menuone", "noselect" }
+vim.opt.list = false -- show whitespace characters
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣", extends = "›", precedes = "‹" }
 
 -- Folding
 vim.opt.foldmethod = "expr"

@@ -84,12 +84,26 @@ return {
 			},
 		},
 	},
-	dependencies = { "nvim-tree/nvim-web-devicons" },
+	dependencies = { "nvim-tree/nvim-web-devicons", "folke/snacks.nvim" },
 	keys = {
 		{ "-", "<cmd>Oil<cr>", desc = "Open parent directory in Oil" },
 	},
 	config = function(_, opts)
 		require("oil").setup(opts)
+
+		-- Tell attached LSP clients about renames/moves done inside Oil (editing
+		-- a filename and :w) so they can update imports/requires. A single save
+		-- can batch multiple move actions, so walk all of them, not just the first.
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "OilActionsPost",
+			callback = function(event)
+				for _, action in ipairs(event.data.actions) do
+					if action.type == "move" then
+						Snacks.rename.on_rename_file(action.src_url, action.dest_url)
+					end
+				end
+			end,
+		})
 
 		-- Expand %% to the current directory on the command line
 		vim.keymap.set("c", "%%", function()

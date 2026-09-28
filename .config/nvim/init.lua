@@ -1,3 +1,7 @@
+-- Cache compiled Lua bytecode so startup doesn't re-parse every plugin's
+-- source from disk each launch — biggest win on slow storage (e.g. Pi SD card).
+vim.loader.enable()
+
 require("config")
 require("keymaps")
 

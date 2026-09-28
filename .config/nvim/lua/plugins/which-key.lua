@@ -12,7 +12,7 @@ return {
 			scroll_up = "<c-u>",
 		},
 		win = {
-			border = "rounded", -- Complete rounded floating card border
+			-- border comes from the global vim.opt.winborder default
 			padding = { 1, 2 }, -- Balanced inner padding
 			title = true,
 			title_pos = "center",
@@ -35,6 +35,7 @@ return {
 			{ "<leader>b", group = "Buffers", icon = "" },
 			{ "<leader>c", group = "Code & LSP", icon = "" },
 			{ "<leader>f", group = "Fzf Search & Find", icon = "" },
+			{ "<leader>g", group = "Git", icon = "" },
 			{ "<leader>h", group = "Harpoon Bookmarks", icon = "" },
 			{ "<leader>l", group = "Location List", icon = "" },
 			{ "<leader>n", group = "Swap Next (Treesitter)", icon = "" },
