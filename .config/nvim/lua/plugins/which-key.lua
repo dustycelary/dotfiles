@@ -35,7 +35,6 @@ return {
 			{ "<leader>b", group = "Buffers", icon = "" },
 			{ "<leader>c", group = "Code & LSP", icon = "" },
 			{ "<leader>f", group = "Fzf Search & Find", icon = "" },
-			{ "<leader>g", group = "Git", icon = "" },
 			{ "<leader>h", group = "Harpoon Bookmarks", icon = "" },
 			{ "<leader>l", group = "Location List", icon = "" },
 			{ "<leader>n", group = "Swap Next (Treesitter)", icon = "" },
