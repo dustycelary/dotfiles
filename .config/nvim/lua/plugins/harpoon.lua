@@ -1,22 +1,35 @@
 -- Harpoon 2 — fast file & command bookmarks & navigation.
 -- Files are scoped to the current directory (harpoon's normal per-project
 -- behavior). Commands are shared globally across every project instead: the
--- "cmd" list's storage key is forced to a constant whenever it's the list
--- being touched, either directly (add/select, flagged via using_global_key)
--- or through the quick-menu UI (detected via ui.active_list.name == "cmd").
+-- "cmd" list's storage key is forced to a constant for the *entire* duration
+-- of any operation that touches that list (add/select/quick-menu), via
+-- with_cmd_list() below. Anything narrower breaks persistence: Harpoon:sync()
+-- re-derives the key independently when the ADD/REMOVE events fire, so if the
+-- flag were reset before that happened, saves would silently land under the
+-- current project's key instead of the global one.
 local GLOBAL_CMD_KEY = "__global_commands__"
 local using_global_key = false
 
-local function cmd_list()
+local function with_cmd_list(fn)
 	using_global_key = true
-	local ok, list = pcall(function()
-		return require("harpoon"):list("cmd")
+	local ok, result = pcall(function()
+		return fn(require("harpoon"):list("cmd"))
 	end)
 	using_global_key = false
 	if not ok then
-		error(list)
+		error(result)
 	end
-	return list
+	return result
+end
+
+-- Runs a stored "cmd" list entry: ':'-prefixed strings run as Vim commands,
+-- anything else runs in a terminal split.
+local function run_cmd(value)
+	if value:sub(1, 1) == ":" then
+		vim.cmd(value:sub(2))
+	else
+		vim.cmd("split | terminal " .. value)
+	end
 end
 
 return {
@@ -38,24 +51,20 @@ return {
 				return vim.loop.cwd()
 			end,
 		},
-	},
-	config = function(_, opts)
-		local harpoon = require("harpoon")
-		harpoon:setup(opts)
-
-		-- Execute Harpoon commands when selected from the "cmd" list
-		harpoon:extend({
-			SELECT = function(cx)
-				if cx.list and cx.list.name == "cmd" and cx.item and cx.item.value then
-					local cmd = cx.item.value
-					if cmd:sub(1, 1) == ":" then
-						vim.cmd(cmd:sub(2))
-					else
-						vim.cmd("split | terminal " .. cmd)
-					end
+		-- Per-list override for "cmd": replaces the default file-opening
+		-- select() entirely, instead of just adding a SELECT event listener
+		-- (List:select() always runs both the event AND config.select, so a
+		-- listener alone can't prevent the default file-buffer behavior).
+		cmd = {
+			select = function(item)
+				if item and item.value then
+					run_cmd(item.value)
 				end
 			end,
-		})
+		},
+	},
+	config = function(_, opts)
+		require("harpoon"):setup(opts)
 	end,
 	keys = {
 		-- File Bookmarks (per directory)
@@ -121,9 +130,11 @@ return {
 		{
 			"<leader>hc",
 			function()
-				vim.ui.input({ prompt = "Add Harpoon Command: " }, function(input)
+				vim.ui.input({ prompt = "Add Harpoon Command (prefix with ':' to run as Vim command, else runs in a terminal): " }, function(input)
 					if input and input ~= "" then
-						cmd_list():add({ value = input })
+						with_cmd_list(function(list)
+							list:add({ value = input })
+						end)
 					end
 				end)
 			end,
@@ -132,35 +143,45 @@ return {
 		{
 			"<leader>hm",
 			function()
-				require("harpoon").ui:toggle_quick_menu(cmd_list())
+				with_cmd_list(function(list)
+					require("harpoon").ui:toggle_quick_menu(list)
+				end)
 			end,
 			desc = "Harpoon command quick menu",
 		},
 		{
 			"<leader>h1",
 			function()
-				cmd_list():select(1)
+				with_cmd_list(function(list)
+					list:select(1)
+				end)
 			end,
 			desc = "Harpoon run command 1",
 		},
 		{
 			"<leader>h2",
 			function()
-				cmd_list():select(2)
+				with_cmd_list(function(list)
+					list:select(2)
+				end)
 			end,
 			desc = "Harpoon run command 2",
 		},
 		{
 			"<leader>h3",
 			function()
-				cmd_list():select(3)
+				with_cmd_list(function(list)
+					list:select(3)
+				end)
 			end,
 			desc = "Harpoon run command 3",
 		},
 		{
 			"<leader>h4",
 			function()
-				cmd_list():select(4)
+				with_cmd_list(function(list)
+					list:select(4)
+				end)
 			end,
 			desc = "Harpoon run command 4",
 		},

@@ -5,32 +5,32 @@ return {
 	opts = {},
 	keys = {
 		{
-			"<leader>qs",
+			"<leader>Sr",
 			function()
 				require("persistence").load()
 			end,
-			desc = "Restore Session for current dir",
+			desc = "Restore session for current dir",
 		},
 		{
-			"<leader>qS",
+			"<leader>Ss",
 			function()
 				require("persistence").select()
 			end,
-			desc = "Select Session to restore",
+			desc = "Select session to restore",
 		},
 		{
-			"<leader>ql",
+			"<leader>Sl",
 			function()
 				require("persistence").load({ last = true })
 			end,
-			desc = "Restore Last Session",
+			desc = "Restore last session",
 		},
 		{
-			"<leader>qd",
+			"<leader>Sd",
 			function()
 				require("persistence").stop()
 			end,
-			desc = "Don't Save Current Session",
+			desc = "Don't save current session",
 		},
 	},
 }

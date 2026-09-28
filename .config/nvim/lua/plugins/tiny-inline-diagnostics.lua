@@ -1,7 +1,7 @@
 -- tiny-inline-diagnostic.nvim — inline diagnostic display replacing nvim's built-in virtual text.
 -- nvim's virtual_text and virtual_lines are disabled in init.lua; this plugin handles all display.
 -- Displays diagnostics inline across all lines in the buffer when enabled.
--- Keymaps: <leader>ud or <leader>xd toggles inline diagnostics on/off.
+-- Keymaps: <leader>ud toggles inline diagnostics on/off.
 return {
 	"rachartier/tiny-inline-diagnostic.nvim",
 	event = "VeryLazy",
@@ -9,13 +9,6 @@ return {
 	keys = {
 		{
 			"<leader>ud",
-			function()
-				require("tiny-inline-diagnostic").toggle()
-			end,
-			desc = "Toggle inline diagnostics",
-		},
-		{
-			"<leader>xd",
 			function()
 				require("tiny-inline-diagnostic").toggle()
 			end,

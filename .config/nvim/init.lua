@@ -14,7 +14,22 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup("plugins")
+require("lazy").setup("plugins", {
+	performance = {
+		rtp = {
+			-- skip sourcing built-in runtime plugins we don't use, to shave a
+			-- few ms off startup (matchit/matchparen kept: real editing features)
+			disabled_plugins = {
+				"gzip",
+				"tarPlugin",
+				"zipPlugin",
+				"tohtml",
+				"tutor",
+				"netrwPlugin", -- oil.nvim replaces netrw anyway
+			},
+		},
+	},
+})
 
 -- Diagnostics
 vim.diagnostic.config({ virtual_text = false, virtual_lines = false })

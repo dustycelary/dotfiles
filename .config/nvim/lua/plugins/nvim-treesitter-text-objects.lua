@@ -1,7 +1,7 @@
 return {
 	"nvim-treesitter/nvim-treesitter-textobjects",
 	branch = "main",
-	lazy = false,
+	event = { "BufReadPost", "BufNewFile" },
 	dependencies = { "nvim-treesitter/nvim-treesitter" },
 	config = function()
 		require("nvim-treesitter-textobjects").setup({
@@ -85,9 +85,9 @@ return {
 		}
 
 		local swap_prev_maps = {
-			["<leader>sa"] = { query = "@parameter.inner", desc = "Swap parameter with prev" },
-			["<leader>s:"] = { query = "@property.outer", desc = "Swap object property with prev" },
-			["<leader>sm"] = { query = "@function.outer", desc = "Swap function with prev" },
+			["<leader>Na"] = { query = "@parameter.inner", desc = "Swap parameter with prev" },
+			["<leader>N:"] = { query = "@property.outer", desc = "Swap object property with prev" },
+			["<leader>Nm"] = { query = "@function.outer", desc = "Swap function with prev" },
 		}
 
 		for key, map in pairs(swap_next_maps) do

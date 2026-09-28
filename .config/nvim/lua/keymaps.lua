@@ -1,17 +1,8 @@
-vim.keymap.set("t", "<C-]>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-
-vim.keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- increment
-vim.keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
-
 -- [[ Editor ]]
 vim.keymap.set("i", "<M-BS>", "<C-w>", { desc = "Delete word backward" })
 vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert new line below without splitting line" })
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
-
--- [[ Horizontal scrolling ]]
--- vim.keymap.set("n", "<M-.>", "5zl", { desc = "Scroll view right" })
--- vim.keymap.set("n", "<M-,>", "5zh", { desc = "Scroll view left" })
 
 -- [[ Navigation ]]
 vim.keymap.set("n", "-", "<cmd>Oil<CR>", { desc = "Open parent directory with Oil" })
@@ -26,19 +17,11 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to below window" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to above window" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
-vim.keymap.set("n", "<S-Right>", "2<C-w><", { desc = "Decrease window width" })
-vim.keymap.set("n", "<S-Left>", "2<C-w>>", { desc = "Increase window width" })
+vim.keymap.set("n", "<S-Left>", "2<C-w><", { desc = "Decrease window width" })
+vim.keymap.set("n", "<S-Right>", "2<C-w>>", { desc = "Increase window width" })
 vim.keymap.set("n", "<S-Up>", "2<C-w>+", { desc = "Increase window height" })
 vim.keymap.set("n", "<S-Down>", "2<C-w>-", { desc = "Decrease window height" })
 vim.keymap.set("n", "<leader><space>", "<cmd>b#<cr>", { desc = "Toggle last active buffer" })
-
-vim.keymap.set("n", "<leader>wc", "<cmd>close<CR>", { desc = "Close window" })
-vim.keymap.set("n", "<leader>z", "<cmd>tab split<CR>", { desc = "Zoom window" })
-vim.keymap.set("n", "<leader>Z", "<cmd>tabclose<CR>", { desc = "Unzoom window" })
-
--- [[ Tab Pages ]]
-vim.keymap.set("n", "<leader>tn", "<cmd>tabnew<CR>", { desc = "New tab page" })
-vim.keymap.set("n", "<leader>tc", "<cmd>tabclose<CR>", { desc = "Close tab page" })
 
 -- [[ Quickfix & Location List ]]
 vim.keymap.set("n", "<leader>qo", "<cmd>copen<CR>", { desc = "Open quickfix panel" })
@@ -46,6 +29,12 @@ vim.keymap.set("n", "<leader>qc", "<cmd>cclose<CR>", { desc = "Close quickfix pa
 vim.keymap.set("n", "<leader>fq", function()
 	require("fzf-lua").quickfix()
 end, { desc = "Fuzzy search quickfix list" })
+
+vim.keymap.set("n", "<leader>lo", "<cmd>lopen<CR>", { desc = "Open location list panel" })
+vim.keymap.set("n", "<leader>lc", "<cmd>lclose<CR>", { desc = "Close location list panel" })
+vim.keymap.set("n", "<leader>fl", function()
+	require("fzf-lua").loclist()
+end, { desc = "Fuzzy search location list" })
 
 -- Close quickfix/loclist window with 'q' when focused inside it
 local qf_augroup = vim.api.nvim_create_augroup("QuickfixKeymaps", { clear = true })
@@ -56,25 +45,6 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = event.buf, silent = true, desc = "Close quickfix" })
 	end,
 })
-
-vim.keymap.set("n", "<leader>lo", "<cmd>lopen<CR>", { desc = "Open location list panel" })
-vim.keymap.set("n", "<leader>lc", "<cmd>lclose<CR>", { desc = "Close location list panel" })
-vim.keymap.set("n", "<leader>l/", function()
-	if vim.fn.getreg("/") == "" then
-		vim.notify("No search pattern", vim.log.levels.WARN)
-		return
-	end
-
-	local ok, err = pcall(vim.cmd, "silent lvimgrep //gj %")
-	if not ok then
-		vim.notify(err, vim.log.levels.ERROR)
-		return
-	end
-	vim.cmd.lopen()
-end, { desc = "Send last search matches to location list" })
-vim.keymap.set("n", "<leader>fl", function()
-	require("fzf-lua").loclist()
-end, { desc = "Fuzzy search location list" })
 
 -- [[ Terminal ]]
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })

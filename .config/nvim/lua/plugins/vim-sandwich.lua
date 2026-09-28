@@ -1,12 +1,13 @@
 -- vim-sandwich — add, delete, replace surrounding pairs (brackets, quotes, tags, etc.).
--- <leader>wa  add surrounding    e.g. <leader>wa" wraps selection in quotes
--- <leader>wd  delete surrounding
--- <leader>wD  delete surrounding (auto-detect, no prompt)
--- <leader>wr  replace surrounding
--- <leader>wR  replace surrounding (auto-detect)
+-- <leader>sa  add surrounding    e.g. <leader>sa" wraps selection in quotes
+-- <leader>sd  delete surrounding
+-- <leader>sD  delete surrounding (auto-detect, no prompt)
+-- <leader>sr  replace surrounding
+-- <leader>sR  replace surrounding (auto-detect)
 -- 'i' recipe lets you type arbitrary open/close strings when adding/replacing.
 return {
 	"machakann/vim-sandwich",
+	event = "VeryLazy",
 	init = function()
 		-- disable the plugin's default "sa"/"sd"/"sdb"/"sr"/"srb" mappings:
 		-- they clash with flash.nvim's plain "s"/"S" jump keys (ambiguous
