@@ -79,11 +79,11 @@ alt-ctrl-shift-j = 'move-node-to-monitor --focus-follows-window --wrap-around do
 alt-ctrl-shift-k = 'move-node-to-monitor --focus-follows-window --wrap-around up'
 alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window --wrap-around right'
 
-alt-ctrl-left = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
-alt-ctrl-right = 'move-node-to-monitor --focus-follows-window --wrap-around next'
+alt-ctrl-right = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
+alt-ctrl-left = 'move-node-to-monitor --focus-follows-window --wrap-around next'
 
-alt-leftSquareBracket = 'workspace --wrap-around prev'
-alt-rightSquareBracket = 'workspace --wrap-around next'
+alt-ctrl-leftSquareBracket = 'workspace --wrap-around prev'
+alt-ctrl-rightSquareBracket = 'workspace --wrap-around next'
 
 alt-f = 'fullscreen'
 alt-tab = 'focus-back-and-forth || workspace-back-and-forth'
@@ -91,8 +91,10 @@ alt-m = 'move-workspace-to-monitor --wrap-around next'
 alt-shift-tab = 'move-workspace-to-monitor --wrap-around prev'
 alt-0 = 'balance-sizes'
 
-alt-ctrl-leftSquareBracket = 'focus-monitor --wrap-around prev'
-alt-ctrl-rightSquareBracket = 'focus-monitor --wrap-around next'
+# alt-leftSquareBracket = 'focus-monitor --wrap-around prev'
+# alt-rightSquareBracket = 'focus-monitor --wrap-around next'
+alt-ctrl-h = 'focus-monitor --wrap-around prev'
+alt-ctrl-l = 'focus-monitor --wrap-around next'
 
 # alt-shift-space = 'mode service'
 alt-backslash = 'mode service'

@@ -21,6 +21,28 @@ local function files_in(dir)
 	end
 end
 
+-- Sibling-file search: <leader>ff walks the whole project, which is the wrong
+-- scope when you already know the file you want sits next to the one you're in.
+-- Oil buffers name a directory rather than a file, so ask oil for it; scratch
+-- buffers and non-file schemes (terminal, fugitive://) have no directory at all.
+local function current_file_dir()
+	if vim.bo.filetype == "oil" then
+		local ok, oil = pcall(require, "oil")
+		if ok then
+			-- nil for a remote adapter (oil-ssh://), which has no local path.
+			local dir = oil.get_current_dir()
+			-- oil hands the path back with a trailing slash; drop it so the
+			-- prompt below doesn't end up with a doubled separator.
+			return dir and (dir:gsub("(.)/$", "%1"))
+		end
+	end
+	local name = vim.api.nvim_buf_get_name(0)
+	if name == "" or name:match("^%a[%w+.-]*://") then
+		return nil
+	end
+	return vim.fs.dirname(name)
+end
+
 return {
 	"ibhagwan/fzf-lua",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -132,6 +154,24 @@ return {
 			desc = "Files (project root)",
 		},
 		{ "<leader>fF", "<cmd>FzfLua files<cr>", desc = "Files (cwd)" },
+		-- Mnemonic: "." is this directory, the same as in the shell.
+		{
+			"<leader>f.",
+			function()
+				local dir = current_file_dir()
+				if not dir then
+					vim.notify("This buffer has no directory on disk", vim.log.levels.WARN)
+					return
+				end
+				require("fzf-lua").files({
+					cwd = dir,
+					-- The picker strips `cwd` from every result, so without this
+					-- the prompt is the only thing saying which directory it is.
+					prompt = vim.fn.fnamemodify(dir, ":~") .. "/ > ",
+				})
+			end,
+			desc = "Files in current file's directory",
+		},
 		{ "<leader>fg", "<cmd>FzfLua live_grep<cr>", desc = "Live grep" },
 		{ "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Buffers" },
 		{ "<leader>fh", "<cmd>FzfLua help_tags<cr>", desc = "Help tags" },
