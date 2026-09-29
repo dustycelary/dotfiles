@@ -33,6 +33,15 @@ on-window-detected = [
     #     'layout floating',
     # ] },
     { if = 'test %{app-bundle-id} = com.spotify.client', run = 'move-node-to-workspace 4-med' },
+
+    # Utility windows. These are modal/transient and get tiled into the layout
+    # by default, which reserves a real tile for a window you dismiss seconds
+    # later. Float them instead. Finder sets check-further-callbacks so a later
+    # workspace rule still gets a chance to run.
+    { if = 'test %{app-bundle-id} = com.apple.systempreferences', run = 'layout floating' },
+    { if = 'test %{app-bundle-id} = com.apple.ActivityMonitor', run = 'layout floating' },
+    { if = 'test %{app-bundle-id} = com.apple.finder', check-further-callbacks = true, run = 'layout floating' },
+
     # { if = 'test %{app-bundle-id} = com.apple.finder', run = 'move-node-to-workspace 5-temp' },
 ]
 
@@ -40,10 +49,14 @@ gaps.inner.horizontal = 10
 gaps.inner.vertical = 10
 gaps.outer.left = 10
 gaps.outer.bottom = 10
-gaps.outer.top = 10
+gaps.outer.top = [{ monitor.'built-in' = 4 }, 10]
 gaps.outer.right = 10
 
 [mode.main.binding]
+# A new window, not a tab: native tabs are separate AX windows that
+# only render when frontmost, so they can't be tiled sensibly.
+alt-enter = 'exec-and-forget open -na Ghostty'
+
 alt-slash = 'layout h_tiles v_tiles'
 # alt-comma = 'layout h_accordion v_accordion' # Reserved for tmux pane navigation
 alt-quote = 'layout v_accordion h_accordion'
@@ -85,7 +98,7 @@ alt-ctrl-left = 'move-node-to-monitor --focus-follows-window --wrap-around next'
 alt-ctrl-leftSquareBracket = 'workspace --wrap-around prev'
 alt-ctrl-rightSquareBracket = 'workspace --wrap-around next'
 
-alt-f = 'fullscreen'
+alt-shift-f = 'fullscreen'
 alt-tab = 'focus-back-and-forth || workspace-back-and-forth'
 alt-m = 'move-workspace-to-monitor --wrap-around next'
 alt-shift-tab = 'move-workspace-to-monitor --wrap-around prev'
