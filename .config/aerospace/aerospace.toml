@@ -79,6 +79,9 @@ alt-ctrl-shift-j = 'move-node-to-monitor --focus-follows-window --wrap-around do
 alt-ctrl-shift-k = 'move-node-to-monitor --focus-follows-window --wrap-around up'
 alt-ctrl-shift-l = 'move-node-to-monitor --focus-follows-window --wrap-around right'
 
+alt-ctrl-left = 'move-node-to-monitor --focus-follows-window --wrap-around prev'
+alt-ctrl-right = 'move-node-to-monitor --focus-follows-window --wrap-around next'
+
 alt-leftSquareBracket = 'workspace --wrap-around prev'
 alt-rightSquareBracket = 'workspace --wrap-around next'
 

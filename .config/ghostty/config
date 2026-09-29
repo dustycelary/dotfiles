@@ -36,7 +36,7 @@ font-feature = calt
 font-feature = liga
 
 # Monaspace Regular is correct weight — keep crisp.
-font-thicken = false
+font-thicken = true
 
 # Monaspace metrics are roomy already, no extra leading needed.
 adjust-cell-height = 0%
