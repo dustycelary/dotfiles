@@ -9,16 +9,18 @@
 # ------------------------------------------------------------------------------
 # font-family = IBM Plex Mono
 # Fallback purely for Nerd Font icon glyphs Plex Mono doesn't have.
-font-family = CommitMono Nerd Font
+# font-family = CommitMono Nerd Font
 # font-family = VictorMono Nerd Font
 # font-family = Iosevka Nerd Font Mono
-# font-family = "Monaspace Argon NF"
+# font-family = Monaspace Neon NF
+# font-family = Agave Nerd Font
+font-family = AnonymicePro Nerd Font
 # Monaspace ships Regular/Bold/Italic — leave font-style at default.
 # NF build already includes Nerd Font icons.
 # font-family = scientifica
 # font-family = UbuntuMono Nerd Font
 
-# font-size = 14
+font-size = 14
 
 # font-family = Iosevka Fergus
 # font-family-bold = "Iosevka Fergus"

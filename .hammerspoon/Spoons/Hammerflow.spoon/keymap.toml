@@ -9,7 +9,7 @@
 #################################################
 
 # settings
-leader_key = "f18"   # required, the leader key that starts the sequence
+leader_key = "f19"   # required, the leader key that starts the sequence
 leader_key_mods = "" # optional, default "", not recommended - a dedicated leader key is better
 # supports cmd ctrl alt shift
 auto_reload = true     # optional, default true, reload when any file in this directory is saved
@@ -92,7 +92,7 @@ a = [
 ]
 n = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_nvim')", "Open in nvim"]
 q = [
-    'cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Documents/Notes/QuickNote/scratch.md"',
+    'cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/Notes/life/scratch.md"',
     "nvim scratch.md",
 ]
 f = ["cmd:shortcuts run 'add_to_shopping'", "Add to shopping list"]

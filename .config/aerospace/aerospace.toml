@@ -28,10 +28,10 @@ on-window-detected = [
     # it would reserve a tile for a window that only renders when its tab is
     # frontmost, leaving a blank pane. Float by default; toggle to tiling
     # per-window (alt-backslash, f) for windows you actually want tiled.
-    { if = 'test %{app-bundle-id} = com.mitchellh.ghostty || test %{app-bundle-id} = com.apple.Terminal', run = [
-        'move-node-to-workspace 2-build',
-        'layout floating',
-    ] },
+    # { if = 'test %{app-bundle-id} = com.mitchellh.ghostty || test %{app-bundle-id} = com.apple.Terminal', run = [
+    #     'move-node-to-workspace 2-build',
+    #     'layout floating',
+    # ] },
     { if = 'test %{app-bundle-id} = com.spotify.client', run = 'move-node-to-workspace 4-med' },
     # { if = 'test %{app-bundle-id} = com.apple.finder', run = 'move-node-to-workspace 5-temp' },
 ]

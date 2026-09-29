@@ -1,25 +1,65 @@
 -- Harpoon 2 — fast file & command bookmarks & navigation.
--- Files are scoped to the current directory (harpoon's normal per-project
--- behavior). Commands are shared globally across every project instead: the
--- "cmd" list's storage key is forced to a constant for the *entire* duration
--- of any operation that touches that list (add/select/quick-menu), via
--- with_cmd_list() below. Anything narrower breaks persistence: Harpoon:sync()
--- re-derives the key independently when the ADD/REMOVE events fire, so if the
--- flag were reset before that happened, saves would silently land under the
--- current project's key instead of the global one.
+--
+-- Files stay scoped to the current directory (harpoon's normal per-project
+-- behavior). Commands are global: the same list in every directory, and it
+-- survives quitting nvim.
+--
+-- settings.key() alone can't do that. It decides two things at once: the
+-- in-memory bucket *and* the file name on disk (harpoon/data.lua hashes the
+-- key to pick <stdpath-data>/harpoon/<sha256>.json), and that file is read
+-- exactly once, when Harpoon:setup() constructs its Data object. So a key()
+-- that returns a constant only while a command keymap is running writes the
+-- commands into the global file but still *reads* the cwd file at startup:
+-- the list looks saved, then comes back empty on the next launch.
+--
+-- So the command list gets its own Data object, permanently pinned to
+-- GLOBAL_CMD_KEY, and is deliberately kept out of harpoon.lists so that
+-- Harpoon:sync() — which is always cwd-keyed — can never write it to the
+-- wrong file. Saving it is our job: after an add, whenever the quick menu
+-- rewrites a list, and on exit.
 local GLOBAL_CMD_KEY = "__global_commands__"
-local using_global_key = false
+local CMD_LIST = "cmd"
 
-local function with_cmd_list(fn)
-	using_global_key = true
-	local ok, result = pcall(function()
-		return fn(require("harpoon"):list("cmd"))
-	end)
-	using_global_key = false
-	if not ok then
-		error(result)
+---@type { data: table, list: table }?
+local cmd_store = nil
+
+local function get_cmd_store()
+	if cmd_store then
+		return cmd_store
 	end
-	return result
+
+	local Data = require("harpoon.data")
+	local Config = require("harpoon.config")
+	local List = require("harpoon.list")
+
+	-- A minimal config whose key() is constant — this is what pins both the
+	-- data file and the bucket inside it to the global key, forever.
+	local data = Data.Data:new({
+		settings = {
+			key = function()
+				return GLOBAL_CMD_KEY
+			end,
+		},
+	})
+
+	local list_config = Config.get_config(require("harpoon").config, CMD_LIST)
+
+	cmd_store = {
+		data = data,
+		list = List.decode(list_config, CMD_LIST, data:data(GLOBAL_CMD_KEY, CMD_LIST)),
+	}
+
+	return cmd_store
+end
+
+local function cmd_list()
+	return get_cmd_store().list
+end
+
+local function save_cmds()
+	local store = get_cmd_store()
+	store.data:update(GLOBAL_CMD_KEY, CMD_LIST, store.list:encode())
+	store.data:sync()
 end
 
 -- Runs a stored "cmd" list entry: ':'-prefixed strings run as Vim commands,
@@ -40,16 +80,6 @@ return {
 		settings = {
 			save_on_toggle = true,
 			sync_on_ui_close = true,
-			key = function()
-				if using_global_key then
-					return GLOBAL_CMD_KEY
-				end
-				local ui = require("harpoon").ui
-				if ui.active_list and ui.active_list.name == "cmd" then
-					return GLOBAL_CMD_KEY
-				end
-				return vim.loop.cwd()
-			end,
 		},
 		-- Per-list override for "cmd": replaces the default file-opening
 		-- select() entirely, instead of just adding a SELECT event listener
@@ -61,10 +91,37 @@ return {
 					run_cmd(item.value)
 				end
 			end,
+			-- Commands are plain strings; skip the default's cursor-position
+			-- context and its relative-path handling for a nil name.
+			create_list_item = function(_, name)
+				return { value = name or "" }
+			end,
 		},
 	},
 	config = function(_, opts)
-		require("harpoon"):setup(opts)
+		local harpoon = require("harpoon")
+		harpoon:setup(opts)
+
+		-- The quick menu rewrites a list in place from the buffer text and
+		-- announces it with LIST_CHANGE, which carries no list argument — so
+		-- persist the command list on any such edit. A redundant write when
+		-- the file list was the one edited is harmless.
+		harpoon:extend({
+			LIST_CHANGE = function()
+				if cmd_store then
+					save_cmds()
+				end
+			end,
+		})
+
+		vim.api.nvim_create_autocmd("VimLeavePre", {
+			group = vim.api.nvim_create_augroup("HarpoonGlobalCommands", { clear = true }),
+			callback = function()
+				if cmd_store then
+					save_cmds()
+				end
+			end,
+		})
 	end,
 	keys = {
 		-- File Bookmarks (per directory)
@@ -126,15 +183,14 @@ return {
 			desc = "Previous file in list",
 		},
 
-		-- Command Bookmarks (global, shared across every project)
+		-- Command Bookmarks (global, shared across every project and session)
 		{
 			"<leader>hc",
 			function()
 				vim.ui.input({ prompt = "Add Harpoon Command (prefix with ':' to run as Vim command, else runs in a terminal): " }, function(input)
 					if input and input ~= "" then
-						with_cmd_list(function(list)
-							list:add({ value = input })
-						end)
+						cmd_list():add({ value = input })
+						save_cmds()
 					end
 				end)
 			end,
@@ -143,45 +199,35 @@ return {
 		{
 			"<leader>hm",
 			function()
-				with_cmd_list(function(list)
-					require("harpoon").ui:toggle_quick_menu(list)
-				end)
+				require("harpoon").ui:toggle_quick_menu(cmd_list())
 			end,
 			desc = "Command quick menu",
 		},
 		{
 			"<leader>h1",
 			function()
-				with_cmd_list(function(list)
-					list:select(1)
-				end)
+				cmd_list():select(1)
 			end,
 			desc = "Run command 1",
 		},
 		{
 			"<leader>h2",
 			function()
-				with_cmd_list(function(list)
-					list:select(2)
-				end)
+				cmd_list():select(2)
 			end,
 			desc = "Run command 2",
 		},
 		{
 			"<leader>h3",
 			function()
-				with_cmd_list(function(list)
-					list:select(3)
-				end)
+				cmd_list():select(3)
 			end,
 			desc = "Run command 3",
 		},
 		{
 			"<leader>h4",
 			function()
-				with_cmd_list(function(list)
-					list:select(4)
-				end)
+				cmd_list():select(4)
 			end,
 			desc = "Run command 4",
 		},

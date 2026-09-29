@@ -21,6 +21,12 @@ export KEYTIMEOUT=1
 # Keep Python from creating __pycache__ directories and .pyc files.
 export PYTHONDONTWRITEBYTECODE=1
 
+# Keep PATH entries unique (Homebrew, Mason, ~/.local/bin re-added elsewhere).
+typeset -U path PATH
+
+# DIRSTACKSIZE caps `AUTO_PUSHD` growth from `cd` + `z` usage.
+DIRSTACKSIZE=20
+
 
 # -----------------------------------------------------------------------------
 # Oh My Zsh and plugins
@@ -39,13 +45,22 @@ ZSH_DISABLE_COMPFIX="true"
 ZSH_COMPDUMP="$HOME/.zcompdump-${HOST}-${ZSH_VERSION}"
 
 
+# Single source of truth for bulky dirs skipped by fd/FZF/rga.
+# Kept in one variable so $HOME searches don't walk ~/Library, node_modules, etc.
+export FD_EXCLUDES='--exclude .git --exclude Library --exclude node_modules --exclude .venv --exclude venv --exclude __pycache__ --exclude .cache --exclude .Trash --exclude .DS_Store'
+
 # Use fd for FZF file searches, including hidden files but excluding bulky data.
-export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv'
+export FZF_DEFAULT_COMMAND="fd --type f --hidden $FD_EXCLUDES"
 
 # Open FZF in a compact panel with results ordered from top to bottom.
 export FZF_DEFAULT_OPTS='--height=60% --layout=reverse --border'
 
 # Load Git helpers, fuzzy finding, and interactive completion enhancements.
+# fzf-marks (dir bookmarks in ~/.fzf-marks):
+#   mark <name>  save cwd (no name = folder basename)
+#   fzm [query]  picker: Enter/ctrl-y jump, ctrl-t toggle multi, ctrl-d delete, ctrl-v paste path
+#   jump <name>  cd directly, dmark delete, pmark print/paste path
+#   NOTE: default ctrl-g is rebound to content-search-widget below, so call `fzm` explicitly.
 plugins=(
   git
   fzf
@@ -86,7 +101,7 @@ SAVEHIST=100000
 
 # Share new commands between open terminals and keep duplicate entries out of
 # saved history and interactive history searches.
-setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_SAVE_NO_DUPS HIST_FIND_NO_DUPS
+setopt SHARE_HISTORY HIST_IGNORE_ALL_DUPS HIST_SAVE_NO_DUPS HIST_FIND_NO_DUPS HIST_IGNORE_SPACE
 
 # If history ever exceeds its configured size, discard duplicates before
 # discarding unique older commands.
@@ -152,14 +167,14 @@ if command -v zoxide >/dev/null 2>&1; then
 fi
 
 # Initialize pyenv lazily when installed so it doesn't slow down shell startup.
+# Only the `pyenv` command itself is shimmed; `python`/`pip` go through pyenv's
+# shims on PATH, so no wrapper functions (and no recursion risk).
 if command -v pyenv >/dev/null 2>&1; then
   pyenv() {
-    unset -f pyenv python pip
+    unset -f pyenv
     eval "$(command pyenv init - zsh)"
     pyenv "$@"
   }
-  python() { pyenv; python "$@"; }
-  pip()    { pyenv; pip "$@"; }
 fi
 
 
@@ -190,9 +205,27 @@ f() {
   [[ -n "$result" ]] && dirname "$result" | pbcopy
 }
 
-# Move files to a recoverable rubbish directory on the Desktop.
-setopt null_glob
-t() { for p in "$@"; do [ -e "$p" ] && mv "$p" ~/.Trash/"${p:t} $(date +%H%M%S)-$RANDOM" && echo "trashed: $p"; done }
+# Move files to a recoverable trash directory (macOS ~/.Trash, Linux XDG Trash).
+t() {
+  setopt localoptions null_glob
+  local trash_dir="${TRASH_DIR:-}"
+  if [[ -z "$trash_dir" ]]; then
+    if [[ -d "$HOME/.Trash" ]]; then
+      trash_dir="$HOME/.Trash"
+    else
+      trash_dir="${XDG_DATA_HOME:-$HOME/.local/share}/Trash/files"
+    fi
+  fi
+  mkdir -p "$trash_dir"
+  local p
+  for p in "$@"; do
+    if [[ -e "$p" ]]; then
+      mv "$p" "$trash_dir/${p:t} $(date +%H%M%S)-$RANDOM" && echo "trashed: $p"
+    else
+      echo "t: no such file: $p" >&2
+    fi
+  done
+}
 L=~/Library
 
 # Copy text, piped input, or file contents to the clipboard.
@@ -210,11 +243,11 @@ clip() {
 
 # Search file contents locally with FZF and rga, returning the selected path.
 _content_search_select() {
-  FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git --exclude venv --exclude .venv' \
+  FZF_DEFAULT_COMMAND="fd --type f --hidden $FD_EXCLUDES" \
     fzf --disabled \
         --prompt='Content> ' \
         --header='Type to search contents; Enter inserts the selected path' \
-        --bind 'change:reload:rga --files-with-matches --hidden --smart-case --glob "!.git/**" --glob "!venv/**" --glob "!.venv/**" -- {q} . 2>/dev/null || true' \
+        --bind 'change:reload:rga --files-with-matches --hidden --smart-case --glob "!.git/**" --glob "!venv/**" --glob "!.venv/**" --glob "!node_modules/**" --glob "!__pycache__/**" -- {q} . 2>/dev/null || true' \
         --preview 'rga --pretty --context 4 --colors "match:fg:black" --colors "match:bg:yellow" -- {q} {} 2>/dev/null'
 }
 
@@ -333,15 +366,22 @@ alias sp_rag='docker exec -it postgres psql -U dev_user -d spotify_rag'
 alias qn_s='nvim ~/Documents/Notes/QuickNote/scratch.md'
 alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 
-# for homelab help 
+# for homelab help
 # Media directory base path
 export MEDIA_PATH="/mnt/t7/data/media"
 
-alias get-codecs="find \"\$MEDIA_PATH\" -type f \( -iname '*.mkv' -o -iname '*.mp4' \) -exec ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 '{}' \; -print | paste - - | awk -F'\t' '{printf \"%-10s %s\n\", \$1, \$2}'"
-
-alias get-hevc="find \"\$MEDIA_PATH\" -type f \( -iname '*.mkv' -o -iname '*.mp4' \) -exec ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 '{}' \; -print | paste - - | awk -F'\t' '\$1 ~ /^(hevc|h265|x265)$/ {print \$2}'"
-
-alias media-summary="find \"\$MEDIA_PATH\" -type f \( -iname '*.mkv' -o -iname '*.mp4' \) -exec ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 '{}' \; | sort | uniq -c"
+# Probe video codecs under $MEDIA_PATH in parallel (much faster than one
+# ffprobe per file via `find -exec \;`). Requires fd + ffprobe on PATH.
+_media_files() {
+  fd --type f -e mkv -e mp4 . "${MEDIA_PATH:?MEDIA_PATH not set}" 2>/dev/null
+}
+_media_codecs() {
+  _media_files | xargs -P "${FFPROBE_JOBS:-8}" -I{} sh -c \
+    'codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$1" 2>/dev/null); printf "%s\t%s\n" "$codec" "$1"' _ {}
+}
+get-codecs() { _media_codecs | awk -F'\t' '{printf "%-10s %s\n", $1, $2}'; }
+get-hevc() { _media_codecs | awk -F'\t' '$1 ~ /^(hevc|h265|x265)$/ {print $2}'; }
+media-summary() { _media_codecs | cut -f1 | sort | uniq -c; }
 
 # Replace ls with lsd when installed and provide common listing shortcuts.
 if command -v lsd >/dev/null 2>&1; then

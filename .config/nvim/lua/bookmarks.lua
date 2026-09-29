@@ -150,8 +150,19 @@ function M.pick()
 		return by_display[utils.strip_ansi_coloring(sel[1])]
 	end
 
+	-- Wrap an action with a help/header label so the picker's F1 help shows
+	-- "open in split" instead of `table: 0x...` (bare functions and plain
+	-- `{fn=...}` tables have no description for fzf-lua to display).
+	local function act(desc, fn)
+		return { fn = fn, desc = desc, header = desc }
+	end
+
 	require("fzf-lua").fzf_exec(entries, {
 		prompt = "Bookmarks❯ ",
+		-- Inline key hints so the binds are visible without opening F1 help.
+		fzf_opts = {
+			["--header"] = "enter:open · ctrl-s/v/t:split/vsplit/tab · ctrl-f:files under · ctrl-x:remove",
+		},
 		winopts = {
 			title = " Bookmarks ",
 			title_pos = "center",
@@ -160,33 +171,33 @@ function M.pick()
 			preview = { hidden = true },
 		},
 		actions = {
-			["default"] = function(sel)
+			["default"] = act("open bookmark", function(sel)
 				local p = selected(sel)
 				if p then
 					open(p)
 				end
-			end,
-			["ctrl-s"] = function(sel)
+			end),
+			["ctrl-s"] = act("open in split", function(sel)
 				local p = selected(sel)
 				if p then
 					open(p, "split")
 				end
-			end,
-			["ctrl-v"] = function(sel)
+			end),
+			["ctrl-v"] = act("open in vsplit", function(sel)
 				local p = selected(sel)
 				if p then
 					open(p, "vsplit")
 				end
-			end,
-			["ctrl-t"] = function(sel)
+			end),
+			["ctrl-t"] = act("open in tab", function(sel)
 				local p = selected(sel)
 				if p then
 					open(p, "tabedit")
 				end
-			end,
+			end),
 			-- Jump the *picker* into that bookmark rather than opening it: find
 			-- files under it (or under its parent, for a file bookmark).
-			["ctrl-f"] = function(sel)
+			["ctrl-f"] = act("find files under bookmark", function(sel)
 				local p = selected(sel)
 				if not p then
 					return
@@ -195,14 +206,14 @@ function M.pick()
 				vim.schedule(function()
 					require("fzf-lua").files({ cwd = dir })
 				end)
-			end,
-			["ctrl-x"] = function(sel)
+			end),
+			["ctrl-x"] = act("remove bookmark", function(sel)
 				local p = selected(sel)
 				if p then
 					M.remove(p)
 					vim.schedule(M.pick)
 				end
-			end,
+			end),
 		},
 	})
 end
