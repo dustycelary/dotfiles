@@ -83,6 +83,7 @@ return {
 				{ pattern = "surround", icon = "", color = "purple" },
 				{ pattern = "terminal", icon = "", color = "red" },
 				{ pattern = "session", icon = "", color = "azure" },
+				{ pattern = "director", icon = "", color = "yellow" },
 				{ pattern = "files in", icon = "", color = "yellow" },
 				{ pattern = "grep", icon = "", color = "green" },
 				{ pattern = "keymap", icon = "", color = "green" },
@@ -101,8 +102,8 @@ return {
 		spec = {
 			{ "<leader>b", group = "Buffers", icon = "" },
 			{ "<leader>c", group = "Code & LSP", icon = "" },
-			{ "<leader>d", group = "Directories", icon = "" },
-			{ "<leader>f", group = "Find & search", icon = "" },
+			{ "<leader>d", group = "Directories (change scope)", icon = "" },
+			{ "<leader>f", group = "Find & search (current scope)", icon = "" },
 			{ "<leader>g", group = "Git", icon = "" },
 			{ "<leader>h", group = "Harpoon (project files)", icon = "" },
 			{ "<leader>l", group = "Location list", icon = "" },

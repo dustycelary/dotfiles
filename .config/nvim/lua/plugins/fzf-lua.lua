@@ -1,8 +1,42 @@
+-- fzf-lua — the fuzzy finder for everything. Two keymap groups, split by
+-- *scope* rather than by picker type:
+--
+--   <leader>f   Find something inside the current scope — files under cwd, the
+--               buffer list, grep, symbols, diagnostics, help.
+--   <leader>d   Pick a *directory*, i.e. change the scope itself. Everything
+--               here can leave the current project.
+--
+-- Inside every picker the same three alt-keys act on the focused entry. A
+-- directory entry is used as-is; a file entry contributes its parent
+-- directory, so the binds mean the same thing in the file, grep, LSP, buffer
+-- and directory pickers:
+--
+--   alt-f  find files in it
+--   alt-s  live grep in it
+--   alt-c  cd into it (tab-local `:tcd`) and open it in oil
+--
+-- alt-* rather than ctrl-*: an action bind is emitted after keymap.fzf and
+-- therefore wins, so a ctrl-* here would silently cost you fzf's own line
+-- editing (ctrl-e is end-of-line, ctrl-f/b are half-page scroll).
+
 -- Directory pickers (<leader>d*) search outside any project, so they can't use
 -- the global `hidden = true` / `no_ignore = true` defaults below — pointed at
 -- $HOME those walk ~/Library, every node_modules and every .git/objects. These
 -- pickers opt back into fd's normal filtering; alt-g / alt-b still toggle the
 -- unfiltered behavior back on from inside the picker.
+local fd_excludes = " --exclude Library --exclude .git --exclude node_modules"
+	.. " --exclude .venv --exclude venv --exclude .cache --exclude .Trash"
+
+-- Every alt-c does the same two things: make the directory the cwd, then land
+-- in it. `:tcd` is tab-local so it doesn't disturb your other tabs, and oil is
+-- the default file explorer, so `:edit` on a directory browses it. The notify
+-- is there because nothing else on screen says the cwd moved.
+local function cd(dir)
+	vim.cmd.tcd(vim.fn.fnameescape(dir))
+	vim.cmd.edit(vim.fn.fnameescape(dir))
+	vim.notify("cwd → " .. vim.fn.fnamemodify(dir, ":~"))
+end
+
 local function files_in(dir)
 	return function()
 		local path = vim.fn.expand(dir)
@@ -14,15 +48,89 @@ local function files_in(dir)
 			cwd = path,
 			no_ignore = false,
 			hidden = false,
-			fd_opts = "--color=never --type f --type l"
-				.. " --exclude Library --exclude .git --exclude node_modules"
-				.. " --exclude .venv --exclude venv --exclude .cache --exclude .Trash",
+			fd_opts = "--color=never --type f --type l" .. fd_excludes,
 		})
 	end
 end
 
--- Sibling-file search: <leader>ff walks the whole project, which is the wrong
--- scope when you already know the file you want sits next to the one you're in.
+-- Actions shared by every picker whose entries are directories. `resolve` turns
+-- one selected entry into an absolute path, which is the only part that differs
+-- between them (fd emits paths relative to its cwd, zoxide emits "score<TAB>
+-- path").
+local function dir_actions(resolve)
+	return {
+		-- oil is the default file explorer, so :edit on a directory opens it as
+		-- an editable buffer.
+		["default"] = function(selected)
+			vim.cmd.edit(vim.fn.fnameescape(resolve(selected)))
+		end,
+		-- Chain straight into the pickers you'd otherwise reach for next,
+		-- already scoped to the directory you just picked.
+		["alt-f"] = function(selected)
+			local d = resolve(selected)
+			require("fzf-lua").files({ cwd = d, prompt = vim.fn.fnamemodify(d, ":~") .. "/ > " })
+		end,
+		["alt-s"] = function(selected)
+			local d = resolve(selected)
+			require("fzf-lua").live_grep({ cwd = d, prompt = vim.fn.fnamemodify(d, ":~") .. "/ > " })
+		end,
+		-- Like <CR>, but it also moves the cwd there.
+		["alt-c"] = function(selected)
+			cd(resolve(selected))
+		end,
+	}
+end
+
+-- Directory picker. fzf-lua ships pickers for files, buffers and grep but has
+-- nothing that searches for *directories*, which is the scope you want when the
+-- target isn't a file you can name — "there's a project somewhere under ~, I
+-- just don't remember where". fd's --type d supplies the candidates; the
+-- actions decide what happens once you've found one.
+--
+-- `dir` is a path string, or a function returning one for pickers whose root
+-- isn't known until you press the key (the cwd variant below).
+local function dirs_in(dir)
+	return function()
+		local fzf = require("fzf-lua")
+		local base = vim.fn.expand(type(dir) == "function" and dir() or dir)
+		if vim.fn.isdirectory(base) == 0 then
+			vim.notify("No such directory: " .. base, vim.log.levels.WARN)
+			return
+		end
+
+		-- Same reasoning as files_in: rooted at $HOME an unfiltered walk drags in
+		-- ~/Library and every node_modules. Hidden directories stay *in* though —
+		-- ~/.config is one of the likeliest targets, and dirs-only keeps the
+		-- result set small enough that it stays instant.
+		local cmd = "fd --color=never --type d --hidden"
+			.. fd_excludes
+			-- Toolchain caches are pure noise in a directory list and between
+			-- them account for ~12k entries under $HOME. Drop one from this
+			-- list if you ever do want to land inside it.
+			.. " --exclude .npm --exclude .pyenv --exclude .nvm"
+			.. " --exclude .cargo --exclude .rustup --exclude .codex"
+
+		-- fd prints directories with a trailing slash; drop it so the entry joins
+		-- cleanly onto `base` (which fd made the results relative to via cwd).
+		local function resolve(selected)
+			return vim.fs.joinpath(base, (selected[1]:gsub("/$", "")))
+		end
+
+		fzf.fzf_exec(cmd, {
+			cwd = base,
+			prompt = vim.fn.fnamemodify(base, ":~") .. "/ > ",
+			-- Native fzf previewer rather than the builtin one, which expects
+			-- file entries and would try to read a directory as text. eza is the
+			-- nicer listing; ls covers boxes that don't have it.
+			preview = "eza --tree --level=1 --color=always {} 2>/dev/null || ls -1 {}",
+			fzf_opts = { ["--no-multi"] = true },
+			actions = dir_actions(resolve),
+		})
+	end
+end
+
+-- Sibling-file search: <leader>ff walks the whole cwd, which is the wrong scope
+-- when you already know the file you want sits next to the one you're in.
 -- Oil buffers name a directory rather than a file, so ask oil for it; scratch
 -- buffers and non-file schemes (terminal, fugitive://) have no directory at all.
 local function current_file_dir()
@@ -50,7 +158,46 @@ return {
 		local fzf = require("fzf-lua")
 		local fzf_path = require("fzf-lua.path")
 
-		-- 1. Unify actions in one table so we don't repeat ourselves
+		-- The alt-f/alt-s/alt-c trio from the directory pickers, generalized to
+		-- pickers whose entries are *files*. entry_to_file is what fzf-lua's own
+		-- actions use — it undoes the formatter, strips grep's ":line:col"
+		-- suffix and resolves buffer entries — so one implementation covers
+		-- files, grep, lsp, oldfiles, quickfix and buffers.
+		local function entry_dir(selected, opts)
+			local entry = fzf_path.entry_to_file(selected[1], opts)
+			local file = entry.path
+			if not file or file == "" then
+				return nil
+			end
+			if not fzf_path.is_absolute(file) then
+				file = fzf_path.join({ opts.cwd or vim.uv.cwd(), file })
+			end
+			-- A directory entry is itself the target; anything else contributes
+			-- its parent. Scratch and terminal buffers resolve to names like
+			-- "[No Name]" and fail both tests.
+			if vim.fn.isdirectory(file) == 1 then
+				return file
+			end
+			local dir = vim.fs.dirname(file)
+			return vim.fn.isdirectory(dir) == 1 and dir or nil
+		end
+
+		local function with_dir(fn)
+			return function(selected, opts)
+				local dir = entry_dir(selected, opts)
+				if not dir then
+					vim.notify("This entry has no directory on disk", vim.log.levels.WARN)
+					return
+				end
+				fn(dir)
+			end
+		end
+
+		-- One action table for every file-ish picker. fzf-lua resolves a
+		-- picker's actions to `actions.buffers or actions.files`, and only
+		-- `files` and `buffers` are real scopes — grep, lsp, oldfiles, quickfix
+		-- and the rest all fall through to `files` — so defining `files` alone
+		-- covers the lot.
 		local common_actions = {
 			["default"] = fzf.actions.file_edit,
 			["ctrl-s"] = fzf.actions.file_split,
@@ -61,6 +208,16 @@ return {
 
 			["alt-g"] = fzf.actions.toggle_ignore,
 			["alt-b"] = fzf.actions.toggle_hidden,
+
+			-- Same keys, same meaning as in the <leader>d pickers, scoped here
+			-- to the focused entry's directory.
+			["alt-f"] = with_dir(function(dir)
+				fzf.files({ cwd = dir, prompt = vim.fn.fnamemodify(dir, ":~") .. "/ > " })
+			end),
+			["alt-s"] = with_dir(function(dir)
+				fzf.live_grep({ cwd = dir, prompt = vim.fn.fnamemodify(dir, ":~") .. "/ > " })
+			end),
+			["alt-c"] = with_dir(cd),
 		}
 
 		fzf.setup({
@@ -108,9 +265,8 @@ return {
 					["<C-_>"] = "toggle-preview",
 				},
 			},
-			-- 2. Global settings for hidden and ignored files
 			defaults = {
-				hidden = true, -- Hide dotfiles by default; alt-b toggles them
+				hidden = true, -- Include dotfiles; alt-b toggles them back off
 				no_ignore = true, -- Include files ignored by .gitignore
 				formatter = "path.filename_first",
 			},
@@ -122,10 +278,7 @@ return {
 				formatter = "path.filename_first",
 			},
 			actions = {
-				-- Apply the exact same keymaps to files, grep, and LSP pickers
 				files = common_actions,
-				grep = common_actions,
-				lsp = common_actions,
 			},
 			registers = {
 				multiline = false,
@@ -136,24 +289,17 @@ return {
 					},
 				},
 			},
-			-- 3. We completely removed the hardcoded 'cmd' overrides and 'fd_excludes'.
-			-- fzf-lua's defaults are already perfectly tuned for fd and ripgrep.
-			-- By not hardcoding exclusions, your alt-i/alt-h toggles will now work correctly!
 		})
 
 		fzf.register_ui_select()
 	end,
 	keys = {
-		-- Project files: resolve the git root rather than using whatever cwd
-		-- happens to be, so this works the same from a nested subdirectory.
-		{
-			"<leader>ff",
-			function()
-				require("fzf-lua").files({ cwd = vim.fs.root(0, ".git") or vim.uv.cwd() })
-			end,
-			desc = "Files (project root)",
-		},
-		{ "<leader>fF", "<cmd>FzfLua files<cr>", desc = "Files (cwd)" },
+		-- [[ <leader>f — find inside the current scope ]]
+		{ "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Files (cwd)" },
+		-- Directories, but inside the current scope, so it belongs here rather
+		-- than in <leader>d. Mnemonic: `-` is the key oil opens a directory
+		-- with, and <CR> here hands the directory straight to oil.
+		{ "<leader>f-", dirs_in(vim.uv.cwd), desc = "Directories (cwd)" },
 		-- Mnemonic: "." is this directory, the same as in the shell.
 		{
 			"<leader>f.",
@@ -174,18 +320,18 @@ return {
 		},
 		{ "<leader>fg", "<cmd>FzfLua live_grep<cr>", desc = "Live grep" },
 		{ "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Buffers" },
-		{ "<leader>fh", "<cmd>FzfLua help_tags<cr>", desc = "Help tags" },
-		{ "<leader>fr", "<cmd>FzfLua resume<cr>", desc = "Resume last picker" },
-		{ "<leader>fc", "<cmd>FzfLua command_history<cr>", desc = "Command history" },
-		{ "<leader>fk", "<cmd>FzfLua keymaps<cr>", desc = "Keymaps" },
 		{ "<leader>fo", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
+		{ "<leader>fr", "<cmd>FzfLua resume<cr>", desc = "Resume last picker" },
+		{ "<leader>fh", "<cmd>FzfLua help_tags<cr>", desc = "Help tags" },
+		{ "<leader>fk", "<cmd>FzfLua keymaps<cr>", desc = "Keymaps" },
 		{ "<leader>fm", "<cmd>FzfLua marks<cr>", desc = "Marks" },
 		{ '<leader>f"', "<cmd>FzfLua registers<cr>", desc = "Registers" },
+		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Commands" },
+		{ "<leader>fc", "<cmd>FzfLua command_history<cr>", desc = "Command history" },
 		{ "<leader>fs", "<cmd>FzfLua lsp_live_workspace_symbols<cr>", desc = "Workspace symbols" },
 		{ "<leader>fd", "<cmd>FzfLua diagnostics_workspace<cr>", desc = "Workspace diagnostics" },
 		{ "<leader>fD", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document diagnostics" },
 		{ "go", "<cmd>FzfLua lsp_document_symbols<cr>", desc = "Document symbols" },
-		{ "<leader>f:", "<cmd>FzfLua commands<cr>", desc = "Commands" },
 
 		-- Quick buffer switch. `sort_lastused` puts the alternate buffer first,
 		-- so <leader><space><CR> is the old `:b#` toggle, and the preview stays
@@ -201,12 +347,49 @@ return {
 			desc = "Switch buffer",
 		},
 
-		-- [[ Directories — search outside the current project ]]
+		-- [[ <leader>d — pick a directory, i.e. change the scope ]]
+		-- In all three: <CR> opens it in oil, alt-f searches files in it,
+		-- alt-s greps it, alt-c makes it the cwd and keeps browsing from there.
+		--
+		-- dd is to directories what ff is to files: the one you reach for.
+		-- (Directories under *cwd* are <leader>f-, with the rest of the
+		-- current-scope pickers.)
+		{ "<leader>dd", dirs_in("~"), desc = "Directories under ~" },
+		-- zoxide is already tracking where you actually spend time, so this is
+		-- the fast path when the directory is one you've visited before.
+		{
+			"<leader>dz",
+			function()
+				local fzf = require("fzf-lua")
+				-- zoxide entries are "<score>\t<path>", so the path is the last
+				-- tab-separated field — but only under fzf-lua's own
+				-- `path.dirname_first`, which leaves the path contiguous. The
+				-- global `path.filename_first` above re-splits it into
+				-- "<tail>\t<parent>", which made the last field the *parent*:
+				-- every action, including fzf-lua's built-in preview and cd,
+				-- landed one directory too high. Pin the formatter this picker
+				-- is written against.
+				local function resolve(selected)
+					return selected[1]:match("[^\t]+$") or selected[1]
+				end
+				fzf.zoxide({
+					formatter = "path.dirname_first",
+					actions = vim.tbl_extend("force", dir_actions(resolve), {
+						-- Same alt-c as everywhere else, plus the score bump
+						-- fzf-lua's own zoxide_cd action would have done, so the
+						-- entry stays near the top next time.
+						["alt-c"] = function(selected)
+							local d = resolve(selected)
+							vim.system({ "zoxide", "add", "--", d })
+							cd(d)
+						end,
+					}),
+				})
+			end,
+			desc = "Zoxide directories",
+		},
+		-- Files rather than directories, for when the target is a file you can
+		-- name and it isn't under the current project.
 		{ "<leader>dh", files_in("~"), desc = "Files in ~" },
-		{ "<leader>dn", files_in("~/Documents"), desc = "Files in ~/Documents" },
-		{ "<leader>dD", files_in("~/Documents/dotfiles"), desc = "Files in ~/Documents/dotfiles" },
-		{ "<leader>dd", files_in("~/Downloads"), desc = "Files in ~/Downloads" },
-		{ "<leader>do", files_in("~/OneDrive"), desc = "Files in ~/OneDrive" },
-		{ "<leader>dc", files_in("~/Developer"), desc = "Files in ~/Developer" },
 	},
 }

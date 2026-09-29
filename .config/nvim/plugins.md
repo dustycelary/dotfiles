@@ -78,36 +78,55 @@ Renders CSV and TSV files as an aligned table with cell borders. Auto-enables on
 ## fzf-lua
 Fuzzy finder for files, grep, buffers, LSP symbols, diagnostics, and more.
 
-Files use `fd` (includes gitignored files by default, includes hidden files, excludes `.git`, `.venv`, `node_modules`, `__pycache__`, etc.). Grep uses `ripgrep` with hidden files included. The `<leader>sF` keymap respects `.gitignore`, and the `<leader>sG` variant bypasses `.gitignore`.
+Two keymap groups, split by **scope**: `<leader>f` searches *inside* the current scope (cwd, buffer list, project), `<leader>d` picks a *directory* — i.e. changes the scope itself, and is the group that can leave the current project.
+
+Files use `fd` and grep uses `ripgrep`, both including hidden and gitignored files by default (`alt-b` / `alt-g` toggle that inside the picker). The `<leader>d` pickers are the exception: pointed at `$HOME` an unfiltered walk drags in `~/Library` and every `node_modules`, so they apply fd's normal filtering plus an exclude list.
+
+### Inside any picker
+These act on the **focused entry's directory** — the entry itself when it's a directory, its parent when it's a file — and work in every picker: files, grep, LSP, buffers, oldfiles, quickfix, the `<leader>d` directory pickers and the bookmarks picker.
 
 | Key | Action |
 |-----|--------|
-| `<leader>sf` | Files (including gitignored) |
-| `<leader>sF` | Files (respecting gitignore) |
-| `<leader>sg` | Live grep |
-| `<leader>sG` | Live grep (including gitignored) |
-| `<leader>sb` | Buffers |
-| `<leader>sh` | Help tags |
-| `<leader>sr` | Resume last picker |
-| `<leader>s:` | Command history |
-| `<leader>sk` | Keymaps |
-| `<leader>so` | Old files (recently opened) |
-| `<leader>sm` | Marks |
-| `<C-x>` | Delete selected file(s) in `files` |
-| `<leader>sw` | Search word under cursor |
-| `<leader>ss` | Workspace LSP symbols |
-| `<leader>sd` | Document diagnostics |
-| `<leader>sD` | Workspace diagnostics |
-| `<leader>sc` | Commands |
-| `<leader>st` | Markdown and .env TODO search |
-| `grd` | Go to definition |
-| `grr` | References |
-| `gri` | Implementations |
-| `go` / `<leader>fS` | Fuzzy-search document symbols |
+| `<M-f>` | Find files in that directory |
+| `<M-s>` | Live grep in that directory |
+| `<M-c>` | `:tcd` into it **and open it in Oil** |
+| `<M-g>` / `<M-b>` | Toggle gitignore / hidden files |
+| `<CR>` `<C-s>` `<C-v>` `<C-t>` | Open · split · vsplit · tab (directories open in Oil) |
+| `<C-q>` / `<C-l>` | Send selection to quickfix / location list |
+| `<C-/>` | Toggle preview (starts hidden below 100 columns) |
 
-All FZF pickers default to fuzzy matching. `<leader>fg` fuzzy-filters all ripgrep results, while `<leader>fG` deliberately starts with live ripgrep/regex search; in either grep picker, press `<C-g>` to switch modes. `<leader>fs` performs a live LSP workspace-symbol search, which is compatible with language servers such as BasedPyright that require a non-empty symbol query. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` to populate quickfix or `<C-l>` to populate the current window's location list. In Markdown, `go` parses the current file directly so heading levels and parent paths are searchable; other filetypes use LSP document symbols.
+### `<leader>f` — find in the current scope
 
-Project-wide rename: `<leader>cR` prompts for search and replacement strings, opens fzf grep, and on confirm sends matches to quickfix then runs `cfdo %s/.../.../ | update` across all matched files.
+| Key | Action |
+|-----|--------|
+| `<leader>ff` | Files (cwd) |
+| `<leader>f.` | Files in the current file's directory |
+| `<leader>f-` | Directories under cwd (`-` is Oil's key; `<CR>` opens the directory in Oil) |
+| `<leader>fg` | Live grep |
+| `<leader>fb` | Buffers |
+| `<leader><space>` | Quick buffer switcher (alternate buffer first) |
+| `<leader>fo` | Recent files |
+| `<leader>fr` | Resume last picker |
+| `<leader>fh` | Help tags |
+| `<leader>fk` | Keymaps |
+| `<leader>fm` | Marks |
+| `<leader>f"` | Registers |
+| `<leader>f:` | Commands |
+| `<leader>fc` | Command history |
+| `<leader>fs` | Workspace symbols (live LSP query) |
+| `<leader>fd` / `<leader>fD` | Workspace / document diagnostics |
+| `<leader>fq` / `<leader>fl` | Quickfix / location list |
+| `go` | Document symbols |
+
+### `<leader>d` — pick a directory
+
+| Key | Action |
+|-----|--------|
+| `<leader>dd` | Search directories under `~` (what `<leader>ff` is for files) |
+| `<leader>dz` | Zoxide directories (ranked by where you actually work) |
+| `<leader>dh` | Files under `~` |
+
+`<leader>fs` performs a live LSP workspace-symbol search, which is compatible with language servers such as BasedPyright that require a non-empty symbol query. In a grep picker, `<C-g>` switches between live ripgrep/regex and fuzzy filtering; `rg_glob` is on, so `search_term -- *.lua` restricts the glob. In the document-symbol picker, use `<M-a>` to select every symbol, then `<C-q>` / `<C-l>` for quickfix / location list.
 
 ---
 
@@ -174,7 +193,7 @@ Also includes a custom Terminal Command Runner. Unlike files, commands are share
 | `<leader>hp` | Previous file in list |
 | `<leader>hc` | Prompt to add a new command |
 | `<leader>hm` | Open command quick menu |
-| `<leader>h1` – `<leader>h4` | Run command slot 1–4 |
+| `<leader>9` / `<leader>8` / `<leader>7` / `<leader>6` | Run command slot 1 / 2 / 3 / 4 |
 
 ---
 

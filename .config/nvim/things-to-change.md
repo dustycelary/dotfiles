@@ -42,6 +42,20 @@
       **the preview starts hidden under 100 columns** — `<C-/>` toggles it back
       (`<F4>` still works; `<F2>`/`<F3>` are eaten by tmux). Zooming the tmux
       pane (F3) and reopening gets the side-by-side preview back with no restart.
+- [x] sort out the search keymaps so they make sense — the two groups are now
+      split by *scope*: `<leader>f` searches inside the current scope,
+      `<leader>d` picks a directory (changes the scope). `<leader>dd` is to
+      directories what `<leader>ff` is to files; directory search under *cwd*
+      is `<leader>f-`, with the rest of the current-scope pickers; and
+      `ds`/`dS`/`dc`/`dd`/`dD`/`dn`/`do`/`fF` are gone. In *every* picker
+      `<M-c>` now cds (`:tcd`) into the focused entry's directory — the entry
+      itself if it is one, its parent if it's a file — and opens it in oil;
+      `<M-f>`/`<M-s>` still find/grep in it. Same three keys in the bookmarks
+      picker. zoxide: the global `path.filename_first` formatter split the
+      entry into "<tail>\t<parent>", and the picker takes the last tab field as
+      the path, so every action landed one directory too high — pinned back to
+      `path.dirname_first`.
+
 - [x] change <leader>space so it does a quick search of buffers?
       — yes, with `sort_lastused` so the alternate buffer is first: `<leader><space><CR>`
       is the old `:b#`. The `:b#` mapping is gone — native `<C-^>` still does it.
@@ -51,9 +65,13 @@
 ┌───────────────────────────┬──────────────────────────────────────────────────────┐
 │            Key            │                        Action                        │
 ├───────────────────────────┼──────────────────────────────────────────────────────┤
-│ <leader>dh dn dd du       │ Files in ~ / ~/Documents / dotfiles / university     │
+│ <leader>dd  dz            │ Directories under ~ / zoxide (cwd ones: <leader>f-) │
 ├───────────────────────────┼──────────────────────────────────────────────────────┤
-│ <leader>ff                │ Files at git root (was cwd); <leader>fF is plain cwd │
+│ <leader>dh                │ Files in ~ (the only files-elsewhere shortcut left)  │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <M-c> (in any fzf picker) │ cd to entry's dir and open it in oil                │
+├───────────────────────────┼──────────────────────────────────────────────────────┤
+│ <leader>ff                │ Files in cwd (<leader>fF removed)                    │
 ├───────────────────────────┼──────────────────────────────────────────────────────┤
 │ <leader><space>           │ Buffer switcher, alternate buffer sorted first       │
 ├───────────────────────────┼──────────────────────────────────────────────────────┤

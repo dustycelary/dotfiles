@@ -150,6 +150,16 @@ function M.pick()
 		return by_display[utils.strip_ansi_coloring(sel[1])]
 	end
 
+	-- The directory an entry stands for: a directory bookmark is itself, a file
+	-- bookmark is the directory holding it.
+	local function bookmark_dir(sel)
+		local p = selected(sel)
+		if not p then
+			return nil
+		end
+		return vim.fn.isdirectory(p) == 1 and p or vim.fn.fnamemodify(p, ":h")
+	end
+
 	-- Wrap an action with a help/header label so the picker's F1 help shows
 	-- "open in split" instead of `table: 0x...` (bare functions and plain
 	-- `{fn=...}` tables have no description for fzf-lua to display).
@@ -161,7 +171,7 @@ function M.pick()
 		prompt = "Bookmarks❯ ",
 		-- Inline key hints so the binds are visible without opening F1 help.
 		fzf_opts = {
-			["--header"] = "enter:open · ctrl-s/v/t:split/vsplit/tab · ctrl-f:files under · ctrl-x:remove",
+			["--header"] = "enter:open · ctrl-s/v/t:split/vsplit/tab · alt-f/s:find/grep under · alt-c:cd · ctrl-x:remove",
 		},
 		winopts = {
 			title = " Bookmarks ",
@@ -195,17 +205,34 @@ function M.pick()
 					open(p, "tabedit")
 				end
 			end),
-			-- Jump the *picker* into that bookmark rather than opening it: find
-			-- files under it (or under its parent, for a file bookmark).
-			["ctrl-f"] = act("find files under bookmark", function(sel)
-				local p = selected(sel)
-				if not p then
-					return
+			-- alt-f / alt-s / alt-c mean the same here as in every fzf-lua
+			-- picker (see plugins/fzf-lua.lua): act on the entry's directory —
+			-- the bookmark itself when it is one, its parent when it's a file —
+			-- rather than opening the entry.
+			["alt-f"] = act("find files under bookmark", function(sel)
+				local dir = bookmark_dir(sel)
+				if dir then
+					vim.schedule(function()
+						require("fzf-lua").files({ cwd = dir })
+					end)
 				end
-				local dir = vim.fn.isdirectory(p) == 1 and p or vim.fn.fnamemodify(p, ":h")
-				vim.schedule(function()
-					require("fzf-lua").files({ cwd = dir })
-				end)
+			end),
+			["alt-s"] = act("grep under bookmark", function(sel)
+				local dir = bookmark_dir(sel)
+				if dir then
+					vim.schedule(function()
+						require("fzf-lua").live_grep({ cwd = dir })
+					end)
+				end
+			end),
+			["alt-c"] = act("cd into bookmark", function(sel)
+				local dir = bookmark_dir(sel)
+				if dir then
+					vim.cmd.tcd(vim.fn.fnameescape(dir))
+					-- oil is the default file explorer, so :edit browses it.
+					vim.cmd.edit(vim.fn.fnameescape(dir))
+					vim.notify("cwd → " .. vim.fn.fnamemodify(dir, ":~"))
+				end
 			end),
 			["ctrl-x"] = act("remove bookmark", function(sel)
 				local p = selected(sel)
