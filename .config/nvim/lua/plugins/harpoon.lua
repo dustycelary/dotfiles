@@ -187,12 +187,15 @@ return {
 		{
 			"<leader>hc",
 			function()
-				vim.ui.input({ prompt = "Add Harpoon Command (prefix with ':' to run as Vim command, else runs in a terminal): " }, function(input)
-					if input and input ~= "" then
-						cmd_list():add({ value = input })
-						save_cmds()
+				vim.ui.input(
+					{ prompt = "Add Harpoon Command (prefix with ':' to run as Vim command, else runs in a terminal): " },
+					function(input)
+						if input and input ~= "" then
+							cmd_list():add({ value = input })
+							save_cmds()
+						end
 					end
-				end)
+				)
 			end,
 			desc = "Add command to list",
 		},
@@ -204,28 +207,28 @@ return {
 			desc = "Command quick menu",
 		},
 		{
-			"<leader>h1",
+			"<leader>6",
 			function()
 				cmd_list():select(1)
 			end,
 			desc = "Run command 1",
 		},
 		{
-			"<leader>h2",
+			"<leader>7",
 			function()
 				cmd_list():select(2)
 			end,
 			desc = "Run command 2",
 		},
 		{
-			"<leader>h3",
+			"<leader>8",
 			function()
 				cmd_list():select(3)
 			end,
 			desc = "Run command 3",
 		},
 		{
-			"<leader>h4",
+			"<leader>9",
 			function()
 				cmd_list():select(4)
 			end,
