@@ -236,6 +236,15 @@ return {
 					yaml = { "prettier" },
 				},
 				formatters = {
+					-- ruff_fix is `ruff check --fix`, which by default deletes unused
+					-- imports (F401) on every save — including the import you just
+					-- typed and were about to use two lines down. The inline config
+					-- *extends* whatever the project's own unfixable list is (the
+					-- --unfixable flag would replace it), so F401 is still reported
+					-- as a diagnostic, it just never gets auto-fixed.
+					ruff_fix = {
+						prepend_args = { "--config", 'lint.extend-unfixable=["F401"]' },
+					},
 					jq_jsonl = {
 						command = "jq",
 						args = { "-c", "." },
