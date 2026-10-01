@@ -11,6 +11,20 @@ return {
 	opts = {
 		notifier = { enabled = true },
 		quickfile = { enabled = true },
+		-- image renders pictures, PDFs and LaTeX math as real pixels via the
+		-- Kitty graphics protocol, which Ghostty implements. Math needs the
+		-- `latex` treesitter parser to locate expressions and `tectonic` to
+		-- typeset them; `magick` crops the result.
+		image = {
+			enabled = true,
+			-- conceal defaults to true for math, which overlays the image onto
+			-- existing buffer lines instead of reserving space. A formula taller
+			-- than one cell row (46px vs this terminal's 29px) then spills its
+			-- second row over the next line of text. false switches snacks to
+			-- virt_lines, which reserve real rows, at the cost of still showing
+			-- the $$...$$ source above the render.
+			doc = { conceal = false },
+		},
 	},
 	keys = {
 		{

@@ -30,6 +30,8 @@ return {
 				"python",
 				"php",
 				"toml",
+				-- required by snacks.image to find math in markdown/tex buffers
+				"latex",
 			})
 		end)
 

@@ -5,7 +5,9 @@ return {
 	"MeanderingProgrammer/render-markdown.nvim",
 	dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
 	ft = { "markdown" },
-	opts = {},
+	-- snacks.image draws math as typeset images; this module's unicode
+	-- approximation (x^2 -> x²) would stack a second copy on top of it.
+	opts = { latex = { enabled = false } },
 	keys = {
 		{ "<leader>um", "<cmd>RenderMarkdown toggle<cr>", desc = "Toggle render markdown" },
 	},
