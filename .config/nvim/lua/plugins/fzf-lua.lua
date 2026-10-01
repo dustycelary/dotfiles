@@ -1,10 +1,23 @@
 -- fzf-lua — the fuzzy finder for everything. Two keymap groups, split by
 -- *scope* rather than by picker type:
 --
---   <leader>f   Find something inside the current scope — files under cwd, the
---               buffer list, grep, symbols, diagnostics, help.
---   <leader>d   Pick a *directory*, i.e. change the scope itself. Everything
---               here can leave the current project.
+--   <leader>f   Find something inside the current scope — files under cwd or
+--               next to the current buffer, the buffer list, grep, symbols,
+--               diagnostics, help.
+--   <leader>d   Search somewhere that is *not* the current directory: $HOME,
+--               OneDrive, iCloud Drive, the trash, anywhere zoxide remembers.
+--
+-- Every fixed location has a files picker and a directories picker on the same
+-- letter, the shifted key being the directories one:
+--
+--   ~             <leader>dh / <leader>dd   (dd predates the rule; dH is unused)
+--   OneDrive      <leader>do / <leader>dO
+--   iCloud Drive  <leader>di / <leader>dI
+--   Trash         <leader>db / <leader>dB   (b for bin — dt is the oil jump)
+--   cwd           <leader>ff / <leader>f-   (- is oil's own "open a dir" key)
+--   buffer's dir  <leader>f. / <leader>f>
+--
+-- <leader>fa and <leader>da are the two roots worth searching as one list.
 --
 -- Inside every picker the same three alt-keys act on the focused entry. A
 -- directory entry is used as-is; a file entry contributes its parent
@@ -37,20 +50,73 @@ local function cd(dir)
 	vim.notify("cwd → " .. vim.fn.fnamemodify(dir, ":~"))
 end
 
-local function files_in(dir)
+-- Where the OS puts deleted files, i.e. where oil's `delete_to_trash` sends
+-- them. Mirrors oil's own two implementations (adapters/trash/{mac,freedesktop})
+-- so <leader>db searches exactly what `g\\` browses: one ~/.Trash on macOS, and
+-- $XDG_DATA_HOME/Trash/files under the freedesktop spec. A function rather than
+-- a constant because XDG_DATA_HOME is set per machine (the Pi moves it onto the
+-- T7), and this way the picker reads it when pressed.
+local function trash_dir()
+	if vim.fn.has("mac") == 1 then
+		return "~/.Trash"
+	end
+	local xdg = vim.env.XDG_DATA_HOME
+	if not xdg or xdg == "" then
+		xdg = vim.fs.joinpath(assert(vim.uv.os_homedir()), ".local", "share")
+	end
+	return vim.fs.joinpath(xdg, "Trash", "files")
+end
+
+-- A picker root: a path string, or a function returning one for the roots that
+-- aren't known until the key is pressed (the current buffer's directory, the
+-- trash). nil after a warning means "nothing to search", so callers just bail.
+local function resolve_root(dir)
+	local base = type(dir) == "function" and dir() or dir
+	if not base or base == "" then
+		-- Only the current-buffer root can be nil: scratch buffers and non-file
+		-- schemes (terminal://, fugitive://) have no directory on disk.
+		vim.notify("This buffer has no directory on disk", vim.log.levels.WARN)
+		return nil
+	end
+	base = vim.fn.expand(base)
+	if vim.fn.isdirectory(base) == 0 then
+		vim.notify("No such directory: " .. vim.fn.fnamemodify(base, ":~"), vim.log.levels.WARN)
+		return nil
+	end
+	return base
+end
+
+-- `types` is the fd --type selection, which is the only thing separating the
+-- files-only pickers from the files-and-directories ones. `overrides` is for
+-- the odd root that wants different filtering (see the trash below).
+local function rooted_picker(dir, types, overrides)
 	return function()
-		local path = vim.fn.expand(dir)
-		if vim.fn.isdirectory(path) == 0 then
-			vim.notify("No such directory: " .. dir, vim.log.levels.WARN)
+		local base = resolve_root(dir)
+		if not base then
 			return
 		end
-		require("fzf-lua").files({
-			cwd = path,
+		require("fzf-lua").files(vim.tbl_extend("force", {
+			cwd = base,
 			no_ignore = false,
 			hidden = false,
-			fd_opts = "--color=never --type f --type l" .. fd_excludes,
-		})
+			fd_opts = "--color=never " .. types .. fd_excludes,
+		}, overrides or {}))
 	end
+end
+
+local function files_in(dir, overrides)
+	return rooted_picker(dir, "--type f --type l", overrides)
+end
+
+-- Files *and* directories in one list. fd emits both from one walk, and nothing
+-- else has to change: fzf-lua's builtin previewer already shells out to
+-- `ls -la` for a directory entry, <CR> runs `:edit` (which oil picks up for a
+-- directory), and common_actions' alt-f/alt-s/alt-c treat a directory entry as
+-- itself rather than as its parent. The trade-off vs. the dirs-only pickers is
+-- volume — directories are outnumbered by files, so this is for "I know roughly
+-- what it's called", not "there's a project somewhere under ~".
+local function files_and_dirs_in(dir, overrides)
+	return rooted_picker(dir, "--type f --type l --type d", overrides)
 end
 
 -- Actions shared by every picker whose entries are directories. `resolve` turns
@@ -92,9 +158,8 @@ end
 local function dirs_in(dir)
 	return function()
 		local fzf = require("fzf-lua")
-		local base = vim.fn.expand(type(dir) == "function" and dir() or dir)
-		if vim.fn.isdirectory(base) == 0 then
-			vim.notify("No such directory: " .. base, vim.log.levels.WARN)
+		local base = resolve_root(dir)
+		if not base then
 			return
 		end
 
@@ -296,6 +361,19 @@ return {
 	keys = {
 		-- [[ <leader>f — find inside the current scope ]]
 		{ "<leader>ff", "<cmd>FzfLua files<cr>", desc = "Files (cwd)" },
+		-- Same scope and the same unfiltered defaults as ff (alt-g / alt-b still
+		-- toggle them), just with directories mixed into the results. fd's own
+		-- --exclude .git/.jj come from fzf-lua's default fd_opts, which this
+		-- replaces, so they're repeated here.
+		{
+			"<leader>fa",
+			function()
+				require("fzf-lua").files({
+					fd_opts = "--color=never --type f --type l --type d --exclude .git --exclude .jj",
+				})
+			end,
+			desc = "Files and directories (cwd)",
+		},
 		-- Directories, but inside the current scope, so it belongs here rather
 		-- than in <leader>d. Mnemonic: `-` is the key oil opens a directory
 		-- with, and <CR> here hands the directory straight to oil.
@@ -318,6 +396,9 @@ return {
 			end,
 			desc = "Files in current file's directory",
 		},
+		-- The directories companion to f. — shifted `.`, matching the
+		-- files/directories pairing described at the top of this file.
+		{ "<leader>f>", dirs_in(current_file_dir), desc = "Directories in current file's directory" },
 		{ "<leader>fg", "<cmd>FzfLua live_grep<cr>", desc = "Live grep" },
 		{ "<leader>fb", "<cmd>FzfLua buffers<cr>", desc = "Buffers" },
 		{ "<leader>fo", "<cmd>FzfLua oldfiles<cr>", desc = "Recent files" },
@@ -391,5 +472,29 @@ return {
 		-- Files rather than directories, for when the target is a file you can
 		-- name and it isn't under the current project.
 		{ "<leader>dh", files_in("~"), desc = "Files in ~" },
+		{ "<leader>da", files_and_dirs_in("~"), desc = "Files and directories in ~" },
+		-- The trash, searched rather than browsed (<leader>dt opens it in oil).
+		-- hidden = true here unlike the other rooted pickers: you delete
+		-- dotfiles too, and the trash is small enough that showing them costs
+		-- nothing. <CR> opens the trashed copy in place — restoring is still
+		-- oil's job, over in the oil-trash:// buffer.
+		{ "<leader>db", files_in(trash_dir, { hidden = true }), desc = "Files in Trash" },
+		{ "<leader>dB", dirs_in(trash_dir), desc = "Directories in Trash" },
+		-- Cloud storage. Both live under ~/Library, which nothing else in this
+		-- config looks at, and neither is ever "under the current project".
+		-- macOS-only paths, so on the Pi these report the missing directory
+		-- rather than opening an empty picker.
+		{ "<leader>do", files_in("~/Library/CloudStorage/OneDrive-Personal"), desc = "Files in OneDrive" },
+		{ "<leader>dO", dirs_in("~/Library/CloudStorage/OneDrive-Personal"), desc = "Directories in OneDrive" },
+		{
+			"<leader>di",
+			files_in("~/Library/Mobile Documents/com~apple~CloudDocs"),
+			desc = "Files in iCloud Drive",
+		},
+		{
+			"<leader>dI",
+			dirs_in("~/Library/Mobile Documents/com~apple~CloudDocs"),
+			desc = "Directories in iCloud Drive",
+		},
 	},
 }
