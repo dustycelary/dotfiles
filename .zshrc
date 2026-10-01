@@ -55,6 +55,10 @@ export FZF_DEFAULT_COMMAND="fd --type f --hidden $FD_EXCLUDES"
 # Open FZF in a compact panel with results ordered from top to bottom.
 export FZF_DEFAULT_OPTS='--height=60% --layout=reverse --border'
 
+# Don't suggest ./ and ../ in path completion (including fzf-tab).
+# Must be set before oh-my-zsh.sh runs compinit.
+zstyle ':completion:*' special-dirs false
+
 # Load Git helpers, fuzzy finding, and interactive completion enhancements.
 # fzf-marks (dir bookmarks in ~/.fzf-marks):
 #   mark <name>  save cwd (no name = folder basename)
@@ -166,15 +170,30 @@ if command -v zoxide >/dev/null 2>&1; then
   bindkey '^[z' recent-directory-widget
 fi
 
-# Initialize pyenv lazily when installed so it doesn't slow down shell startup.
-# Only the `pyenv` command itself is shimmed; `python`/`pip` go through pyenv's
-# shims on PATH, so no wrapper functions (and no recursion risk).
+# Initialize pyenv in every interactive shell so `python`/`pip` are the
+# pyenv-selected version, not the system/Homebrew one.
+#
+# This used to be a lazy wrapper that only redefined the `pyenv` *function* and
+# deferred `pyenv init` until the first `pyenv` call. The comment claimed the
+# shims were on PATH already, but nothing ever put them there — so in a fresh
+# terminal `python3` was Homebrew's and `pyenv global` had no effect until you
+# happened to run `pyenv` once. Doing it up front costs ~25ms; --no-rehash skips
+# the shim rebuild (run `pyenv rehash` after installing a Python or a new
+# console-script entry point).
+#
+# Both halves are guarded, so a box without pyenv — the Raspberry Pi — just
+# skips the block instead of erroring. $PYENV_ROOT/bin is prepended for
+# git-clone installs (the Pi's route, if pyenv ever lands there); Homebrew's
+# pyenv is already on PATH and has no bin/ of its own.
+export PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
+[[ -d "$PYENV_ROOT/bin" ]] && path=("$PYENV_ROOT/bin" $path)
 if command -v pyenv >/dev/null 2>&1; then
-  pyenv() {
-    unset -f pyenv
-    eval "$(command pyenv init - zsh)"
-    pyenv "$@"
-  }
+  eval "$(command pyenv init - --no-rehash zsh)"
+  # pyenv-virtualenv, when that plugin is installed: auto-activate the
+  # virtualenv a directory's .python-version names.
+  if command -v pyenv-virtualenv-init >/dev/null 2>&1; then
+    eval "$(command pyenv virtualenv-init - zsh)"
+  fi
 fi
 
 

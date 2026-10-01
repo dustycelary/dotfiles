@@ -98,8 +98,13 @@ if command -v zoxide >/dev/null 2>&1; then
 fi
 
 # Initialize pyenv when installed so its selected Python version is available.
+# $PYENV_ROOT/bin covers git-clone installs (Homebrew's pyenv is already on PATH
+# and ships no bin/ of its own); both halves are guarded so a box without pyenv
+# just skips this. Mirrors the pyenv block in .zshrc.
+export PYENV_ROOT="${PYENV_ROOT:-$HOME/.pyenv}"
+[[ -d "$PYENV_ROOT/bin" ]] && PATH="$PYENV_ROOT/bin:$PATH"
 if command -v pyenv >/dev/null 2>&1; then
-  eval "$(pyenv init - bash)"
+  eval "$(pyenv init - --no-rehash bash)"
 fi
 
 # Replace ls with lsd when installed and provide common listing shortcuts.
