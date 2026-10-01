@@ -1,4 +1,26 @@
 -- oil.nvim — file explorer that allows editing the filesystem like a normal Vim buffer.
+
+-- Jump straight to one fixed directory, wherever you are. `:edit` is enough
+-- because oil is default_file_explorer with netrw disabled.
+local function open_dir(path)
+	return function()
+		local dir = vim.fn.expand(path)
+		if vim.fn.isdirectory(dir) == 0 then
+			vim.notify("No such directory: " .. path, vim.log.levels.WARN)
+			return
+		end
+		vim.cmd.edit(vim.fn.fnameescape(dir))
+	end
+end
+
+-- The trash oil writes to with delete_to_trash. macOS has one system-wide
+-- trash, so the path in the URL is ignored there and you always get all of
+-- ~/.Trash; the freedesktop (Pi) implementation is per-directory, so passing
+-- $HOME gets everything trashed from under the home directory.
+local function open_trash()
+	vim.cmd.edit("oil-trash://" .. vim.fn.expand("~"))
+end
+
 return {
 	"stevearc/oil.nvim",
 	lazy = false,
@@ -71,7 +93,25 @@ return {
 			["gx"] = "actions.open_external",
 			["g."] = "actions.toggle_hidden",
 			["g\\"] = "actions.toggle_trash",
-			["gy"] = "actions.yank_entry",
+			-- oil's own actions.yank_entry writes to vim.v.register, i.e. the
+			-- unnamed register unless you type "+gy. Yank straight to the
+			-- system clipboard instead (matching gY below), while still
+			-- honouring an explicit register prefix like "ay.
+			["gy"] = {
+				desc = "Yank entry path to clipboard",
+				callback = function()
+					local oil = require("oil")
+					local entry = oil.get_cursor_entry()
+					local dir = oil.get_current_dir()
+					if not (entry and dir) then
+						return
+					end
+					local path = dir .. entry.name .. (entry.type == "directory" and "/" or "")
+					local register = vim.v.register == '"' and "+" or vim.v.register
+					vim.fn.setreg(register, path)
+					vim.notify("Yanked " .. path)
+				end,
+			},
 			["gY"] = {
 				desc = "Yank current directory path",
 				callback = function()
@@ -87,6 +127,11 @@ return {
 	dependencies = { "nvim-tree/nvim-web-devicons", "folke/snacks.nvim" },
 	keys = {
 		{ "-", "<cmd>Oil<cr>", desc = "Open parent directory in Oil" },
+		-- Two directories that are never "under the current project" but are
+		-- always worth one key: where downloads land, and where deletes go.
+		-- (g\ still toggles the trash for whatever directory you're browsing.)
+		{ "<leader>dw", open_dir("~/Downloads"), desc = "Downloads" },
+		{ "<leader>dt", open_trash, desc = "Trash" },
 	},
 	config = function(_, opts)
 		require("oil").setup(opts)
