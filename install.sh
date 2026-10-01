@@ -23,6 +23,7 @@ FILES=(
   .zprofile
   .gitconfig
   .tmux.conf
+  .tmux-toggle-scratch.sh
   .inputrc
   .config/ghostty/config
   .config/nvim

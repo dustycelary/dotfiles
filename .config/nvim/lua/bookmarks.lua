@@ -170,8 +170,13 @@ function M.pick()
 	require("fzf-lua").fzf_exec(entries, {
 		prompt = "Bookmarks❯ ",
 		-- Inline key hints so the binds are visible without opening F1 help.
+		-- Kept short deliberately: fzf *truncates* a too-long header rather than
+		-- wrapping it (--wrap only applies to the result list), and this picker
+		-- is 0.70 of the editor — a ~61 column budget on a 90 column terminal.
+		-- Readline notation (^s for ctrl, M-f for alt) is what buys the room;
+		-- spelling the keys out ran to 93 columns and lost its last two hints.
 		fzf_opts = {
-			["--header"] = "enter:open · ctrl-s/v/t:split/vsplit/tab · alt-f/s:find/grep under · alt-c:cd · ctrl-x:remove",
+			["--header"] = "⏎ open · ^s/v/t split · M-f/s find/grep · M-c cd · ^x remove",
 		},
 		winopts = {
 			title = " Bookmarks ",
