@@ -1,22 +1,3 @@
--- Harpoon 2 — fast file & command bookmarks & navigation.
---
--- Files stay scoped to the current directory (harpoon's normal per-project
--- behavior). Commands are global: the same list in every directory, and it
--- survives quitting nvim.
---
--- settings.key() alone can't do that. It decides two things at once: the
--- in-memory bucket *and* the file name on disk (harpoon/data.lua hashes the
--- key to pick <stdpath-data>/harpoon/<sha256>.json), and that file is read
--- exactly once, when Harpoon:setup() constructs its Data object. So a key()
--- that returns a constant only while a command keymap is running writes the
--- commands into the global file but still *reads* the cwd file at startup:
--- the list looks saved, then comes back empty on the next launch.
---
--- So the command list gets its own Data object, permanently pinned to
--- GLOBAL_CMD_KEY, and is deliberately kept out of harpoon.lists so that
--- Harpoon:sync() — which is always cwd-keyed — can never write it to the
--- wrong file. Saving it is our job: after an add, whenever the quick menu
--- rewrites a list, and on exit.
 local GLOBAL_CMD_KEY = "__global_commands__"
 local CMD_LIST = "cmd"
 
@@ -188,7 +169,9 @@ return {
 			"<leader>hc",
 			function()
 				vim.ui.input(
-					{ prompt = "Add Harpoon Command (prefix with ':' to run as Vim command, else runs in a terminal): " },
+					{
+						prompt = "Add Harpoon Command (prefix with ':' to run as Vim command, else runs in a terminal): ",
+					},
 					function(input)
 						if input and input ~= "" then
 							cmd_list():add({ value = input })

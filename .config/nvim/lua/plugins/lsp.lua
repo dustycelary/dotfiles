@@ -30,6 +30,10 @@ return {
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = { "b0o/schemastore.nvim" },
 		config = function()
+			-- Disable Neovim's built-in gr*/gO/K/<C-S> LSP keymaps; we define our
+			-- own <leader>c* mappings below instead.
+			vim.g.lsp_no_default_keymaps = true
+
 			-- LspInfo command
 			local function lsp_info()
 				local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -175,14 +179,31 @@ return {
 				callback = function(args)
 					local b = args.buf
 
-					vim.keymap.set("n", "grd", function()
+					vim.keymap.set("n", "<leader>cd", function()
 						require("fzf-lua").lsp_definitions({ jump1 = true })
 					end, { buffer = b, desc = "Go to definition" })
-					vim.keymap.set("n", "grD", vim.lsp.buf.declaration, { buffer = b, desc = "Go to declaration" })
-					vim.keymap.set("n", "grr", vim.lsp.buf.references, { buffer = b, desc = "References → quickfix" })
-					vim.keymap.set("n", "gri", function()
+					vim.keymap.set(
+						"n",
+						"<leader>cD",
+						vim.lsp.buf.declaration,
+						{ buffer = b, desc = "Go to declaration" }
+					)
+					vim.keymap.set(
+						"n",
+						"<leader>cr",
+						vim.lsp.buf.references,
+						{ buffer = b, desc = "References → quickfix" }
+					)
+					vim.keymap.set("n", "<leader>cI", function()
 						require("fzf-lua").lsp_implementations({ jump1 = true })
 					end, { buffer = b, desc = "Implementations" })
+					vim.keymap.set(
+						"n",
+						"<leader>ct",
+						vim.lsp.buf.type_definition,
+						{ buffer = b, desc = "Go to type definition" }
+					)
+					vim.keymap.set("n", "<leader>cx", vim.lsp.codelens.run, { buffer = b, desc = "Run codelens" })
 					vim.keymap.set("n", "<leader>cs", function()
 						local blink = require("blink.cmp")
 						if blink.is_signature_visible() then

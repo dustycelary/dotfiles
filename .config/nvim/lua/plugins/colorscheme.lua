@@ -29,6 +29,11 @@ return {
 					flash = true,
 					oil = true,
 				},
+				custom_highlights = function(colors)
+					return {
+						WinSeparator = { fg = colors.overlay2, bold = true },
+					}
+				end,
 			})
 			vim.o.background = "dark"
 			vim.cmd.colorscheme("catppuccin")

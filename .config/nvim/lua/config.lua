@@ -92,6 +92,7 @@ vim.opt.timeoutlen = 300
 vim.opt.wrap = false
 
 vim.opt.winborder = "rounded" -- default border for all floating windows (hover, oil, bqf, etc.)
+vim.opt.fillchars = { vert = "│", horiz = "─", verthoriz = "┼", horizup = "┴", horizdown = "┬", vertleft = "┤", vertright = "├" }
 vim.opt.inccommand = "nosplit" -- live preview :s and cmdline commands
 vim.opt.splitkeep = "screen" -- keep text on screen steady when splitting/closing
 vim.opt.completeopt = { "menuone", "noselect" }
