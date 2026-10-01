@@ -6,8 +6,8 @@
 -- popup reads as one list instead of a pile of plugin jargon:
 --   * Verb first, sentence case: "Close window", "Toggle pin", "Live grep".
 --   * No group prefix on keys that sit *inside* that group — the panel header
---     already says "Git", so <leader>gs is "Status", not "Git status". Keys at
---     the root keep their context ("Harpoon file 1", "Next buffer").
+--     already says "Buffers", so <leader>bp is "Toggle pin", not "Buffer toggle
+--     pin". Keys at the root keep their context ("Harpoon file 1", "Next buffer").
 --   * "Previous"/"Next" spelled out, never "Prev".
 --   * "→" means "sends its results to": "Diagnostics → quickfix".
 --
@@ -52,11 +52,8 @@ return {
 				-- Whole plugins first: lazy manages these keys, so they match on
 				-- plugin name and don't depend on how each desc is worded.
 				{ plugin = "harpoon", icon = "", color = "azure" },
-				{ plugin = "vim-fugitive", icon = "", color = "orange" },
 				{ plugin = "bufferline.nvim", icon = "", color = "azure" },
 				{ plugin = "oil.nvim", icon = "", color = "yellow" },
-				{ plugin = "persistence.nvim", icon = "", color = "azure" },
-				{ plugin = "inc-rename.nvim", icon = "", color = "orange" },
 				{ plugin = "vim-sandwich", icon = "", color = "purple" },
 				{ plugin = "flash.nvim", icon = "", color = "yellow" },
 				{ plugin = "smart-splits.nvim", icon = "", color = "blue" },
@@ -82,7 +79,6 @@ return {
 				{ pattern = "clipboard", icon = "", color = "yellow" },
 				{ pattern = "surround", icon = "", color = "purple" },
 				{ pattern = "terminal", icon = "", color = "red" },
-				{ pattern = "session", icon = "", color = "azure" },
 				{ pattern = "director", icon = "", color = "yellow" },
 				{ pattern = "files in", icon = "", color = "yellow" },
 				{ pattern = "grep", icon = "", color = "green" },
@@ -104,16 +100,13 @@ return {
 			{ "<leader>c", group = "Code & LSP", icon = "" },
 			{ "<leader>d", group = "Directories (change scope)", icon = "" },
 			{ "<leader>f", group = "Find & search (current scope)", icon = "" },
-			{ "<leader>g", group = "Git", icon = "" },
 			{ "<leader>h", group = "Harpoon (project files)", icon = "" },
 			{ "<leader>l", group = "Location list", icon = "" },
 			{ "<leader>m", group = "Bookmarks (global)", icon = "" },
 			{ "<leader>n", group = "Swap with next (Treesitter)", icon = "" },
 			{ "<leader>N", group = "Swap with previous (Treesitter)", icon = "" },
 			{ "<leader>q", group = "Quickfix", icon = "" },
-			{ "<leader>S", group = "Sessions", icon = "" },
 			{ "<leader>s", group = "Surround", icon = "" },
-			{ "<leader>t", group = "Terminal", icon = "" },
 			{ "<leader>u", group = "UI toggles", icon = "" },
 			{ "<leader>w", group = "Windows & splits", icon = "" },
 			{ "<leader>?", "<cmd>FzfLua keymaps<cr>", desc = "Search all keymaps", icon = "" },
@@ -139,7 +132,6 @@ return {
 			{ "ib", desc = "Select surrounding (auto-detect, inner)", mode = { "x", "o" }, icon = "" },
 			{ "as", desc = "Select surrounding (query, outer)", mode = { "x", "o" }, icon = "" },
 			{ "is", desc = "Select surrounding (query, inner)", mode = { "x", "o" }, icon = "" },
-			{ "y<C-G>", desc = "Yank path of current fugitive object", icon = "" },
 		},
 	},
 }

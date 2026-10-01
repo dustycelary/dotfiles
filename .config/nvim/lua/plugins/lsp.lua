@@ -191,9 +191,11 @@ return {
 							blink.show_signature()
 						end
 					end, { buffer = b, desc = "Toggle signature help" })
-					-- <leader>cn (rename symbol) belongs to inc-rename.nvim. It has to
-					-- stay out of here: a buffer-local map would shadow the global one
-					-- and we'd be back to the preview-less prompt.
+					-- Native rename: the server's own prepareRename decides what text
+					-- the prompt starts with, so it is the real symbol range rather
+					-- than whatever <cword> happens to grab. Snacks' input module
+					-- (snacks.lua) renders the prompt as a float at the cursor.
+					vim.keymap.set("n", "<leader>cn", vim.lsp.buf.rename, { buffer = b, desc = "Rename symbol" })
 					vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = b, desc = "Code actions" })
 					vim.keymap.set(
 						"v",

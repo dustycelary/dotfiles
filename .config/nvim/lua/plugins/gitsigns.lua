@@ -1,6 +1,6 @@
 -- gitsigns.nvim — git change indicators in the sign column.
 -- Shows add/change/delete markers using ▎ and  glyphs.
--- Inline blame toggled with <leader>gb (off by default, 400ms delay when on).
+-- Inline blame toggled with <leader>ub (off by default, 400ms delay when on).
 -- Staged hunks shown with separate (dimmer) signs alongside unstaged ones.
 return {
 	"lewis6991/gitsigns.nvim",
