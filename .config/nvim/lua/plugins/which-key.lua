@@ -113,6 +113,7 @@ return {
 			{ "<leader>q", group = "Quickfix", icon = "" },
 			{ "<leader>S", group = "Sessions", icon = "" },
 			{ "<leader>s", group = "Surround", icon = "" },
+			{ "<leader>t", group = "Terminal", icon = "" },
 			{ "<leader>u", group = "UI toggles", icon = "" },
 			{ "<leader>w", group = "Windows & splits", icon = "" },
 			{ "<leader>?", "<cmd>FzfLua keymaps<cr>", desc = "Search all keymaps", icon = "" },
