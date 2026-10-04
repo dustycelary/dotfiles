@@ -23,5 +23,21 @@ return {
 			end,
 			desc = "Rename file",
 		},
+		{
+			"<leader>un",
+			function()
+				local lines = { "# Notifications" }
+				for _, n in ipairs(Snacks.notifier.history or {}) do
+					lines[#lines + 1] = ("[%s] %s"):format((n.level or "info"):upper(), n.msg or "")
+				end
+				vim.cmd("new")
+				vim.bo.bufhidden = "wipe"
+				vim.bo.swapfile = false
+				vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+				vim.bo.modifiable = false
+				vim.bo.filetype = "text"
+			end,
+			desc = "Notification history",
+		},
 	},
 }

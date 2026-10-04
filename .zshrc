@@ -392,16 +392,15 @@ export MEDIA_PATH="/mnt/t7/data"
 # Probe video codecs under $MEDIA_PATH in parallel (much faster than one
 # ffprobe per file via `find -exec \;`). Requires fd + ffprobe on PATH.
 _media_files() {
-  fd --type f -e mkv -e mp4 . "${MEDIA_PATH:?MEDIA_PATH not set}" 2>/dev/null
+  # Uses $1 if provided, otherwise defaults to $MEDIA_PATH
+  local target="${1:-${MEDIA_PATH:?MEDIA_PATH not set}}"
+  fd --type f -e mkv -e mp4 -0 . "$target" 2>/dev/null
 }
-_media_codecs() {
-  _media_files | xargs -P "${FFPROBE_JOBS:-8}" -I{} sh -c \
-    'codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$1" 2>/dev/null); printf "%s\t%s\n" "$codec" "$1"' _ {}
-}
-get-codecs() { _media_codecs | awk -F'\t' '{printf "%-10s %s\n", $1, $2}'; }
-get-hevc() { _media_codecs | awk -F'\t' '$1 ~ /^(hevc|h265|x265)$/ {print $2}'; }
-media-summary() { _media_codecs | cut -f1 | sort | uniq -c; }
 
+_media_codecs() { _media_files "$@" | xargs -0 -P "${FFPROBE_JOBS:-8}" -I{} sh -c 'codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name -of default=noprint_wrappers=1:nokey=1 "$1" 2>/dev/null); printf "%s\t%s\n" "$codec" "$1"' _ {}; }
+get-codecs()    { _media_codecs "$@" | awk -F'\t' '{printf "%-10s %s\n", $1, $2}'; }
+get-hevc()      { _media_codecs "$@" | awk -F'\t' '$1 ~ /^(hevc|h265|x265)$/ {print $2}'; }
+media-summary() { _media_codecs "$@" | cut -f1 | sort | uniq -c; }
 # Replace ls with lsd when installed and provide common listing shortcuts.
 if command -v lsd >/dev/null 2>&1; then
   alias ls='lsd -1'
