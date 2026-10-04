@@ -14,7 +14,7 @@
 # font-family = Iosevka Nerd Font Mono
 # font-family = Monaspace Neon NF
 # font-family = Agave Nerd Font
-font-family = AnonymicePro Nerd Font
+# font-family = AnonymicePro Nerd Font
 # Monaspace ships Regular/Bold/Italic — leave font-style at default.
 # NF build already includes Nerd Font icons.
 # font-family = scientifica
@@ -22,7 +22,7 @@ font-family = AnonymicePro Nerd Font
 
 font-size = 14
 
-# font-family = Iosevka Fergus
+font-family = Iosevka Fergus
 # font-family-bold = "Iosevka Fergus"
 # font-style-bold = "SemiBold"
 # font-size = 14
@@ -36,7 +36,7 @@ font-feature = calt
 font-feature = liga
 
 # Monaspace Regular is correct weight — keep crisp.
-font-thicken = true
+# font-thicken = true
 
 # Monaspace metrics are roomy already, no extra leading needed.
 adjust-cell-height = 0%

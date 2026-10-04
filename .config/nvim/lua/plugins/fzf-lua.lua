@@ -153,7 +153,13 @@ end
 -- directories, except ~ (dh/dd history).
 local root_pairs = {
 	{ fkey = "h", dkey = "dd", dir = "~", flabel = "~", dlabel = "~" },
-	{ fkey = "o", dkey = "O", dir = "~/Library/CloudStorage/OneDrive-Personal", flabel = "OneDrive", dlabel = "OneDrive" },
+	{
+		fkey = "o",
+		dkey = "O",
+		dir = "~/Library/CloudStorage/OneDrive-Personal",
+		flabel = "OneDrive",
+		dlabel = "OneDrive",
+	},
 	{
 		fkey = "i",
 		dkey = "I",
@@ -161,7 +167,14 @@ local root_pairs = {
 		flabel = "iCloud Drive",
 		dlabel = "iCloud Drive",
 	},
-	{ fkey = "b", dkey = "B", dir = trash_dir, flabel = "Trash", dlabel = "Trash", files_overrides = { hidden = true } },
+	{
+		fkey = "b",
+		dkey = "B",
+		dir = trash_dir,
+		flabel = "Trash",
+		dlabel = "Trash",
+		files_overrides = { hidden = true },
+	},
 }
 
 local keys = {
@@ -300,7 +313,7 @@ return {
 			end,
 			defaults = {
 				hidden = true,
-				no_ignore = true,
+				no_ignore = false,
 				formatter = "path.filename_first",
 			},
 			grep = {

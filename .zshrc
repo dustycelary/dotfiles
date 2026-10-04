@@ -387,7 +387,7 @@ alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 
 # for homelab help
 # Media directory base path
-export MEDIA_PATH="/mnt/t7/data/media"
+export MEDIA_PATH="/mnt/t7/data"
 
 # Probe video codecs under $MEDIA_PATH in parallel (much faster than one
 # ffprobe per file via `find -exec \;`). Requires fd + ffprobe on PATH.

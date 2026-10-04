@@ -22,6 +22,7 @@ key-mapping.preset = 'qwerty'
 
 on-window-detected = [
     { if = 'test %{app-bundle-id} = com.apple.Safari', run = 'move-node-to-workspace 1-look' },
+    { if = 'test %{app-bundle-id} = net.whatsapp.WhatsApp', run = 'move-node-to-workspace 5-temp' },
     { if = 'test %{app-bundle-id} = com.apple.iCal || test %{app-bundle-id} = com.apple.reminders || test %{app-bundle-id} = com.apple.mail', run = 'move-node-to-workspace 3-org' },
     # Ghostty's tabs are native NSWindow tab groups, so each new tab is its
     # own AX window to Aerospace, not just a tab in the current one. Tiling
