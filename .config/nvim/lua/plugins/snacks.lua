@@ -24,18 +24,12 @@ return {
 			desc = "Rename file",
 		},
 		{
+			-- snacks owns this: history lives on the internal notifier instance,
+			-- so Snacks.notifier.history is nil and has to be read via
+			-- get_history()/show_history() instead.
 			"<leader>un",
 			function()
-				local lines = { "# Notifications" }
-				for _, n in ipairs(Snacks.notifier.history or {}) do
-					lines[#lines + 1] = ("[%s] %s"):format((n.level or "info"):upper(), n.msg or "")
-				end
-				vim.cmd("new")
-				vim.bo.bufhidden = "wipe"
-				vim.bo.swapfile = false
-				vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
-				vim.bo.modifiable = false
-				vim.bo.filetype = "text"
+				Snacks.notifier.show_history()
 			end,
 			desc = "Notification history",
 		},

@@ -4,16 +4,6 @@
 export EDITOR='nvim'
 export VISUAL='nvim'
 
-# Pi + fast SSD: keep hot Neovim paths (lazy plugins, Mason, treesitter
-# parsers, cache, shada) on /mnt/t7 instead of the SD card. Only kicks in
-# when that mount exists, so macOS is unaffected.
-# First-time setup on the Pi:
-#   mkdir -p /mnt/t7/nvim/{data,cache,state}
-if [[ -d /mnt/t7/nvim ]]; then
-  export XDG_DATA_HOME='/mnt/t7/nvim/data'
-  export XDG_CACHE_HOME='/mnt/t7/nvim/cache'
-  export XDG_STATE_HOME='/mnt/t7/nvim/state'
-fi
 
 # Reduce delay when pressing Escape or keybindings (10ms)
 export KEYTIMEOUT=1
