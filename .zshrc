@@ -45,10 +45,6 @@ export FZF_DEFAULT_COMMAND="fd --type f --hidden $FD_EXCLUDES"
 # Open FZF in a compact panel with results ordered from top to bottom.
 export FZF_DEFAULT_OPTS='--height=60% --layout=reverse --border'
 
-# Don't suggest ./ and ../ in path completion (including fzf-tab).
-# Must be set before oh-my-zsh.sh runs compinit.
-zstyle ':completion:*' special-dirs false
-
 # Load Git helpers, fuzzy finding, and interactive completion enhancements.
 # fzf-marks (dir bookmarks in ~/.fzf-marks):
 #   mark <name>  save cwd (no name = folder basename)
@@ -64,10 +60,7 @@ plugins=(
   fzf-marks
 )
 
-# Skip heavy syntax-highlighting & tab completion widgets on low-power ARM devices (e.g. Raspberry Pi)
-if [[ "$(uname -m)" != "arm"* && "$(uname -m)" != "aarch64"* ]]; then
-  plugins+=(fzf-tab zsh-syntax-highlighting)
-fi
+plugins+=(fzf-tab zsh-syntax-highlighting)
 
 # Initialize Oh My Zsh and the plugins listed above.
 if [[ -f "$ZSH/oh-my-zsh.sh" ]]; then
@@ -127,6 +120,10 @@ unsetopt BEEP
 
 # Make tab completion case-insensitive.
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# Don't suggest ./ and ../ in path completion (including fzf-tab).
+# Must come after oh-my-zsh.sh, whose lib/completion.zsh sets special-dirs true.
+zstyle ':completion:*' special-dirs false
 
 # Include hidden files and directories in tab completion.
 _comp_options+=(globdots)
@@ -374,6 +371,7 @@ alias sp_rag='docker exec -it postgres psql -U dev_user -d spotify_rag'
 # Open frequently used notes and search scripts.
 alias qn_s='nvim ~/Documents/Notes/QuickNote/scratch.md'
 alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
+alias j='jump'
 
 # for homelab help
 # Media directory base path

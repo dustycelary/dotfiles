@@ -49,7 +49,7 @@ r = [
 o = ["cmd:open ~/OneDrive", "onedrive"]
 h = ["cmd:open ~/", "fungus"]
 D = [
-    "cmd:open /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/admin/dopamine_menu_v1.pdf",
+    "cmd:open /Users/fungus/Library/CloudStorage/OneDrive-Personal/onedocs/life/dopamine_menu_v1.pdf",
     "Dopa menu",
 ]
 c = [
@@ -92,7 +92,7 @@ a = [
 ]
 n = ["hs:hs.urlevent.openURL('kmtrigger://macro=open_in_nvim')", "Open in nvim"]
 q = [
-    'cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Library/CloudStorage/OneDrive-Personal/Documents/Notes/life/scratch.md"',
+    'cmd:open -na Ghostty --args --quit-after-last-window-closed=true --command="/opt/homebrew/bin/nvim /Users/fungus/Library/Mobile\ Documents/iCloud~com~coderforart~One-Markdown/Documents/Notes/life/scratch.md"',
     "nvim scratch.md",
 ]
 f = ["cmd:shortcuts run 'add_to_shopping'", "Add to shopping list"]

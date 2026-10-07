@@ -64,3 +64,6 @@ if spoon.Hammerflow.auto_reload then
 end
 
 require("hammer-control.init")
+
+-- AeroSpace cheat sheet overlay (alt-space, /)
+require("aerospace-keys")

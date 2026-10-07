@@ -19,7 +19,7 @@
   - `<leader>ff` → files in current project (now resolves the **git root**, not
     cwd; `<leader>fF` kept for plain cwd)
   - `<leader>dh` → files in home directory
-  - `<leader>du` → files in `~/OneDrive/Documents/university` (there is no `~/Uni`)
+  - `<leader>du` → files in `~/OneDrive/onedocs/university` (there is no `~/Uni`)
   - `<leader>dn` → files in `~/Documents`, `<leader>dd` → dotfiles
   - NOTE: these override the global `hidden`/`no_ignore` defaults, otherwise a
     `$HOME` search walks `~/Library` and every `node_modules`. alt-g / alt-b

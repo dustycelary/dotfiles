@@ -112,7 +112,7 @@ function M.pick()
 	-- Mirror fzf-lua's `path.filename_first` formatter: basename first, parent
 	-- directory dimmed off to the right. Without this a long path is truncated
 	-- from the right and every entry reads as an indistinguishable
-	-- "~/Library/CloudStorage/OneDrive-Personal/Documents/tech...".
+	-- "~/Library/CloudStorage/OneDrive-Personal/onedocs/tech...".
 	local utils = require("fzf-lua.utils")
 
 	local rows, width = {}, 0
