@@ -62,8 +62,8 @@ return {
 			["am"] = { query = "@function.outer", desc = "Select outer part of a method/function definition" },
 			["im"] = { query = "@function.inner", desc = "Select inner part of a method/function definition" },
 
-			["ac"] = { query = "@class.outer", desc = "Select outer part of a class" },
-			["ic"] = { query = "@class.inner", desc = "Select inner part of a class" },
+			["ak"] = { query = "@class.outer", desc = "Select outer part of a class" },
+			["ik"] = { query = "@class.inner", desc = "Select inner part of a class" },
 
 			["ax"] = { query = "@exception.outer", desc = "Select outer part of a try/except block" },
 			["ix"] = { query = "@exception.inner", desc = "Select inner part of a try/except block" },
@@ -106,7 +106,7 @@ return {
 		local move_next_start = {
 			["]f"] = { query = "@call.outer", desc = "Next function call start" },
 			["]m"] = { query = "@function.outer", desc = "Next method/function def start" },
-			["]c"] = { query = "@class.outer", desc = "Next class start" },
+			["]k"] = { query = "@class.outer", desc = "Next class start" },
 			["]i"] = { query = "@conditional.outer", desc = "Next conditional start" },
 			["]o"] = { query = "@loop.outer", desc = "Next loop start" },
 			["]x"] = { query = "@exception.outer", desc = "Next try/except block start" },
@@ -116,7 +116,7 @@ return {
 		local move_next_end = {
 			["]F"] = { query = "@call.outer", desc = "Next function call end" },
 			["]M"] = { query = "@function.outer", desc = "Next method/function def end" },
-			["]C"] = { query = "@class.outer", desc = "Next class end" },
+			["]K"] = { query = "@class.outer", desc = "Next class end" },
 			["]I"] = { query = "@conditional.outer", desc = "Next conditional end" },
 			["]O"] = { query = "@loop.outer", desc = "Next loop end" },
 			["]X"] = { query = "@exception.outer", desc = "Next try/except block end" },
@@ -125,7 +125,7 @@ return {
 		local move_prev_start = {
 			["[f"] = { query = "@call.outer", desc = "Previous function call start" },
 			["[m"] = { query = "@function.outer", desc = "Previous method/function def start" },
-			["[c"] = { query = "@class.outer", desc = "Previous class start" },
+			["[k"] = { query = "@class.outer", desc = "Previous class start" },
 			["[i"] = { query = "@conditional.outer", desc = "Previous conditional start" },
 			["[o"] = { query = "@loop.outer", desc = "Previous loop start" },
 			["[x"] = { query = "@exception.outer", desc = "Previous try/except block start" },
@@ -134,7 +134,7 @@ return {
 		local move_prev_end = {
 			["[F"] = { query = "@call.outer", desc = "Previous function call end" },
 			["[M"] = { query = "@function.outer", desc = "Previous method/function def end" },
-			["[C"] = { query = "@class.outer", desc = "Previous class end" },
+			["[K"] = { query = "@class.outer", desc = "Previous class end" },
 			["[I"] = { query = "@conditional.outer", desc = "Previous conditional end" },
 			["[O"] = { query = "@loop.outer", desc = "Previous loop end" },
 			["[X"] = { query = "@exception.outer", desc = "Previous try/except block end" },
@@ -216,6 +216,18 @@ return {
 		vim.keymap.set({ "n", "x", "o" }, "[l", function()
 			move_loc({ forward = false })
 		end, { desc = "Previous location list item" })
+
+		-- Spelling: wrap the built-in ]s/[s so ; and , repeat them too
+		local move_spell = make_repeatable(function(opts)
+			vim.cmd("normal! " .. vim.v.count1 .. (opts.forward and "]s" or "[s"))
+		end)
+
+		vim.keymap.set({ "n", "x", "o" }, "]s", function()
+			move_spell({ forward = true })
+		end, { desc = "Next misspelled word" })
+		vim.keymap.set({ "n", "x", "o" }, "[s", function()
+			move_spell({ forward = false })
+		end, { desc = "Previous misspelled word" })
 
 		-- Repeatable moves
 		vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)

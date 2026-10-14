@@ -4,6 +4,27 @@ vim.keymap.set("i", "<C-CR>", "<C-o>o", { desc = "Insert line below without spli
 
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlights" })
 
+-- [[ Spelling ]]
+-- Markdown turns spell on by itself (config.lua); this flips it anywhere.
+vim.keymap.set("n", "<leader>us", function()
+	vim.opt_local.spell = not vim.wo.spell
+	vim.notify(
+		"Spell check: " .. (vim.wo.spell and "ON" or "OFF") .. " (this buffer)",
+		vim.log.levels.INFO,
+		{ title = "Spell" }
+	)
+end, { desc = "Toggle spell check (buffer)" })
+
+-- Suggestions in a fuzzy picker; a count (1z=) still takes that suggestion
+-- straight away, like the built-in.
+vim.keymap.set("n", "z=", function()
+	if vim.v.count > 0 then
+		vim.cmd("normal! " .. vim.v.count .. "z=")
+	else
+		require("fzf-lua").spell_suggest()
+	end
+end, { desc = "Spelling suggestions" })
+
 -- [[ Diagnostics ]]
 -- Defined here (not inside lsp.lua's lazy-loaded config) so they exist
 -- even before any LSP client has attached.
