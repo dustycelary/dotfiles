@@ -18,14 +18,15 @@
 # Monaspace ships Regular/Bold/Italic — leave font-style at default.
 # NF build already includes Nerd Font icons.
 # font-family = scientifica
-# font-family = UbuntuMono Nerd Font
+font-family = UbuntuMono Nerd Font
+# font-family = 0xProto Nerd Font
 
-font-size = 14
+font-size = 16
 
-font-family = Iosevka Fergus
+# font-family = Iosevka Fergus
 # font-family-bold = "Iosevka Fergus"
 # font-style-bold = "SemiBold"
-# font-size = 14
+# font-thicken = true
 
 
 
@@ -36,7 +37,6 @@ font-feature = calt
 font-feature = liga
 
 # Monaspace Regular is correct weight — keep crisp.
-# font-thicken = true
 
 # Monaspace metrics are roomy already, no extra leading needed.
 adjust-cell-height = 0%
@@ -109,7 +109,7 @@ mouse-hide-while-typing = true
 # 6. SYSTEM & CLIPBOARD
 # ------------------------------------------------------------------------------
 scrollback-limit = 50000
-shell-integration-features = no-cursor,sudo,no-title
+shell-integration-features = ssh-terminfo,ssh-env,no-cursor,sudo,no-title
 
 copy-on-select = clipboard
 clipboard-read = allow

@@ -183,6 +183,52 @@ if command -v pyenv >/dev/null 2>&1; then
   fi
 fi
 
+# Auto-activate the nearest .venv (searching upward) on cd, and deactivate it
+# on leaving the project. Only touches venvs this hook activated — one you
+# `source`d by hand stays active until you deactivate it yourself.
+_auto_venv() {
+  local dir=$PWD venv=
+  while :; do
+    [[ -f $dir/.venv/bin/activate ]] && { venv=$dir/.venv; break; }
+    [[ $dir == / ]] && break
+    dir=${dir:h}
+  done
+  [[ $venv == "$VIRTUAL_ENV" ]] && return
+  if [[ -n $_AUTO_VENV && $VIRTUAL_ENV == "$_AUTO_VENV" ]] && (( $+functions[deactivate] )); then
+    deactivate
+    unset _AUTO_VENV
+  fi
+  if [[ -n $venv && -z $VIRTUAL_ENV ]]; then
+    source "$venv/bin/activate"
+    _AUTO_VENV=$venv
+  fi
+}
+autoload -Uz add-zsh-hook
+add-zsh-hook chpwd _auto_venv
+_auto_venv
+
+# List the new directory after every cd (also z, cd -, popd). Big directories
+# stop after AUTO_LS_LINES grid rows plus an item count. Skipped when stdout
+# isn't a terminal, so $(cd foo && pwd) doesn't capture the listing.
+AUTO_LS_LINES=${AUTO_LS_LINES:-6}
+_auto_ls() {
+  [[ -t 1 ]] || return
+  local -a out
+  if (( $+commands[eza] )); then
+    out=(${(f)"$(eza --grid --icons --group-directories-first --color=always -w $COLUMNS 2>/dev/null)"})
+  else
+    out=(${(f)"$(COLUMNS=$COLUMNS command ls -C 2>/dev/null)"})
+  fi
+  if (( ${#out} <= AUTO_LS_LINES )); then
+    (( ${#out} )) && print -rl -- $out
+    return
+  fi
+  print -rl -- "${(@)out[1,AUTO_LS_LINES]}"
+  local -a items=( *(N) )
+  print -P "%F{8}… ${#items} items — ls for the rest%f"
+}
+add-zsh-hook chpwd _auto_ls
+
 
 # -----------------------------------------------------------------------------
 # Small helper functions
@@ -211,26 +257,72 @@ f() {
   [[ -n "$result" ]] && dirname "$result" | pbcopy
 }
 
-# Move files to a recoverable trash directory (macOS ~/.Trash, Linux XDG Trash).
+# Move files to the trash. Prefers the system tool (macOS 15+ /usr/bin/trash,
+# gio, trash-cli) so Finder's "Put Back" works; otherwise a plain mv into
+# ~/.Trash or the XDG trash dir.
 t() {
   setopt localoptions null_glob
-  local trash_dir="${TRASH_DIR:-}"
-  if [[ -z "$trash_dir" ]]; then
-    if [[ -d "$HOME/.Trash" ]]; then
-      trash_dir="$HOME/.Trash"
-    else
-      trash_dir="${XDG_DATA_HOME:-$HOME/.local/share}/Trash/files"
-    fi
-  fi
-  mkdir -p "$trash_dir"
   local p
+  local -a files
   for p in "$@"; do
-    if [[ -e "$p" ]]; then
-      mv "$p" "$trash_dir/${p:t} $(date +%H%M%S)-$RANDOM" && echo "trashed: $p"
+    if [[ -e "$p" || -L "$p" ]]; then
+      [[ "$p" == -* ]] && p="./$p"
+      files+=("$p")
     else
       echo "t: no such file: $p" >&2
     fi
   done
+  (( ${#files} )) || return 1
+
+  if [[ -x /usr/bin/trash ]]; then
+    /usr/bin/trash "${files[@]}" || return
+  elif (( $+commands[gio] )) && [[ "$OSTYPE" != darwin* ]]; then
+    gio trash "${files[@]}" || return
+  elif (( $+commands[trash-put] )); then
+    trash-put "${files[@]}" || return
+  else
+    local trash_dir="${TRASH_DIR:-}"
+    if [[ -z "$trash_dir" ]]; then
+      if [[ -d "$HOME/.Trash" ]]; then
+        trash_dir="$HOME/.Trash"
+      else
+        trash_dir="${XDG_DATA_HOME:-$HOME/.local/share}/Trash/files"
+      fi
+    fi
+    mkdir -p "$trash_dir"
+    for p in "${files[@]}"; do
+      mv "$p" "$trash_dir/${p:t} $(date +%H%M%S)-$RANDOM" || return
+    done
+  fi
+  printf 'trashed: %s\n' "${files[@]}"
+}
+
+# rm sends to the trash in interactive shells. Flags (-r, -f, -i, ...) are
+# accepted and ignored, except -f still silences missing-file errors. Scripts
+# don't read .zshrc, so they keep the real rm; here use `command rm` or `\rm`.
+rm() {
+  local p force=0 opts_done=0
+  local -a files
+  for p in "$@"; do
+    if (( ! opts_done )) && [[ "$p" == -* ]]; then
+      if [[ "$p" == -- ]]; then
+        opts_done=1
+      elif [[ "$p" == --force || ( "$p" != --* && "$p" == *f* ) ]]; then
+        force=1
+      fi
+      continue
+    fi
+    if (( force )) && [[ ! -e "$p" && ! -L "$p" ]]; then
+      continue
+    fi
+    files+=("$p")
+  done
+  if (( ! ${#files} )); then
+    (( force )) && return 0
+    echo "rm: missing operand" >&2
+    return 1
+  fi
+  t "${files[@]}"
 }
 L=~/Library
 
@@ -372,6 +464,39 @@ alias sp_rag='docker exec -it postgres psql -U dev_user -d spotify_rag'
 alias qn_s='nvim ~/Documents/Notes/QuickNote/scratch.md'
 alias fsearch='/Users/fungus/Developer/scripts/alfred-fzf-content-search.zsh'
 alias j='jump'
+
+
+
+genftree () {
+  local root readme tree_out
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "Not in a git repo" >&2; return 1; }
+  readme="$root/${1:-README.md}"
+
+  grep -q '<!-- tree-start -->' "$readme" || { echo "No tree markers in $readme" >&2; return 1; }
+
+  # Build the tree BEFORE creating the .tmp file, so it doesn't appear in the output
+  tree_out="$(cd "$root" && git ls-files --cached --others --exclude-standard \
+    | tree --fromfile -a --dirsfirst --noreport .)" || return 1
+
+  TREE="$tree_out" awk '
+  /<!-- tree-start -->/ { print; print "```text"; print ENVIRON["TREE"]; print "```"; skip=1; next }
+  /<!-- tree-end -->/   { skip=0 }
+  !skip
+  ' "$readme" > "$readme.tmp" && mv "$readme.tmp" "$readme"
+
+  echo "Updated $readme"
+}
+alias genftree='genftree'
+
+
+gendiagram() {
+    python  /Users/fungus/Developer/scripts/generate_mermaid_diagram.py "${1:-.}"
+}
+alias genmpic='gendiagram'
+
+
+
+
 
 # for homelab help
 # Media directory base path
