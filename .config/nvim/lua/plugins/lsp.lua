@@ -30,10 +30,6 @@ return {
 		event = { "BufReadPre", "BufNewFile" },
 		dependencies = { "b0o/schemastore.nvim" },
 		config = function()
-			-- Disable Neovim's built-in gr*/gO/K/<C-S> LSP keymaps; we define our
-			-- own <leader>c* mappings below instead.
-			vim.g.lsp_no_default_keymaps = true
-
 			-- LspInfo command
 			local function lsp_info()
 				local clients = vim.lsp.get_clients({ bufnr = 0 })
@@ -115,9 +111,8 @@ return {
 								autoSearchPaths = true,
 								useLibraryCodeForTypes = true,
 								indexing = true,
+								-- REMOVED .venv and venv from ignore so Basedpyright can read them!
 								ignore = {
-									"**/.venv",
-									"**/venv",
 									"**/node_modules",
 									"**/__pycache__",
 									"**/build",
@@ -178,6 +173,14 @@ return {
 			vim.api.nvim_create_autocmd("LspAttach", {
 				callback = function(args)
 					local b = args.buf
+					-- <leader>ul turned LSP off for this buffer: keep servers from
+					-- re-attaching (e.g. after :e or a server restart).
+					if vim.b[b].lsp_disabled then
+						vim.schedule(function()
+							vim.lsp.buf_detach_client(b, args.data.client_id)
+						end)
+						return
+					end
 
 					vim.keymap.set("n", "<leader>cd", function()
 						require("fzf-lua").lsp_definitions({ jump1 = true })
@@ -226,6 +229,24 @@ return {
 					)
 				end,
 			})
+
+			-- Per-buffer LSP toggle. Re-enabling re-fires vim.lsp.enable's FileType
+			-- autocmd, which reuses running clients or starts new ones as needed.
+			vim.keymap.set("n", "<leader>ul", function()
+				local b = vim.api.nvim_get_current_buf()
+				if vim.b[b].lsp_disabled then
+					vim.b[b].lsp_disabled = nil
+					pcall(vim.api.nvim_exec_autocmds, "FileType", { group = "nvim.lsp.enable", buffer = b })
+					vim.notify("LSP: ON (this buffer)", vim.log.levels.INFO, { title = "LSP" })
+				else
+					vim.b[b].lsp_disabled = true
+					for _, client in ipairs(vim.lsp.get_clients({ bufnr = b })) do
+						vim.lsp.buf_detach_client(b, client.id)
+					end
+					vim.diagnostic.reset(nil, b)
+					vim.notify("LSP: OFF (this buffer)", vim.log.levels.INFO, { title = "LSP" })
+				end
+			end, { desc = "Toggle LSP (buffer)" })
 
 			local virtual_text_enabled = false
 			vim.keymap.set("n", "<leader>uV", function()
@@ -278,9 +299,17 @@ return {
 					if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
 						return
 					end
-					return { timeout_ms = 500, lsp_fallback = true }
+					return { timeout_ms = 500, lsp_format = "fallback" }
 				end,
 			})
+			vim.keymap.set("n", "<leader>uf", function()
+				vim.b.disable_autoformat = not vim.b.disable_autoformat
+				vim.notify(
+					"Format on save: " .. (vim.b.disable_autoformat and "OFF" or "ON") .. " (this buffer)",
+					vim.log.levels.INFO,
+					{ title = "Format" }
+				)
+			end, { desc = "Toggle format on save (buffer)" })
 			vim.keymap.set("n", "<leader>cf", function()
 				require("conform").format({ async = true })
 			end, { desc = "Format buffer" })

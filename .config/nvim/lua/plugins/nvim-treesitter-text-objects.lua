@@ -110,7 +110,6 @@ return {
 			["]i"] = { query = "@conditional.outer", desc = "Next conditional start" },
 			["]o"] = { query = "@loop.outer", desc = "Next loop start" },
 			["]x"] = { query = "@exception.outer", desc = "Next try/except block start" },
-			["]s"] = { query = "@scope", query_group = "locals", desc = "Next scope" },
 			["]z"] = { query = "@fold", query_group = "folds", desc = "Next fold" },
 		}
 

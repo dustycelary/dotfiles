@@ -87,7 +87,7 @@ local function dir_actions(resolve)
 		["default"] = function(selected)
 			vim.cmd.edit(vim.fn.fnameescape(resolve(selected)))
 		end,
-		["alt-f"] = function(selected)
+		["alt-e"] = function(selected)
 			goto_files(resolve(selected))
 		end,
 		["alt-s"] = function(selected)
@@ -280,7 +280,7 @@ return {
 			["alt-b"] = fzf.actions.toggle_hidden,
 
 			-- Same trio as dir pickers, scoped to the entry's directory.
-			["alt-f"] = with_dir(goto_files),
+			["alt-e"] = with_dir(goto_files),
 			["alt-s"] = with_dir(goto_grep),
 			["alt-c"] = with_dir(cd),
 		}

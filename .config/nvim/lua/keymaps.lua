@@ -20,10 +20,6 @@ vim.keymap.set("n", "]e", function()
 	vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR })
 end, { desc = "Next error" })
 
--- [[ Clipboard ]]
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank clipboard" })
-vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste clipboard" })
-
 -- [[ Windows ]]
 vim.keymap.set("n", "<leader>ws", "<C-w>s", { desc = "Split horizontal" })
 vim.keymap.set("n", "<leader>wv", "<C-w>v", { desc = "Split vertical" })

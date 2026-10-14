@@ -214,7 +214,7 @@ function M.pick()
 			-- picker (see plugins/fzf-lua.lua): act on the entry's directory —
 			-- the bookmark itself when it is one, its parent when it's a file —
 			-- rather than opening the entry.
-			["alt-f"] = act("find files under bookmark", function(sel)
+			["alt-e"] = act("find files under bookmark", function(sel)
 				local dir = bookmark_dir(sel)
 				if dir then
 					vim.schedule(function()

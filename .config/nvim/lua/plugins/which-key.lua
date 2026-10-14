@@ -57,6 +57,9 @@ return {
 				{ plugin = "vim-sandwich", icon = "", color = "purple" },
 				{ plugin = "flash.nvim", icon = "", color = "yellow" },
 				{ plugin = "smart-splits.nvim", icon = "", color = "blue" },
+				{ plugin = "neotest", icon = "󰙨", color = "green" },
+				{ plugin = "grug-far.nvim", icon = "", color = "orange" },
+				{ plugin = "yanky.nvim", icon = "", color = "yellow" },
 
 				-- Then desc patterns, specific → general.
 				{ pattern = "bookmark", icon = "", color = "yellow" },
@@ -106,7 +109,9 @@ return {
 			{ "<leader>n", group = "Swap with next (Treesitter)", icon = "" },
 			{ "<leader>N", group = "Swap with previous (Treesitter)", icon = "" },
 			{ "<leader>q", group = "Quickfix", icon = "" },
+			{ "<leader>r", group = "Replace (grug-far)", icon = "" },
 			{ "<leader>s", group = "Surround", icon = "" },
+			{ "<leader>t", group = "Tests", icon = "󰙨" },
 			{ "<leader>u", group = "UI toggles", icon = "" },
 			{ "<leader>w", group = "Windows & splits", icon = "" },
 			{ "<leader>?", "<cmd>FzfLua keymaps<cr>", desc = "Search all keymaps", icon = "" },

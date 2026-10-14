@@ -33,14 +33,28 @@ return {
 			})
 		end)
 
-		-- enable highlighting
+		-- TS indentation is experimental, so it's opt-in; everything else keeps Nvim's builtin indent
+		-- scripts (e.g. yaml: TS can't indent after a value-less `key:`, GetYAMLIndent can)
+		local ts_indent = {
+			javascript = true,
+			typescript = true,
+			tsx = true,
+			svelte = true,
+			html = true,
+			css = true,
+		}
+
+		-- enable highlighting, plus indentation for ts_indent languages
 		vim.api.nvim_create_autocmd("FileType", {
 			pattern = "*",
 			callback = function(args)
 				local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
-				if lang then
-					-- Enables highlighting
-					pcall(vim.treesitter.start, args.buf, lang)
+				if not lang then
+					return
+				end
+				pcall(vim.treesitter.start, args.buf, lang)
+				if ts_indent[lang] and pcall(vim.treesitter.query.get, lang, "indents") then
+					vim.bo[args.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
 				end
 			end,
 		})

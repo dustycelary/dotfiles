@@ -15,7 +15,7 @@ return {
 					percentage = 0.15,
 				},
 				integrations = {
-					cmp = true,
+					blink_cmp = true,
 					gitsigns = true,
 					harpoon = true,
 					indent_blankline = { enabled = true },

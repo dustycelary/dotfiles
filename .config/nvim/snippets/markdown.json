@@ -1,0 +1,9 @@
+{
+  "Todo comment": {
+    "prefix": "tc",
+    "body": [
+      "<!-- ${1|TODO,FIXME,HACK,WARN,PERF,NOTE|}: ${2} -->$0"
+    ],
+    "description": "todo-comments keyword in an HTML comment (<C-l>/<C-h> cycle keyword)"
+  }
+}

@@ -23,8 +23,9 @@ return {
 		config = function()
 			local luasnip = require("luasnip")
 
+			-- No history: a finished snippet stops being jumpable, so <Tab> elsewhere
+			-- can't teleport the cursor back into it.
 			luasnip.config.setup({
-				history = true,
 				update_events = "TextChanged,TextChangedI",
 				delete_check_events = "TextChanged",
 			})
@@ -33,21 +34,22 @@ return {
 			require("luasnip.loaders.from_vscode").lazy_load({
 				paths = { vim.fn.stdpath("config") .. "/snippets" },
 			})
-			require("luasnip.loaders.from_lua").lazy_load({
-				paths = { vim.fn.stdpath("config") .. "/snippets" },
-			})
 
+			-- expr maps so the key falls through to its normal behaviour (e.g. <C-h>
+			-- = backspace) when no choice node is active.
 			vim.keymap.set({ "i", "s" }, "<C-l>", function()
 				if luasnip.choice_active() then
-					luasnip.change_choice(1)
+					return "<Plug>luasnip-next-choice"
 				end
-			end, { desc = "Next snippet choice" })
+				return "<C-l>"
+			end, { expr = true, remap = true, desc = "Next snippet choice" })
 
 			vim.keymap.set({ "i", "s" }, "<C-h>", function()
 				if luasnip.choice_active() then
-					luasnip.change_choice(-1)
+					return "<Plug>luasnip-prev-choice"
 				end
-			end, { desc = "Previous snippet choice" })
+				return "<C-h>"
+			end, { expr = true, remap = true, desc = "Previous snippet choice" })
 		end,
 	},
 	-- 3. Supermaven AI inline completion (DISABLED: change enabled = true to turn back on)
@@ -83,7 +85,7 @@ return {
 	-- 4. Next-Gen Autocompletion Engine (blink.cmp)
 	{
 		"saghen/blink.cmp",
-		dependencies = { "rafamadriz/friendly-snippets", "L3MON4D3/LuaSnip" },
+		dependencies = { "L3MON4D3/LuaSnip" },
 		version = "*",
 		opts = {
 			keymap = {
@@ -92,8 +94,11 @@ return {
 				preset = "enter",
 				["<C-y>"] = { "select_and_accept" },
 				["<M-Space>"] = { "show", "show_documentation", "hide_documentation" },
-				["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
-				["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+				-- Snippet jumps win over menu navigation, so <Tab> still moves to the
+				-- next placeholder when the menu pops up mid-snippet (use <C-n>/<C-p>
+				-- to move through the menu while inside a snippet).
+				["<Tab>"] = { "snippet_forward", "select_next", "fallback" },
+				["<S-Tab>"] = { "snippet_backward", "select_prev", "fallback" },
 			},
 			appearance = {
 				nerd_font_variant = "mono",

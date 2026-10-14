@@ -36,21 +36,6 @@ vim.opt.autoindent = true -- Keep indentation from previous line
 vim.opt.smarttab = true
 -- vim.opt.smartindent = true
 vim.opt.expandtab = true -- Convert tabs to spaces by default
-
--- Use treesitter's indentexpr where a parser provides one (falls back to autoindent)
-_G.__ts_indentexpr = function()
-	return require("nvim-treesitter").indentexpr()
-end
-vim.api.nvim_create_autocmd("FileType", {
-	group = vim.api.nvim_create_augroup("UserTreesitterIndent", { clear = true }),
-	pattern = "*",
-	callback = function(args)
-		local lang = vim.treesitter.language.get_lang(vim.bo[args.buf].filetype)
-		if lang and pcall(vim.treesitter.query.get, lang, "indents") then
-			vim.bo[args.buf].indentexpr = "v:lua.__ts_indentexpr()"
-		end
-	end,
-})
 vim.opt.tabstop = 4 -- Number of spaces that a <Tab> in the file counts for
 vim.opt.shiftwidth = 4 -- Size of an indent
 vim.opt.softtabstop = 4 -- Number of spaces that a <Tab> counts for while performing editing operations
@@ -59,7 +44,11 @@ vim.opt.undofile = true
 vim.opt.scrolloff = 8
 vim.opt.sidescrolloff = 8
 vim.opt.cursorline = true
--- vim.opt.clipboard = "unnamedplus" -- Use system clipboard by default
+-- y/d/c/p use the system clipboard. Scheduled so the clipboard provider
+-- check (pbcopy, OSC 52 over SSH) stays off the startup path.
+vim.schedule(function()
+	vim.opt.clipboard = "unnamedplus"
+end)
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
@@ -75,7 +64,15 @@ vim.opt.timeoutlen = 300
 vim.opt.wrap = false
 
 vim.opt.winborder = "rounded" -- default border for all floating windows (hover, oil, bqf, etc.)
-vim.opt.fillchars = { vert = "│", horiz = "─", verthoriz = "┼", horizup = "┴", horizdown = "┬", vertleft = "┤", vertright = "├" }
+vim.opt.fillchars = {
+	vert = "│",
+	horiz = "─",
+	verthoriz = "┼",
+	horizup = "┴",
+	horizdown = "┬",
+	vertleft = "┤",
+	vertright = "├",
+}
 vim.opt.inccommand = "nosplit" -- live preview :s and cmdline commands
 vim.opt.splitkeep = "screen" -- keep text on screen steady when splitting/closing
 vim.opt.completeopt = { "menuone", "noselect" }
@@ -101,3 +98,17 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.formatoptions:remove("o")
 	end,
 })
+
+-- Spell check prose. Treesitter limits it to text, so code blocks and URLs
+-- aren't flagged. ]s/[s next/previous typo, z= suggestions, zg add word.
+vim.api.nvim_create_autocmd("FileType", {
+	group = user_config_group,
+	pattern = "markdown",
+	callback = function()
+		vim.opt_local.spell = true
+		vim.opt_local.spelllang = "en_us"
+	end,
+})
+
+vim.opt.title = true
+vim.opt.titlestring = "nvim: %{expand('%:p')}"
